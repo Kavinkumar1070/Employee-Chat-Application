@@ -4,6 +4,7 @@ from src.core.database import SessionLocal
 from src.crud.personal import create_employee, get_employee, update_employee, delete_employee
 from src.schemas.personal import EmployeeCreate,EmployeeUpdate
 from typing import List, Optional
+from src.core.utils import normalize_string
 from datetime import datetime
 
 router = APIRouter(
@@ -29,7 +30,13 @@ def convert_date_format(date_str):
 
 @router.post("/employees/")
 def create_employee_route(employee: EmployeeCreate, db: Session = Depends(get_db)):
-    # employee.DateOfBirth = convert_date_format(employee.DateOfBirth)
+    employee.firstname = normalize_string(employee.firstname)
+    employee.lastname = normalize_string(employee.lastname)
+    employee.address = normalize_string(employee.address)
+    employee.nationality = normalize_string(employee.nationality)
+    employee.gender = normalize_string(employee.gender)
+    employee.maritalstatus = normalize_string(employee.maritalstatus)
+    employee.emailaddress = normalize_string(employee.emailaddress)
     return create_employee(db, employee)
 
 

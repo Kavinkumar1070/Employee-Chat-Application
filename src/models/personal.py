@@ -1,19 +1,22 @@
-from sqlalchemy import Column, Integer, String, Date, Text
+from sqlalchemy import Column, Integer, String, Date, Text,BigInteger,DateTime
 from sqlalchemy.orm import relationship
 from src.core.database import Base
+from datetime import datetime
 
 class EmployeeOnboarding(Base):
     __tablename__ = 'employee_onboarding'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    FirstName = Column(String(100), nullable=False)
-    LastName = Column(String(100), nullable=False)
-    DateOfBirth = Column(Date, nullable=False)
-    ContactNumber = Column(String(15), nullable=False)
-    EmailAddress = Column(String(100), nullable=False)
-    Address = Column(Text, nullable=False)
-    Nationality = Column(String(50), nullable=False)
-    Gender = Column(String(10))
-    MaritalStatus = Column(String(50))
+    firstname = Column(String(100), nullable=False)
+    lastname = Column(String(100), nullable=False)
+    dateofbirth = Column(Date, nullable=False)
+    contactnumber = Column(BigInteger, nullable=False)
+    emailaddress = Column(String(100), nullable=False)
+    address = Column(Text, nullable=False)
+    nationality = Column(String(50), nullable=False)
+    gender = Column(String(10))
+    maritalstatus = Column(String(50))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     employment_details = relationship("EmployeeEmploymentDetails", back_populates="employee") 

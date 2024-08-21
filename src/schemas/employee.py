@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,EmailStr
 from typing import Optional
 from datetime import date
 
@@ -17,13 +17,14 @@ class EmployeeEmploymentDetailsCreate(EmployeeEmploymentDetailsBase):
     pass
 
 class EmployeeEmploymentDetailsUpdate(BaseModel):
-    employment_id: str
+    employment_id: str ="cds0001"
     job_position: str |None=None
     department: str    |None=None
     start_date: date     |None=None
     employment_type: str     |None=None
     reporting_manager: Optional[str] =None
     work_location: Optional[str] =None
+    employee_email: Optional[EmailStr] =None
     basic_salary: Optional[float] =None
 
 class EmployeeEmploymentDetails(EmployeeEmploymentDetailsBase):

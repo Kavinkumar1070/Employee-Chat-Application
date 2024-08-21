@@ -1,28 +1,46 @@
-from pydantic import BaseModel,Field
+from pydantic import BaseModel, validator, ValidationError,Field,EmailStr
 from typing import Optional
 from datetime import date
 
+
 class EmployeeBase(BaseModel):
-    FirstName: str
-    LastName: str
-    DateOfBirth: date = Field(..., example="1990-05-15") 
-    ContactNumber: str
-    EmailAddress: str
-    Address: str
-    Nationality: str
-    Gender: str
-    MaritalStatus: str
+    firstname: str
+    lastname: str
+    dateofbirth: date = Field(..., example="1990-05-15") 
+    contactnumber: int
+    emailaddress: EmailStr  
+    address: str
+    nationality: str
+    gender: str
+    maritalstatus: str
+
+    @validator('contactNumber',check_fields=False)
+    def validate_phone_number(cls, value):
+        # Convert the integer to a string to validate its length
+        contact_number_str = str(value)
+        if not (10 <= len(contact_number_str) <= 12):
+            raise ValueError('Invalid phone number length. Phone number must be between 9 and 12 digits.')
+        return value
 
 class EmployeeCreate(EmployeeBase):
     pass
 
 class EmployeeUpdate(BaseModel):
-    FirstName: str |None=None
-    LastName: str |None=None
-    DateOfBirth: date = Field(None, example="1990-05-15")  
-    ContactNumber: str |None=None
-    EmailAddress: str |None=None
-    Address: str |None=None
-    Nationality: str |None=None
-    Gender: str |None=None
-    MaritalStatus: str |None=None
+    firstname: Optional[str] = None
+    lastname: Optional[str] = None
+    dateofbirth: Optional[date] = Field(None, example="1990-05-15")  
+    contactnumber: Optional[int] = None
+    emailaddress: Optional[EmailStr] = None
+    address: Optional[str] = None
+    nationality: Optional[str] = None
+    gender: Optional[str] = None
+    maritalstatus: Optional[str] = None
+
+    @validator('contactnumber', check_fields=False)
+    def validate_phone_number(cls, value):
+        if value is None:
+            return value  # Skip validation if the value is None
+        contact_number_str = str(value)
+        if not (10 <= len(contact_number_str) <= 12):
+            raise ValueError('Invalid phone number length. Phone number must be between 9 and 12 digits.')
+        return value

@@ -3,6 +3,7 @@ from src.models.employee import EmployeeEmploymentDetails
 from src.models.personal import EmployeeOnboarding
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import date
+from fastapi import HTTPException,status
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -13,12 +14,17 @@ def create_employee_employment_details(db: Session, employee_employment_data:Emp
     try:
         employee_onboarding = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.id == employee_employment_data.employment_id).first()
         if not employee_onboarding:
-            raise ValueError(f"No EmployeeOnboarding record found for id {employee_employment_data.employment_id}")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"No EmployeeOnboarding record found for id {employee_employment_data.employment_id}")
 
-        employment_id = f"CDS{str(employee_employment_data.employment_id).zfill(4)}"
-       
+        employment_id = f"cds{str(employee_employment_data.employment_id).zfill(4)}"
+        employment_details=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employment_id==employment_id).first()
+        if employment_details:
+            raise HTTPException(status_code=status.HTTP_208_ALREADY_REPORTED,detail=f"Employee is Already in employment_id '{employment_id}',for this Employee_onboarding '{employee_employment_data.employment_id}' ")
+        email_address = f"{employee_onboarding.firstname.lower()}{employee_onboarding.lastname.lower()}@conversedatasolution.com"
+
         new_employment_details = EmployeeEmploymentDetails(
             employment_id=employment_id,  
+            employee_email=email_address,
             job_position=employee_employment_data.job_position,
             department=employee_employment_data.department,
             start_date=employee_employment_data.start_date,
