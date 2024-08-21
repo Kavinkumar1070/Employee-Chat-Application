@@ -9,8 +9,6 @@ def create_employee(db: Session, employee: EmployeeCreate):
     db.refresh(db_employee)
     return db_employee
 
-def get_employees(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(EmployeeOnboarding).offset(skip).limit(limit).all()
 
 def get_employee(db: Session, employee_id: int):
     return db.query(EmployeeOnboarding).filter(EmployeeOnboarding.id == employee_id).first()

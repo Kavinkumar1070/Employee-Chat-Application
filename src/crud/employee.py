@@ -13,10 +13,10 @@ def create_employee_employment_details(db: Session, employee_employment_data:Emp
     try:
         employee_onboarding = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.id == employee_employment_data.employment_id).first()
         if not employee_onboarding:
-            raise ValueError(f"No EmployeeOnboarding record found for id {employee_employment_data.get('id')}")
+            raise ValueError(f"No EmployeeOnboarding record found for id {employee_employment_data.employment_id}")
 
         employment_id = f"CDS{str(employee_employment_data.employment_id).zfill(4)}"
-        print(employment_id)
+       
         new_employment_details = EmployeeEmploymentDetails(
             employment_id=employment_id,  
             job_position=employee_employment_data.job_position,
@@ -41,8 +41,6 @@ def create_employee_employment_details(db: Session, employee_employment_data:Emp
         raise
 
 
-def get_employee_employment_details(db: Session, employee_id: int):
-    return db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employment_id == employee_id).first()
 
 def get_all_employee_employment_details(db: Session, employee_id: int):
     emp= db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employment_id == employee_id).first()

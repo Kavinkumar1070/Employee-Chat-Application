@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from src.core.database import get_db
 from src.crud.employee import(
     create_employee_employment_details,
-    get_employee_employment_details,
     update_employee_employment_details,
     delete_employee_employment_details,
     get_all_employee_employment_details
@@ -25,12 +24,7 @@ def create_employee(employee_employment: EmployeeEmploymentDetailsCreate, db: Se
     db_employee = create_employee_employment_details(db,employee_employment)
     return db_employee
 
-@router.get("/employees/{employee_id}")
-def read_employee(employee_id: str, db: Session = Depends(get_db)):
-    db_employee = get_employee_employment_details(db, employee_id=employee_id)
-    if db_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
-    return db_employee
+
 
 @router.get("/all-employees/{employee_id}")
 def read_all_employee(employee_id: str, db: Session = Depends(get_db)):

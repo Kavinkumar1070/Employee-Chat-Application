@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.core.database import SessionLocal
-from src.crud.personal import create_employee, get_employees, get_employee, update_employee, delete_employee
+from src.crud.personal import create_employee, get_employee, update_employee, delete_employee
 from src.schemas.personal import EmployeeCreate,EmployeeUpdate
 from typing import List, Optional
 from datetime import datetime
@@ -32,9 +32,7 @@ def create_employee_route(employee: EmployeeCreate, db: Session = Depends(get_db
     # employee.DateOfBirth = convert_date_format(employee.DateOfBirth)
     return create_employee(db, employee)
 
-@router.get("/employees/")
-def read_employees_route(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    return get_employees(db, skip=skip, limit=limit)
+
 
 @router.get("/employees/{employee_id}")
 def read_employee_route(employee_id: int, db: Session = Depends(get_db)):
