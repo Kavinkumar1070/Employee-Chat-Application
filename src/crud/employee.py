@@ -15,7 +15,7 @@ def create_employee_employment_details(db: Session, employee_employment_data:Emp
         if not employee_onboarding:
             raise ValueError(f"No EmployeeOnboarding record found for id {employee_employment_data.get('id')}")
 
-        employment_id = f"CDS{str(employee_employment_data.employment_id).zfill(3)}"
+        employment_id = f"CDS{str(employee_employment_data.employment_id).zfill(4)}"
         print(employment_id)
         new_employment_details = EmployeeEmploymentDetails(
             employment_id=employment_id,  

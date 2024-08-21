@@ -74,6 +74,7 @@ target/
 profile_default/
 ipython_config.py
 
+
 # pyenv
 .python-version
 
@@ -81,13 +82,16 @@ ipython_config.py
 celerybeat-schedule
 
 # dotenv
-.myenv
+env/
+.env
 .venv
-myenv/
+.myenv
+env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -117,6 +121,3 @@ instance/
 # Ignore Alembic migrations
 alembic/
 alembic.ini
-
-
-.env
