@@ -117,3 +117,6 @@ instance/
 # Ignore Alembic migrations
 alembic/
 alembic.ini
+
+
+.env
