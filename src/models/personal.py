@@ -1,12 +1,13 @@
-from sqlalchemy import Column, Integer, String, Date, Text,BigInteger,DateTime
+from sqlalchemy import Column, Integer, String, Date, Text, BigInteger, DateTime
 from sqlalchemy.orm import relationship
 from src.core.database import Base
 from datetime import datetime
-
+from .association import employee_role
 class EmployeeOnboarding(Base):
     __tablename__ = 'employee_onboarding'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
+    employment_id = Column(String(100), unique=True)  
     firstname = Column(String(100), nullable=False)
     lastname = Column(String(100), nullable=False)
     dateofbirth = Column(Date, nullable=False)
@@ -19,4 +20,6 @@ class EmployeeOnboarding(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    employment_details = relationship("EmployeeEmploymentDetails", back_populates="employee") 
+    employment_details = relationship("EmployeeEmploymentDetails", back_populates="employee")
+    roles = relationship("Role", secondary=employee_role, back_populates="employees")
+    

@@ -44,3 +44,5 @@ class EmployeeUpdate(BaseModel):
         if not (10 <= len(contact_number_str) <= 12):
             raise ValueError('Invalid phone number length. Phone number must be between 9 and 12 digits.')
         return value
+    
+

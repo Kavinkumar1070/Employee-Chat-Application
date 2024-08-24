@@ -3,12 +3,12 @@ from typing import Optional
 from datetime import date
 
 class EmployeeEmploymentDetailsBase(BaseModel):
-    employment_id:int
+    employment_id:str
     job_position: str
     department: str
     start_date: date
     employment_type: str
-    reporting_manager: Optional[str] 
+    reporting_manager: Optional[int] 
     work_location: Optional[str] 
     basic_salary: Optional[float] 
 
@@ -22,7 +22,7 @@ class EmployeeEmploymentDetailsUpdate(BaseModel):
     department: str    |None=None
     start_date: date     |None=None
     employment_type: str     |None=None
-    reporting_manager: Optional[str] =None
+    reporting_manager: Optional[int] =None
     work_location: Optional[str] =None
     employee_email: Optional[EmailStr] =None
     basic_salary: Optional[float] =None
@@ -33,3 +33,7 @@ class EmployeeEmploymentDetails(EmployeeEmploymentDetailsBase):
 
     class Config:
         orm_mode = True
+
+class Login(BaseModel):
+    email:str 
+    password:str
