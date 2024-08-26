@@ -16,6 +16,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 load_dotenv()
 
+
 def normalize_string(value: str) -> str:
 
     if isinstance(value, str):
@@ -28,6 +29,7 @@ def generate_password(suffix: str = "@cds", length: int = 4) -> str:
 
     password = f"{digits}{suffix}"
     return password
+
 
 async def send_email(recipient_email: EmailStr,name:str,lname:str,Email: str, Password:str):
 
@@ -55,6 +57,7 @@ async def send_email(recipient_email: EmailStr,name:str,lname:str,Email: str, Pa
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
+
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)

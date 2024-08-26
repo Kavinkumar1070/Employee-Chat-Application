@@ -48,10 +48,10 @@ def create_employee_employment_details(db: Session, employee_employment_data:Emp
         raise
 
 
-
 def get_all_employee_employment_details(db: Session, employee_id: str):
     emp= db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id).first()
     return emp
+
 
 def update_employee_employment_details(db: Session, updates: EmployeeEmploymentDetailsUpdate):
 
@@ -82,6 +82,7 @@ def update_employee_employment_details(db: Session, updates: EmployeeEmploymentD
     db.commit()
     db.refresh(employee_employment)
     return employee_employment
+
 
 def delete_employee_employment_details(db: Session, employee_id: int):
     employee_employment = db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.id == employee_id).first()

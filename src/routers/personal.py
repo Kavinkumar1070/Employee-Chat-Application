@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from src.core.database import SessionLocal
 from src.crud.personal import create_employee, get_employee, update_employee, delete_employee
 from src.schemas.personal import EmployeeCreate,EmployeeUpdate
-from typing import List, Optional
 from src.core.utils import normalize_string,send_email
 from src.core.authentication import roles_required
 from datetime import datetime
@@ -56,7 +55,6 @@ async def create_employee_route(employee: EmployeeCreate, db: Session = Depends(
     return "Email Send Successfully"
 
 
-
 @router.get("/employees/{employee_id}", dependencies=[Depends(roles_required("admin"))])
 async def read_employee_route(employee_id: str, db: Session = Depends(get_db)):
     db_employee = get_employee(db, employee_id)
@@ -71,6 +69,7 @@ async def update_employee_data(employee_id: str,employee_update: EmployeeUpdate,
     if updated_employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
     return updated_employee
+
 
 @router.delete("/employees/{employee_id}", dependencies=[Depends(roles_required("admin"))])
 async def delete_employee_route(employee_id: str, db: Session = Depends(get_db)):

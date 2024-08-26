@@ -8,6 +8,8 @@ from src.models.role import Role
 from src.schemas.role import EmployeeRole
 from src.models.personal import EmployeeOnboarding
 from src.models.association import employee_role
+
+
 def create(db:Session,name:str):
     role_check=db.query(Role).filter(Role.name==name).first()
     if role_check:
@@ -24,12 +26,12 @@ def get_role(db: Session, role_name: str):
         return role
 
 
-
 def delete(db: Session, db_role:int ):
     role=db.query(Role).filter(Role.id == db_role).first()
     db.delete(role)
     db.commit()
     return {"message": "Role deleted successfully"}
+
 
 def update(db: Session, role_id: int, new_name: str):
     role = db.query(Role).filter(Role.id == role_id).first()
@@ -42,9 +44,11 @@ def update(db: Session, role_id: int, new_name: str):
     except IntegrityError as e:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="role name is already exists")
 
+
 def get(db: Session, role_id: int):
     single_role=db.query(Role).filter(Role.id == role_id).first()
     return single_role
+
 
 def assign_employee_role(db:Session,data:EmployeeRole):
     employee_details=db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id==data.employee_id).first()

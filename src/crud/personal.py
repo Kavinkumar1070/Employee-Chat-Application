@@ -14,10 +14,10 @@ from src.models.association import  employee_role
 
 def create_employee(db: Session, employee: EmployeeCreate):
   
-    # exist_number = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.contactnumber == employee.contactnumber).first()
-    # exist_email = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.emailaddress == employee.emailaddress).first()
-    # if exist_number or exist_email:
-    #     raise HTTPException(status_code=status.HTTP_208_ALREADY_REPORTED, detail="Contact number or email address already exists")
+    exist_number = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.contactnumber == employee.contactnumber).first()
+    exist_email = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.emailaddress == employee.emailaddress).first()
+    if exist_number or exist_email:
+        raise HTTPException(status_code=status.HTTP_208_ALREADY_REPORTED, detail="Contact number or email address already exists")
 
     new_details = EmployeeOnboarding(
         firstname=employee.firstname,

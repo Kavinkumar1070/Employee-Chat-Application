@@ -22,8 +22,10 @@ class EmployeeBase(BaseModel):
             raise ValueError('Invalid phone number length. Phone number must be between 9 and 12 digits.')
         return value
 
+
 class EmployeeCreate(EmployeeBase):
     pass
+
 
 class EmployeeUpdate(BaseModel):
     firstname: Optional[str] = None

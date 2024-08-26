@@ -16,6 +16,7 @@ class EmployeeEmploymentDetailsBase(BaseModel):
 class EmployeeEmploymentDetailsCreate(EmployeeEmploymentDetailsBase):
     pass
 
+
 class EmployeeEmploymentDetailsUpdate(BaseModel):
     employment_id: str ="cds0001"
     job_position: str |None=None
@@ -27,12 +28,14 @@ class EmployeeEmploymentDetailsUpdate(BaseModel):
     employee_email: Optional[EmailStr] =None
     basic_salary: Optional[float] =None
 
+
 class EmployeeEmploymentDetails(EmployeeEmploymentDetailsBase):
     id: int
     employment_id: str
 
     class Config:
         orm_mode = True
+
 
 class Login(BaseModel):
     email:str 
