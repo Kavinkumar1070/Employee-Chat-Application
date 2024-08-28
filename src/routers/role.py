@@ -57,10 +57,10 @@ async def get_role(id:int,db:Session=Depends(get_db)):
     return role
 
 
-@router.post("employee/role")
+@router.post("employee/role", dependencies=[Depends(roles_required("admin"))])
 def assign_role_to_employee(data:EmployeeRole,db:Session=Depends(get_db)):
     data=assign_employee_role(db,data)
     if data:
-        return {"message":"Role Updated Successfully to  Employee"}
+        return data
     
 

@@ -70,6 +70,6 @@ def assign_employee_role(db:Session,data:EmployeeRole):
         insert_statement = insert(employee_role).values(new_employee_role)
         db.execute(insert_statement)
         db.commit() 
-    return new_employee_role
-
+        return {"message":"Role Updated Successfully to Employee"}
+    return {"message":"Role already exists to employee"}
 
