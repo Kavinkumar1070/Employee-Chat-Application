@@ -8,7 +8,7 @@ class EmployeeEmploymentDetailsBase(BaseModel):
     department: str
     start_date: date
     employment_type: str
-    reporting_manager: Optional[int] 
+    reporting_manager: Optional[str] 
     work_location: Optional[str] 
     basic_salary: Optional[float] 
 
@@ -23,7 +23,7 @@ class EmployeeEmploymentDetailsUpdate(BaseModel):
     department: str    |None=None
     start_date: date     |None=None
     employment_type: str     |None=None
-    reporting_manager: Optional[int] =None
+    reporting_manager: Optional[str] =None
     work_location: Optional[str] =None
     employee_email: Optional[EmailStr] =None
     basic_salary: Optional[float] =None

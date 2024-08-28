@@ -14,7 +14,7 @@ class EmployeeEmploymentDetails(Base):
     department = Column(String(100), nullable=False)
     start_date = Column(Date, nullable=False)
     employment_type = Column(String(50), nullable=False)
-    reporting_manager = Column(Integer)
+    reporting_manager = Column(String)
     work_location = Column(String(100))
     basic_salary = Column(DECIMAL(10, 2))
     releave_date = Column(Date, default=None)

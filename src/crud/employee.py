@@ -18,9 +18,12 @@ def create_employee_employment_details(db: Session, employee_employment_data:Emp
         employee_onboarding = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id == employee_employment_data.employment_id).first()
         if not employee_onboarding:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"No EmployeeOnboarding record found for id {employee_employment_data.employment_id}")
+        reporting_manager = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id == employee_employment_data.reporting_manager).first()
+        if not employee_onboarding:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"No EmployeeOnboarding record found for id {employee_employment_data.reporting_manager}")
         
         inter_data= db.query(employee_role).filter(
-            employee_role.c.employee_id==employee_employment_data.reporting_manager
+            employee_role.c.employee_id==reporting_manager.id
             ).first()
         if not inter_data:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Reporting_manager is Not  Association With the  role")

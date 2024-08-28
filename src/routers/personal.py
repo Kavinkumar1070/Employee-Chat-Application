@@ -63,7 +63,7 @@ async def read_employee_route(employee_id: str, db: Session = Depends(get_db)):
     return db_employee
 
 
-@router.put("/employees/{employee_id}", dependencies=[Depends(roles_required("employee"))])
+@router.put("/employees/{employee_id}", dependencies=[Depends(roles_required("admin"))])
 async def update_employee_data(employee_id: str,employee_update: EmployeeUpdate,db: Session = Depends(get_db)):
     updated_employee = update_employee(db, employee_id, employee_update)
     if updated_employee is None:
