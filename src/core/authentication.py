@@ -10,7 +10,7 @@ from src.core.database import get_db
 from src.core.utils import verify_password
 from src.schemas.authentication import TokenData
 from src.models.personal import EmployeeOnboarding
-from src.models.role import Role
+from src.models.role import Role,RoleFunction
 from src.models.association import employee_role
 from src.models.employee import EmployeeEmploymentDetails
 
@@ -52,6 +52,10 @@ def get_current_employee(
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         employee_id: int = payload.get("sub")
+        expires:datetime = payload.get("exp")
+        #check
+        if datetime.fromtimestamp(expires) < datetime.utcnow():
+            return None
         if employee_id is None:
             raise credentials_exception
         token_data = TokenData(employee_id=employee_id)
@@ -63,6 +67,36 @@ def get_current_employee(
         raise credentials_exception
     return employee
 
+def get_current_user_function(
+        db: Session,
+        token: str = Depends(oauth2_scheme),
+        
+):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authentication": "Bearer"}
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        employee_id: int = payload.get("sub")
+        expires:datetime = payload.get("exp")
+        #check
+        if datetime.fromtimestamp(expires) < datetime.utcnow():
+            return None
+        if employee_id is None:
+            raise credentials_exception
+        token_data = TokenData(employee_id=employee_id)
+    except JWTError:
+        raise credentials_exception
+    
+    employee = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.id == token_data.employee_id).first()
+    role=get_current_employee_roles(employee.id,db)
+    role_functions = db.query(RoleFunction).filter(RoleFunction.role_id == role.id).all()
+    role_function=[role_function.function for role_function in role_functions]
+    role_file=[role_function.jsonfile for role_function in role_functions]
+    print(role_functions)
+    return {"Functions":role_function,"file":role_file}
 
 def authenticate_employee(db: Session, employee_email: str, password: str):
     employee = db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_email == employee_email).first()
@@ -95,7 +129,7 @@ def get_current_employee_roles(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User does not have any assigned roles"
         )
-    return roles.name
+    return roles
 
 
 def roles_required(*required_roles: str):
@@ -111,6 +145,13 @@ def roles_required(*required_roles: str):
 
 
 
+def get_role_functions_by_role_id(db: Session, role_id: int):
+    role_functions = db.query(RoleFunction).filter(RoleFunction.role_id == role_id).all()
+    if not role_functions:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No functions found for the given role ID")
+    
+    return role_functions
+
 @router.post("/token")
 def login_for_access_token(
     db: Session = Depends(get_db),
@@ -125,10 +166,15 @@ def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": str(employee.id)}, expires_delta=access_token_expires
+        data={"sub": str(employee.id),"exp":access_token_expires}
     )
-    role=get_current_employee_roles(employee.id,db,)
-    return {"access_token": access_token, "token_type": "bearer","role":role}
+    role=get_current_employee_roles(employee.id,db)
+    role_functions = db.query(RoleFunction).filter(RoleFunction.role_id == role.id).all()
+    print(role.id)
+    role_function=[role_function.function for role_function in role_functions]
+    role_file=[role_function.jsonfile for role_function in role_functions]
+    print(role_functions)
+    return {"access_token": access_token, "token_type": "bearer","role":role.name,"Functions":role_function,"file":role_file}
 
 
 

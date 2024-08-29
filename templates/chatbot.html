@@ -35,9 +35,11 @@
             const initialMessage = document.getElementById('initial');
 
             const token = localStorage.getItem('token'); // Get the token stored during login
+            console.log(token)
 
             if (token) {
-                fetchProfileInfo(token);
+               fetchProfileInfo(token);
+            
             } else {
                 document.getElementById('welcome-message').innerText = "Welcome!";
             }
@@ -56,7 +58,8 @@
                     }
 
                     const profile = await response.json();
-                    document.getElementById('welcome-message').innerText = `Welcome, ${profile.username}! (Employee ID: ${profile.employee_id})`;
+                    console.log(profile.Functions)
+                    document.getElementById('welcome-message').innerText = `Welcome, ${profile.Functions}! (Employee ID: ${profile.file})`;
 
                 } catch (error) {
                     document.getElementById('welcome-message').innerText = "Welcome!";

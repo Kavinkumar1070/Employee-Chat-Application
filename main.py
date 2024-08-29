@@ -8,6 +8,8 @@ from src.core.authentication import router as auth_router, authenticate_employee
 from pathlib import Path
 from fastapi.responses import HTMLResponse
 from src.core.authentication import *
+from src.core.authentication import oauth2_scheme,get_current_user_function
+
 
 app = FastAPI()
 
@@ -30,3 +32,19 @@ def get():
     if not file_path.exists():
         return HTMLResponse("File not found", status_code=404)
     return HTMLResponse(file_path.read_text())
+
+
+
+    
+@app.get("/profile")
+async def get_profile(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+):
+    db_user =  get_current_user_function(db, token)
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You are not authenticated"
+        )
+    return db_user
