@@ -85,6 +85,18 @@ def get_current_user_roles(
         )
     return [role.name for role in roles]
 
+def get_current_employee_roles(
+    current_user: int,
+    db: Session = Depends(get_db)
+) -> list:
+    roles = db.query(Role).join(employee_role).filter(employee_role.c.employee_id == current_user).all()
+    if not roles:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User does not have any assigned roles"
+        )
+    return [role.name for role in roles]
+
 
 def roles_required(*required_roles: str):
     def role_dependency(
@@ -98,6 +110,25 @@ def roles_required(*required_roles: str):
     return role_dependency
 
 
+
+@router.post("/token")
+def login_for_access_token(
+    db: Session = Depends(get_db),
+    form_data: OAuth2PasswordRequestForm = Depends()
+):
+    employee = authenticate_employee(db, form_data.username, form_data.password)
+    if not employee:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect employee email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": str(employee.id)}, expires_delta=access_token_expires
+    )
+    role=get_current_employee_roles(employee.id,db,)
+    return {"access_token": access_token, "token_type": "bearer","role":role}
 
 
 

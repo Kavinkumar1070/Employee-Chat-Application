@@ -4,11 +4,11 @@ from sqlalchemy.exc import IntegrityError
 from typing import List
 from sqlalchemy import insert
                        
-from src.models.role import Role
+from src.models.role import Role,RoleFunction
 from src.schemas.role import EmployeeRole
 from src.models.personal import EmployeeOnboarding
 from src.models.association import employee_role
-
+from src.schemas.role import  RoleFunctionCreate,RoleFunctionUpdate
 
 def create(db:Session,name:str):
     role_check=db.query(Role).filter(Role.name==name).first()
@@ -50,26 +50,60 @@ def get(db: Session, role_id: int):
     return single_role
 
 
-def assign_employee_role(db:Session,data:EmployeeRole):
-    employee_details=db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id==data.employee_id).first()
+def assign_employee_role(db: Session, data: EmployeeRole):
+    # Check if the employee exists
+    employee_details = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id == data.employee_id).first()
     if not employee_details:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Employee not Found")
-    role_details=db.query(Role).filter(Role.id==data.role_id).first()
-    if not role_details:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Role not Found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee not Found")
     
-    db_employee_role = db.query(employee_role).filter(
+    # Check if the role exists
+    role_details = db.query(Role).filter(Role.id == data.role_id).first()
+    if not role_details:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Role not Found")
+
+    # Check if the employee already has the "Team Leader" role
+    existing_role = db.query(employee_role).filter(
         employee_role.c.employee_id == employee_details.id,
         employee_role.c.role_id == data.role_id
     ).first()
-    if not db_employee_role:
-        new_employee_role = {
-            "employee_id": employee_details.id,
-            "role_id": data.role_id
-        }
-        insert_statement = insert(employee_role).values(new_employee_role)
-        db.execute(insert_statement)
-        db.commit() 
-        return {"message":"Role Updated Successfully to Employee"}
-    return {"message":"Role already exists to employee"}
 
+    if existing_role:
+        return {"message": f"Employee already has the role '{role_details.name}'"}
+
+    # Check if the employee has the default "Employee" role
+    default_role = db.query(employee_role).filter(
+        employee_role.c.employee_id == employee_details.id
+    ).first()
+
+    if not default_role:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Employee does not have a default role")
+
+    # Update the employee's role from "Employee" to "Team Leader"
+    update_statement = employee_role.update().where(
+        employee_role.c.employee_id == employee_details.id
+    ).values(role_id=data.role_id)
+
+    db.execute(update_statement)
+    db.commit()
+
+    return {"message": f"Role updated successfully to ' {role_details.name}'"}
+
+
+
+# RoleFunction CRUD operations
+def create_role_function(db: Session, role_function: RoleFunctionCreate, role_id: int):
+    db_role_function = RoleFunction(role_id=role_id, function=role_function.function, jsonfile=role_function.jsonfile)
+    db.add(db_role_function)
+    db.commit()
+    db.refresh(db_role_function)
+    return db_role_function
+
+def get_role_functions(db: Session, role_id: int):
+    return db.query(RoleFunction).filter(RoleFunction.role_id == role_id).first()
+
+def delete_role_function(db: Session, role_function_id: int):
+    db_role_function = db.query(RoleFunction).filter(RoleFunction.id == role_function_id).first()
+    if db_role_function:
+        db.delete(db_role_function)
+        db.commit()
+    return db_role_function

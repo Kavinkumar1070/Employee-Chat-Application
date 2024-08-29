@@ -4,18 +4,14 @@ from src.core.utils import normalize_string
 from src.core.authentication import roles_required
 from src.core.database import get_db
 
+from src.crud.role import *
+from src.schemas.role import  RoleFunctionCreate,RoleFunctionUpdate
+
 from src.schemas.role import(
                         Role,
                         UpdateRoleNameRequest,
                         EmployeeRole,
                         )
-from src.crud.role import(
-                        get,
-                        create,
-                        delete,
-                        update,
-                        assign_employee_role,
-                    )
 
 router = APIRouter(
     prefix="/roles",
@@ -64,3 +60,18 @@ def assign_role_to_employee(data:EmployeeRole,db:Session=Depends(get_db)):
         return data
     
 
+# RoleFunction endpoints
+@router.post("/{role_id}/functions/")
+def create_new_role_function(role_id: int, role_function: RoleFunctionCreate, db: Session = Depends(get_db)):
+    return create_role_function(db, role_function, role_id)
+
+@router.get("/roles/{role_id}/functions/")
+def read_role_functions(role_id: int, db: Session = Depends(get_db)): 
+    return get_role_functions(db, role_id)
+
+@router.delete("/roles/functions/{role_function_id}")
+def delete_existing_role_function(role_function_id: int, db: Session = Depends(get_db)):
+    db_role_function = delete_role_function(db, role_function_id)
+    if db_role_function is None:
+        raise HTTPException(status_code=404, detail="Role Function not found")
+    return db_role_function

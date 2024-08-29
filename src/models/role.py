@@ -10,3 +10,18 @@ class Role(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), unique=True, index=True)
     employees = relationship("EmployeeOnboarding", secondary=employee_role, back_populates="roles")
+    functions = relationship("RoleFunction", back_populates="role", cascade="all, delete-orphan")
+
+
+
+# Function model
+class RoleFunction(Base):
+    __tablename__ = 'role_function'
+
+    id = Column(Integer, primary_key=True, index=True)
+    role_id = Column(Integer, ForeignKey('roles.id'))
+    function = Column(String(500), unique=True, index=True)
+    jsonfile = Column(String(20), unique=True, index=True)
+    
+    
+    role = relationship("Role", back_populates="functions")
