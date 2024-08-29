@@ -16,9 +16,6 @@ def create_employee(db: Session, employee: EmployeeCreate):
   
     exist_number = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.contactnumber == employee.contactnumber).first()
     exist_email = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.emailaddress == employee.emailaddress).first()
-    role=db.query(Role).filter(Role.name=="employee").first()
-    if not role:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=" Default Role is not Found ")
     if exist_number or exist_email:
         raise HTTPException(status_code=status.HTTP_208_ALREADY_REPORTED, detail="Contact number or email address already exists")
 
@@ -33,22 +30,9 @@ def create_employee(db: Session, employee: EmployeeCreate):
         gender=employee.gender,
         maritalstatus=employee.maritalstatus
     )
-    db_employee_role = db.query(employee_role).filter(
-        employee_role.c.employee_id == new_details.id,
-        employee_role.c.role_id == role.id
-    ).first()
-    if not db_employee_role:
-        new_employee_role = {
-            "employee_id": new_details.id,
-            "role_id": role.id
-        }
-        insert_statement = insert(employee_role).values(new_employee_role)
-
     
     db.add(new_details)
     db.commit()  
-    db.execute(insert_statement)
-    db.commit() 
     db.refresh(new_details)  
     
     new_details.employment_id = f"cds{str(new_details.id).zfill(4)}"
@@ -76,8 +60,9 @@ def create_employee(db: Session, employee: EmployeeCreate):
     )
     db.add(email_upload)
     db.commit()
-    
-    
+    role=db.query(Role).filter(Role.name=="employee").first()
+    if not role:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=" Default Role is not Found ")
     db_employee_role = db.query(employee_role).filter(
         employee_role.c.employee_id == new_details.id,
         employee_role.c.role_id == role.id
