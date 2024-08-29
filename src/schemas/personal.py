@@ -18,7 +18,7 @@ class EmployeeBase(BaseModel):
     def validate_phone_number(cls, value):
         # Convert the integer to a string to validate its length
         contact_number_str = str(value)
-        if not (10 <= len(contact_number_str) <= 12):
+        if not (10 == len(contact_number_str)):
             raise ValueError('Invalid phone number length. Phone number must be between 9 and 12 digits.')
         return value
 

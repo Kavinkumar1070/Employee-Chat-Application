@@ -89,13 +89,13 @@ def get_current_employee_roles(
     current_user: int,
     db: Session = Depends(get_db)
 ) -> list:
-    roles = db.query(Role).join(employee_role).filter(employee_role.c.employee_id == current_user).all()
+    roles = db.query(Role).join(employee_role).filter(employee_role.c.employee_id == current_user).first()
     if not roles:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User does not have any assigned roles"
         )
-    return [role.name for role in roles]
+    return roles.name
 
 
 def roles_required(*required_roles: str):

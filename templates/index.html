@@ -101,12 +101,12 @@
             
                     const data = await response.json();
                     const token = data.access_token;
+                    const role = data.role
             
                     // Store the token in local storage
                     localStorage.setItem('token', token);
             
-                    window.location.assign("/templates/index1.html");
-
+                    window.location.href = "/templates/chatbot.html";
             
                 } catch (error) {
                     document.getElementById('message').innerText = error.message;

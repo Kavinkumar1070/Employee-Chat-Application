@@ -30,23 +30,3 @@ def get():
     if not file_path.exists():
         return HTMLResponse("File not found", status_code=404)
     return HTMLResponse(file_path.read_text())
-
-# @app.post("/token")
-# def login_for_access_token(
-#     db: Session = Depends(get_db),
-#     form_data: OAuth2PasswordRequestForm = Depends()
-# ):
-#     employee = authenticate_employee(db, form_data.username, form_data.password)
-#     if not employee:
-#         raise HTTPException(
-
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Incorrect employee email or password",
-#             headers={"WWW-Authenticate": "Bearer"},
-#         )
-#     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-#     access_token = create_access_token(
-#         data={"sub": str(employee.id)}, expires_delta=access_token_expires
-#     )
-#     role=get_current_employee_roles(employee.id,db,)
-#     return {"access_token": access_token, "token_type": "bearer","role":role}

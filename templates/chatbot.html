@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot UI</title>
+    <link rel="stylesheet" href="../templates/newstyle.css">
+</head>
+<body>
+    <div>
+        <div class="headerbox">
+            <p id="welcome-message" class="para">Loading...</p>
+        </div>
+        <div class="chat-container">
+            <div class="chat-box" id="chat-box">
+                <div id="initial">
+                    <p>Hello, I am Jarvis. Please ask a query related to the topics below:</p>
+                    <ul>
+                        <li>Apply Leave Request</li>
+                        <li>Cancel Leave Request</li>
+                        <li>Check Weather Report</li>
+                        <li>Ask Jokes</li>
+                        <li>Permission Management</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="input-box">
+                <input type="text" id="user-input" placeholder="Type a message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+        <script>
+            const chatBox = document.getElementById('chat-box');
+            const userInput = document.getElementById('user-input');
+            const initialMessage = document.getElementById('initial');
+
+            const token = localStorage.getItem('token'); // Get the token stored during login
+
+            if (token) {
+                fetchProfileInfo(token);
+            } else {
+                document.getElementById('welcome-message').innerText = "Welcome!";
+            }
+
+            async function fetchProfileInfo(token) {
+                try {
+                    const response = await fetch('/profile', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch profile info');
+                    }
+
+                    const profile = await response.json();
+                    document.getElementById('welcome-message').innerText = `Welcome, ${profile.username}! (Employee ID: ${profile.employee_id})`;
+
+                } catch (error) {
+                    document.getElementById('welcome-message').innerText = "Welcome!";
+                    console.error(error);
+                }
+            }
+
+            const websocket = new WebSocket("ws://127.0.0.1:8000/ws");
+
+            websocket.onopen = () => {
+                console.log("WebSocket connection established.");
+            };
+
+            websocket.onmessage = (event) => {
+                const message = event.data;
+                addMessageToChat(message, 'bot');
+            };
+
+            function sendMessage() {
+                const message = userInput.value;
+                if (message.trim() === "") return;
+
+                if (initialMessage) {
+                    initialMessage.style.display = 'none';
+                }
+
+                addMessageToChat(message, 'user');
+                websocket.send(JSON.stringify({ message: message }));
+
+                userInput.value = "";
+            }
+
+            function addMessageToChat(message, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', sender);
+                messageElement.textContent = message;
+                chatBox.appendChild(messageElement);
+
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+            userInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
