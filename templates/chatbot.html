@@ -15,12 +15,8 @@
             <div class="chat-box" id="chat-box">
                 <div id="initial">
                     <p>Hello, I am Jarvis. Please ask a query related to the topics below:</p>
-                    <ul>
-                        <li>Apply Leave Request</li>
-                        <li>Cancel Leave Request</li>
-                        <li>Check Weather Report</li>
-                        <li>Ask Jokes</li>
-                        <li>Permission Management</li>
+                    <ul id="lists">
+                       
                     </ul>
                 </div>
             </div>
@@ -53,13 +49,27 @@
                         }
                     });
 
+                    console.log("response",response)
+
                     if (!response.ok) {
                         throw new Error('Failed to fetch profile info');
                     }
 
                     const profile = await response.json();
-                    console.log(profile.Functions)
-                    document.getElementById('welcome-message').innerText = `Welcome, ${profile.Functions}! (Employee ID: ${profile.file})`;
+                    setTimeout(()=>{
+                        (profile.Functions || []).forEach((data) => {
+                            const list = document.getElementById("lists");
+                            const listItem = document.createElement("li");
+                            listItem.innerHTML = data;
+                            list.appendChild(listItem);
+                        });
+                    },1000)
+                  
+                    /*document.getElementById('welcome-message').innerText = `Welcome, ${profile.Functions[0]}! (Employee ID: ${profile.file[0]})`;*/
+              
+                   
+                    
+
 
                 } catch (error) {
                     document.getElementById('welcome-message').innerText = "Welcome!";
