@@ -20,8 +20,8 @@ class RoleFunction(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     role_id = Column(Integer, ForeignKey('roles.id'))
-    function = Column(String(500), unique=True, index=True)
-    jsonfile = Column(String(20), unique=True, index=True)
+    function = Column(String(500), index=True)
+    jsonfile = Column(String(20), index=True)
     
     
     role = relationship("Role", back_populates="functions")

@@ -1,0 +1,311 @@
+{
+    "onboarding": {
+        "project": "onboarding",
+        "project description": "Create a new user by providing their personal details.",
+        "url": "https://example.com/onboard",
+        "apikey": "YOUR_API_KEY",
+        "method": "POST",
+        "payload": {
+            "firstname": {
+                "description": "First name of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "lastname": {
+                "description": "Last name of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "dateofbirth": {
+                "description": "Date of birth of the user in YYYY-MM-DD format",
+                "datatype": "date",
+                "format": "%Y-%m-%d",
+                "required": true,
+                "default": "None"
+            },
+            "contactnumber": {
+                "description": "Contact number of the user",
+                "datatype": "integer",
+                "required": true,
+                "default": "None"
+            },
+            "emailaddress": {
+                "description": "Email address of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "address": {
+                "description": "Residential address of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "nationality": {
+                "description": "Nationality of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "gender": {
+                "description": "Gender of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "maritalstatus": {
+                "description": "Marital status of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "get personal details": {
+        "project": "get personal details",
+        "project description": "Retrieve user details by employee ID (Admin only).",
+        "url": "https://example.com/onboard/{employee_id}",
+        "apikey": "YOUR_API_KEY",
+        "method": "GET",
+        "payload": {
+            "employee_id": {
+                "description": "Unique ID of the employee",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "update personal details": {
+        "project": "update personal details",
+        "project description": "update user details by employee ID (Admin only).",
+        "url": "https://example.com/onboard/{employee_id}",
+        "apikey": "YOUR_API_KEY",
+        "method": "PUT",
+        "payload": {
+            "employee_id": {
+                "description": "Unique ID of the employee",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "delete personal details": {
+        "project": "delete personal detail",
+        "project description": "Retrieve, update, or delete user details by employee ID (Admin only).",
+        "url": "https://example.com/onboard/{employee_id}",
+        "apikey": "YOUR_API_KEY",
+        "method": "DELETE",
+        "payload": {
+            "employee_id": {
+                "description": "Unique ID of the employee",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "employment details": {
+        "project": "employment details",
+        "project description": "Create a new employment record for an employee.",
+        "url": "https://example.com/employment",
+        "apikey": "YOUR_API_KEY",
+        "method": "POST",
+        "payload": {
+            "job_position": {
+                "description": "Job position of the employee",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "department": {
+                "description": "Department of the employee",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "start_date": {
+                "description": "Employment start date in YYYY-MM-DD format",
+                "datatype": "date",
+                "format": "%Y-%m-%d",
+                "required": true,
+                "default": "None"
+            },
+            "employment_type": {
+                "description": "Type of employment (e.g., Full-time, Part-time)",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "reporting_manager": {
+                "description": "Name of the reporting manager",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "work_location": {
+                "description": "Work location of the employee",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "basic_salary": {
+                "description": "Basic salary of the employee",
+                "datatype": "integer",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "get employment details": {
+        "project": "get employment details",
+        "project description": "Retrieve employment records by employment ID (Admin only).",
+        "url": "https://example.com/employment/{employee_id}",
+        "apikey": "YOUR_API_KEY",
+        "method": "GET",
+        "payload": {
+            "employee_id": {
+                "description": "Unique ID of the employee",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "update employment details": {
+        "project": "update employment details",
+        "project description": "update employment records by employment ID (Admin only).",
+        "url": "https://example.com/employment/{employee_id}",
+        "apikey": "YOUR_API_KEY",
+        "method": "PUT",
+        "payload": {
+            "employee_id": {
+                "description": "Unique ID of the employee",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "delete employment details": {
+        "project": "delete employment details",
+        "project description": "delete employment records by employment ID (Admin only).",
+        "url": "https://example.com/employment/{employee_id}",
+        "apikey": "YOUR_API_KEY",
+        "method": "DELETE",
+        "payload": {
+            "employee_id": {
+                "description": "Unique ID of the employee",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "create new role": {
+        "project": "create new role",
+        "project description": "Create a new role like Team Lead, Admin, Manager, etc.",
+        "url": "https://example.com/roles",
+        "apikey": "YOUR_API_KEY",
+        "method": "POST",
+        "payload": {
+            "role_name": {
+                "description": "Name of the new role",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "roles": {
+        "project": "roles get, put, delete",
+        "project description": "Retrieve, update, or delete roles by role ID (Admin only).",
+        "url": "https://example.com/roles/{role_id}",
+        "apikey": "YOUR_API_KEY",
+        "method": "GET, PUT, DELETE",
+        "payload": {
+            "role_id": {
+                "description": "Unique ID of the role",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "get roles": {
+        "project": "get roles",
+        "project description": "Retrieve roles by role ID (Admin only).",
+        "url": "https://example.com/roles/{role_id}",
+        "apikey": "YOUR_API_KEY",
+        "method": "GET",
+        "payload": {
+            "role_id": {
+                "description": "Unique ID of the role",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "update roles": {
+        "project": "update roles",
+        "project description": "update roles by role ID (Admin only).",
+        "url": "https://example.com/roles/{role_id}",
+        "apikey": "YOUR_API_KEY",
+        "method": "PUT",
+        "payload": {
+            "role_id": {
+                "description": "Unique ID of the role",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "delete roles": {
+        "project": "delete roles",
+        "project description": "delete roles by role ID (Admin only).",
+        "url": "https://example.com/roles/{role_id}",
+        "apikey": "YOUR_API_KEY",
+        "method": "DELETE",
+        "payload": {
+            "role_id": {
+                "description": "Unique ID of the role",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "employee role assign": {
+        "project": "employee role assign",
+        "project description": "Assign a role to an employee by providing the employee ID and role ID.",
+        "url": "https://example.com/role_employee",
+        "apikey": "YOUR_API_KEY",
+        "method": "POST",
+        "payload": {
+            "employee_id": {
+                "description": "Unique ID of the employee",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "default": "None"
+            },
+            "role_id": {
+                "description": "Unique ID of the role",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            }
+        }
+    }
+}

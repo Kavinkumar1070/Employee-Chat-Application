@@ -95,8 +95,7 @@ def get_current_user_function(
     role_functions = db.query(RoleFunction).filter(RoleFunction.role_id == role.id).all()
     role_function=[role_function.function for role_function in role_functions]
     role_file=[role_function.jsonfile for role_function in role_functions]
-    print(role_functions)
-    return {"Functions":role_function,"file":role_file}
+    return {"Employee_ID":employee.employment_id,"Role":role.name,"Functions":role_function,"file":role_file}
 
 def authenticate_employee(db: Session, employee_email: str, password: str):
     employee = db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_email == employee_email).first()

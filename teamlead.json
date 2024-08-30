@@ -1,0 +1,49 @@
+{
+    "weather report": {
+    "project": "weather report",
+    "project description": "Retrieve the latest weather report for a specified city.",
+    "url": "https://example.com/weather",
+    "apikey": "ccfc42ec271940e5a3f85224242906",
+    "method": "GET",
+    "payload": {
+        "city": {
+            "description": "City checking for weather report",
+            "datatype": "string",
+            "required": true,
+            "default": "None"
+        }
+    }
+},
+"joke app": {
+    "project": "joke app",
+    "project description": "Fetch a joke of a specified type to lighten up your day.",
+    "url": "https://official-joke-api.appspot.com/jokes",
+    "apikey": "HHTGJKJGFTOPTIOPTEWIOPTEW",
+    "method": "GET",
+    "payload": {
+        "joketype": {
+            "description": "Type of joke looking for : general, programming, or knock-knock",
+            "datatype": "choices",
+            "required": true,
+            "choices": ["general", "programming", "knock-knock"],
+            "default": "None"
+        }
+    }
+},
+"permission management": {
+    "project": "permission management",
+    "project description": "this is to create an new permission in database",
+    "url": "https://converse-ecom-bk-py-9336c2d9fedc.herokuapp.com/permissions",
+    "apikey": "HHTGJKJGFTOPTIOPvbnTEWIOPTEW",
+    "method": "POST",
+    "payload": {
+        "action": {
+            "description": "permission creator in datatbase :",
+            "datatype": "choices",
+            "required": true,
+            "choices": ["create", "delete","update","get"],
+            "default": "None"
+        }
+    }
+}
+}

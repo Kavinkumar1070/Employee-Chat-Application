@@ -1,0 +1,66 @@
+{
+    "onboarding": {
+        "project": "onboarding",
+        "project description": "Create a new user by providing their personal details.",
+        "url": "https://example.com/onboard",
+        "apikey": "YOUR_API_KEY",
+        "method": "POST",
+        "payload": {
+            "firstname": {
+                "description": "First name of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "lastname": {
+                "description": "Last name of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "dateofbirth": {
+                "description": "Date of birth of the user in YYYY-MM-DD format",
+                "datatype": "date",
+                "format": "%Y-%m-%d",
+                "required": true,
+                "default": "None"
+            },
+            "contactnumber": {
+                "description": "Contact number of the user",
+                "datatype": "integer",
+                "required": true,
+                "default": "None"
+            },
+            "emailaddress": {
+                "description": "Email address of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "address": {
+                "description": "Residential address of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "nationality": {
+                "description": "Nationality of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "gender": {
+                "description": "Gender of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "maritalstatus": {
+                "description": "Marital status of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            }
+        }
+    }
+}
