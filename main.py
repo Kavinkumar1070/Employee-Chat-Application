@@ -64,33 +64,27 @@ async def websocket_endpoint(websocket: WebSocket):
             data_json = json.loads(data)
             print("data_json",data_json)
             user_message = data_json.get("message")
+            role = data_json.get("role")
 
             if user_message.lower() == 'quit':
                 await websocket.send_text("Goodbye, Thanks for using our app!")
                 break
             else:
-                query, project_name = await get_project_details(websocket, user_message)
-                project_details = get_project_script(project_name)
+                jsonfile = choose_json(role)
+                print("jsonfile selected :",jsonfile)
+                query, project_name = await get_project_details(websocket, user_message,jsonfile)
+                print("query :",query)
+                print("project_name :",project_name)
+                project_details = get_project_script(project_name,jsonfile)
                 payload_details = split_payload_fields(project_details)
-                filled_cleaned = await fill_payload_values(websocket, query, payload_details)
+                filled_cleaned = await fill_payload_values(websocket, query, payload_details,jsonfile)
+                print("filled_cleaned :",filled_cleaned)
                 validate_payload = validate(project_details, filled_cleaned)
                 logger.info(f"Validated payload: {validate_payload}")
                 answer = await ask_user(websocket, project_details, validate_payload)
                 logger.info(f"Answer from ask_user: {answer}")
 
-                project = answer['project']
-                if project == "joke app":
-                    result = get_joke(answer['payload']["joketype"])
-                elif project == "weather report":
-                    result = get_weather(answer['apikey'], answer['payload']["city"])
-                elif project == "leave apply":
-                    result = apply_leave(answer['payload']["empid"], answer['payload']["startdate"], answer['payload']["enddate"], answer['payload']["reason"])
-                elif project == "leave cancel":
-                    result = cancel_leave(answer['payload']["leaveid"], answer['payload']["reason"])
-                else:
-                    result = post_permission(answer)
-
-                model_op = nlp_response(result)
+                model_op = nlp_response(answer)
 
                 await websocket.send_text(model_op + " Thanks for using this app. Need anything, feel free to ask!")
     except WebSocketDisconnect:
@@ -98,3 +92,5 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         logger.error(f"Exception: {e}")
         await websocket.send_text(json.dumps({"Response": "An error occurred. Please try again."}))
+
+

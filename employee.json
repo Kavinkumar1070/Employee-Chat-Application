@@ -1,7 +1,7 @@
 {
     "leave apply": {
         "project": "leave apply",
-        "project description": "Request to take time off from work by providing necessary details for your leave request.",
+        "project description": "Handles requests related to applying for leave, including submission of new leave requests",
         "url": "https://example.com/apply_leave",
         "apikey": "divjfvnanfmvamzcm",
         "method": "CREATE",
@@ -38,24 +38,24 @@
     },
     "leave cancel": {
         "project": "leave cancel",
-        "project description": "Revoke a previously applied leave request, making yourself available for work on the specified dates.",
+        "project description": "Manages requests to cancel previously applied or approved leave.",
         "url": "https://example.com/cancel_leave",
         "apikey": "bBDFBVNNNFNLLKDKLDSKL",
         "method": "DELETE",
         "payload": {
             "leaveid": {
-                "description": "Leave ID for cancelling leave request Example format:'L23','L06'",
+                "description": "Leave ID for cancelling leave request",
                 "datatype": "regex",
-                "format": "^L\\d{2}$",
+                "format": "^l\\d{2}$",
                 "required": true,
                 "default": "None"
             },
             "reason": {
-                "description": "Reason for cancelling leave request : choices nowork, plancancel, or wrongdate",
+                "description": "Reason for cancelling leave request",
                 "datatype": "choices",
                 "required": true,
                 "choices": ["nowork", "plancancel","wrongdate"],
-                "default": "None"
+                "default": "wrongdate"
             }
         }
     }

@@ -29,21 +29,5 @@
             "default": "None"
         }
     }
-},
-"permission management": {
-    "project": "permission management",
-    "project description": "this is to create an new permission in database",
-    "url": "https://converse-ecom-bk-py-9336c2d9fedc.herokuapp.com/permissions",
-    "apikey": "HHTGJKJGFTOPTIOPvbnTEWIOPTEW",
-    "method": "POST",
-    "payload": {
-        "action": {
-            "description": "permission creator in datatbase :",
-            "datatype": "choices",
-            "required": true,
-            "choices": ["create", "delete","update","get"],
-            "default": "None"
-        }
-    }
 }
 }

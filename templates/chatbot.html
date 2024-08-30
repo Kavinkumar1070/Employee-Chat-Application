@@ -65,9 +65,7 @@
                             list.appendChild(listItem);
                         });
                     }, 1000);
-
                     document.getElementById('welcome-message').innerText = `Welcome, Your Role is: ${profile.Role} Your Employee ID is: ${employeeId}.`;
-                    
                     enableInput(); // Enable the input field and send button after fetching profile info
 
                 } catch (error) {
