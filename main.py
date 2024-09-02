@@ -16,8 +16,8 @@ import logging
 import json
 from chatcode.function import *
 from chatcode.api_call import *
-from chatcode.onbfunction import collect_user_input, validate_input,jsonfile
-
+from chatcode.onbfunction import collect_user_input, validate_input,get_jsonfile
+import asyncio
 
 app = FastAPI()
 
@@ -54,6 +54,45 @@ async def get_profile(
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+@app.websocket("/ws/onboard")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            data_json = json.loads(data)
+            user_message = data_json.get("message", "").strip().lower()            
+            print(f"Received message: '{user_message}'")  # Debugging: Log the received message
+
+            if user_message == 'quit':
+                await websocket.send_text("Please wait,You will be Navigated to Login Screen")  # Redirect to the new page
+                await asyncio.sleep(3)  # Add a 3-second delay
+                await websocket.send_text("navigate")  # Redirect to the new page
+                break
+
+            elif user_message == 'onboard':
+                file = get_jsonfile()
+                print(file)
+                print(type(file))
+                await websocket.send_text(f"You said: {user_message}")
+                details = await collect_user_input(websocket, file, validate_input)
+                await websocket.send_text("Your details have been saved successfully. Check your personal mail for Username and Password.")
+                await websocket.send_text("You will be Navigated to Login Screen")  # Redirect to the new page
+                await asyncio.sleep(3)  # Add a 3-second delay
+                await websocket.send_text("navigate")
+                break
+
+            else:
+                await websocket.send_text("Please enter 'Onboard' in the chat below or 'Quit' to exit.")
+    
+    except WebSocketDisconnect:
+        logger.info("Client disconnected")
+    except Exception as e:
+        logger.error(f"Exception: {e}")
+        await websocket.send_text(json.dumps({"Response": "An error occurred. Please try again."}))
+
 
 @app.websocket("/ws/chat")
 async def websocket_endpoint(websocket: WebSocket):
@@ -95,31 +134,4 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.send_text(json.dumps({"Response": "An error occurred. Please try again."}))
 
 
-@app.websocket("/ws/onboard")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
 
-    try:
-        while True:
-            data = await websocket.receive_text()
-            data_json = json.loads(data)
-            user_message = data_json.get("message")
-            file = jsonfile
-            if user_message.lower() == 'quit':
-                await websocket.send_text("Goodbye, Thanks for using our app!")
-                break
-            else:
-                if user_message and user_message.lower() == 'onboard':
-                    await websocket.send_text(f"You said: {user_message}")
-                    details = await collect_user_input(websocket,file, validate_input)
-                    await websocket.send_text("Thanks for using this app. Need anything, feel free to ask!")
-                else:
-                    await websocket.send_text("Please Enter Onboard in below chat!")
-                    details = await collect_user_input(websocket,file, validate_input)
-                    await websocket.send_text("Thanks for using this app. Need anything, feel free to ask!")
-
-    except WebSocketDisconnect:
-        logger.info("Client disconnected")
-    except Exception as e:
-        logger.error(f"Exception: {e}")
-        await websocket.send_text(json.dumps({"Response": "An error occurred. Please try again."}))

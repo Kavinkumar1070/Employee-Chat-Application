@@ -5,18 +5,19 @@ from fastapi import WebSocket
 import json
 
 logger = logging.getLogger(__name__)
+import os
 
-jsonfile = {
-    'firstname': {'datatype': 'string'},
-    'lastname': {'datatype': 'string'},
-    'dateofbirth': {'datatype': 'date'},
-    'contactnumber': {'datatype': 'mobile'},
-    'emailaddress': {'datatype': 'email'},
-    'address': {'datatype': 'string'},
-    'nationality': {'datatype': 'string'},
-    'gender': {'datatype': 'gender'},
-    'maritalstatus': {'datatype': 'maritalstatus'}
-}
+def get_jsonfile():
+    # Get the directory where the current script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Construct the absolute path to the onboard.json file
+    file_path = os.path.join(script_dir, 'onboard.json')
+    
+    with open(file_path, 'r') as f:
+        jsonfile = json.load(f)
+        return jsonfile
+
 
 def validate_input(field, value, datatype):
     logger.info(f"Validating {field} with value: '{value}' and datatype: {datatype}")

@@ -14,9 +14,10 @@
         <div class="chat-container">
             <div class="chat-box" id="chat-box">
                 <div id="initial">
-                    <p>Hello, I am AI Registration Bot for Employee, Provide your personal information.</p>
+                    <p>Hello, I am AI Registration Bot for New Employee.</p>
                     <ul>
-                        <li>Enter Onboard on below</li>
+                        <li>Enter "Onboard" for Registeration.</li>
+                        <li>Enter "Quit" for return Login Screen.</li>
                     </ul>
                 </div>
             </div>
@@ -30,6 +31,7 @@
             const userInput = document.getElementById('user-input');
             const initialMessage = document.getElementById('initial');
 
+            // Ensure the WebSocket URL is correct
             const websocket = new WebSocket("ws://127.0.0.1:8000/ws/onboard");
 
             websocket.onopen = () => {
@@ -38,22 +40,29 @@
 
             websocket.onmessage = (event) => {
                 const message = event.data;
-                addMessageToChat(message, 'bot');
+
+                // If the server sends "navigate", redirect the user
+                if (message === "navigate") {
+                    window.location.href = "/templates/index.html";  // Update this URL as needed
+                } else {
+                    addMessageToChat(message, 'bot');
+                }
             };
 
             function sendMessage() {
-                const message = userInput.value;
-                if (message.trim() === "") return;
-
+                const message = userInput.value.trim();  // Trim whitespace
+                if (message === "") return;  // Don't send empty messages
+            
                 if (initialMessage) {
                     initialMessage.style.display = 'none';
                 }
-
+            
                 addMessageToChat(message, 'user');
                 websocket.send(JSON.stringify({ message: message }));
-
+            
                 userInput.value = "";
             }
+            
 
             function addMessageToChat(message, sender) {
                 const messageElement = document.createElement('div');
@@ -61,9 +70,11 @@
                 messageElement.textContent = message;
                 chatBox.appendChild(messageElement);
 
+                // Scroll to the bottom of the chat box
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
 
+            // Handle "Enter" keypress to send the message
             userInput.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter') {
                     sendMessage();
