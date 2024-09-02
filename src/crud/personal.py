@@ -16,6 +16,8 @@ def create_employee(db: Session, employee: EmployeeCreate):
   
     exist_number = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.contactnumber == employee.contactnumber).first()
     exist_email = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.emailaddress == employee.emailaddress).first()
+    if len(str(employee.contactnumber)) != 10:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Contact number  must be 10 numbers")
     if exist_number or exist_email:
         raise HTTPException(status_code=status.HTTP_208_ALREADY_REPORTED, detail="Contact number or email address already exists")
 
