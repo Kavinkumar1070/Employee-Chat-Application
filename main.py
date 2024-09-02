@@ -14,8 +14,9 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi import WebSocket, WebSocketDisconnect
 import logging
 import json
-from function import *
-from api_call import *
+from chatcode.function import *
+from chatcode.api_call import *
+from chatcode.onbfunction import collect_user_input, validate_input,jsonfile
 
 
 app = FastAPI()
@@ -54,7 +55,7 @@ async def get_profile(
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@app.websocket("/ws")
+@app.websocket("/ws/chat")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
 
@@ -94,3 +95,31 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.send_text(json.dumps({"Response": "An error occurred. Please try again."}))
 
 
+@app.websocket("/ws/onboard")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            data_json = json.loads(data)
+            user_message = data_json.get("message")
+            file = jsonfile
+            if user_message.lower() == 'quit':
+                await websocket.send_text("Goodbye, Thanks for using our app!")
+                break
+            else:
+                if user_message and user_message.lower() == 'onboard':
+                    await websocket.send_text(f"You said: {user_message}")
+                    details = await collect_user_input(websocket,file, validate_input)
+                    await websocket.send_text("Thanks for using this app. Need anything, feel free to ask!")
+                else:
+                    await websocket.send_text("Please Enter Onboard in below chat!")
+                    details = await collect_user_input(websocket,file, validate_input)
+                    await websocket.send_text("Thanks for using this app. Need anything, feel free to ask!")
+
+    except WebSocketDisconnect:
+        logger.info("Client disconnected")
+    except Exception as e:
+        logger.error(f"Exception: {e}")
+        await websocket.send_text(json.dumps({"Response": "An error occurred. Please try again."}))

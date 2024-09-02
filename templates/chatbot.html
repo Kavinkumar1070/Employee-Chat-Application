@@ -80,7 +80,7 @@
                 sendButton.disabled = false;
             }
 
-            const websocket = new WebSocket("ws://127.0.0.1:8000/ws");
+            const websocket = new WebSocket("ws://127.0.0.1:8000/ws/chat");
 
             websocket.onopen = () => {
                 console.log("WebSocket connection established.");
