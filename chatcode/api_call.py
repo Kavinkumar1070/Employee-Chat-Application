@@ -6,6 +6,7 @@ import httpx
 import asyncio
 from fastapi import WebSocket
 import logging
+import json
 logger = logging.getLogger(__name__)
 
 
@@ -15,29 +16,31 @@ from fastapi import WebSocket
 import httpx
 from fastapi import WebSocket
 
-async def onboard_personal_details(websocket: WebSocket, det):
+async def onboard_personal_details(websocket: WebSocket, det: dict):
     url = 'http://127.0.0.1:8000/personal/employees'
     payload = det
-    print("*****")
-    print(payload)
-    print("*****")
-
     try:
-        print('trying')
         async with httpx.AsyncClient() as client:
-            response =  client.post(url, json=payload)
+            response = await client.post(url, json=payload)
+        response.raise_for_status()
         response_data = response.json()
-        print('response', response_data)
-        print("00000000000000000000000000000000000000")
-        await websocket.send_text(str(response_data))
-        # Send the response as text through WebSocket
-        print("jnfuidffiusgu")
-        return response_data
+        response_str = json.dumps(response_data)
+        print(response_str)
+        await websocket.send_text(response_str)
+
+        return response_str
+
+    except httpx.HTTPStatusError as e:
+        error_message = f"HTTP error occurred: {str(e)}"
+        await websocket.send_text(error_message)
+        print(error_message)
+        return error_message
 
     except Exception as e:
-        error_message = f"An unexpected error occurred: {e}"
-        print("error", error_message)
+        error_message = f"An unexpected error occurred: {str(e)}"
         await websocket.send_text(error_message)
+        print(error_message)
+        return error_message
 
 
 

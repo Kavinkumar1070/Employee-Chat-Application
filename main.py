@@ -80,7 +80,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 details['contactnumber'] = int(details['contactnumber'])
                 print(details)
                 response = await onboard_personal_details(websocket,details)
-                print("outter",response)
                 await websocket.send_text("Your details have been saved successfully. Check your personal mail for Username and Password.")
                 await websocket.send_text("You will be Navigated to Login Screen")  # Redirect to the new page
                 await asyncio.sleep(3)  # Add a 3-second delay
