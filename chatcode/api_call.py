@@ -21,8 +21,9 @@ async def onboard_personal_details(websocket: WebSocket, det: dict):
     payload = det
     try:
         print('Trying to send request')
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=10) as client:
             response = await client.post(url, json=payload)
+            print('sdasd')
         response.raise_for_status()
 
         response_data = response.json()
