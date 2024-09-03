@@ -20,13 +20,17 @@ async def onboard_personal_details(websocket: WebSocket, det: dict):
     url = 'http://127.0.0.1:8000/personal/employees'
     payload = det
     try:
+        print('Trying to send request')
         async with httpx.AsyncClient() as client:
             response = await client.post(url, json=payload)
         response.raise_for_status()
+
         response_data = response.json()
         response_str = json.dumps(response_data)
-        print(response_str)
-        await websocket.send_text(response_str)
+
+        print('Response:', response_str)
+
+        await websocket.send_text(str(response_str))
 
         return response_str
 
