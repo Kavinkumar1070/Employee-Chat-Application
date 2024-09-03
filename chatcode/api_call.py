@@ -29,9 +29,10 @@ async def onboard_personal_details(websocket: WebSocket, det: Dict[str, str]):
         
         response.raise_for_status()  # Raise an exception for HTTP errors
         response_data = response.json()
-        print('response_data',response_data)
+        data = response_data['detail']
+        print('response_data',data)
         #await websocket.send_text(response_data)
-        return response_data
+        return data
 
     except httpx.HTTPStatusError as e:
         # Include response text in error message for better diagnostics

@@ -80,7 +80,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 details['contactnumber'] = int(details['contactnumber'])
                 response = await onboard_personal_details(websocket,details)
                 if response != "Email Send Successfully":
-                    await websocket.send_text("Your details email or mobile number is already existed . try again")
+                    await websocket.send_text(response)
                     await websocket.send_text("You will be Navigated to Login Screen")  # Redirect to the new page
                     await asyncio.sleep(7)  # Add a 3-second delay
                     await websocket.send_text("navigate")
