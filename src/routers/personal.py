@@ -52,7 +52,7 @@ async def create_employee_route(employee: EmployeeCreate, db: Session = Depends(
     )
     
     
-    return "Email Send Successfully"
+    return {"detail":"Email Send Successfully"}
 
 
 @router.get("/employees/{employee_id}", dependencies=[Depends(roles_required("admin"))])

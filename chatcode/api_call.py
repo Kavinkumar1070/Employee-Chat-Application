@@ -5,6 +5,7 @@ from datetime import datetime
 import httpx
 import asyncio
 from fastapi import WebSocket
+from typing import Dict
 import logging
 import json
 logger = logging.getLogger(__name__)
@@ -16,31 +17,38 @@ from fastapi import WebSocket
 import httpx
 from fastapi import WebSocket
 
-async def onboard_personal_details(websocket: WebSocket, det: dict):
+async def onboard_personal_details(websocket: WebSocket, det: Dict[str, str]):
     url = 'http://127.0.0.1:8000/personal/employees'
     payload = det
+    timeout_seconds = 30  # Timeout in seconds
+
     try:
-        print('Trying to send request')
-        async with httpx.AsyncClient() as client:
+        # Initialize HTTP client with timeout
+        async with httpx.AsyncClient(timeout=timeout_seconds) as client:
             response = await client.post(url, json=payload)
-        response.raise_for_status()
-
+        
+        response.raise_for_status()  # Raise an exception for HTTP errors
         response_data = response.json()
-        response_str = json.dumps(response_data)
-
-        print('Response:', response_str)
-
-        await websocket.send_text(str(response_str))
-
-        return response_str
+        print('response_data',response_data)
+        #await websocket.send_text(response_data)
+        return response_data
 
     except httpx.HTTPStatusError as e:
-        error_message = f"HTTP error occurred: {str(e)}"
+        # Include response text in error message for better diagnostics
+        error_message = f"HTTP error occurred: {str(e)} - Status Code: {e.response.status_code}\nResponse Content: {e.response.text}"
+        await websocket.send_text(error_message)
+        print(error_message)
+        return error_message
+
+    except httpx.RequestError as e:
+        # General request error handling
+        error_message = f"Request error occurred: {str(e)}"
         await websocket.send_text(error_message)
         print(error_message)
         return error_message
 
     except Exception as e:
+        # Catch all other unexpected errors
         error_message = f"An unexpected error occurred: {str(e)}"
         await websocket.send_text(error_message)
         print(error_message)
