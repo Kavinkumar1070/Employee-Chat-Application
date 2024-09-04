@@ -25,6 +25,7 @@ class EmployeeEmploymentDetails(Base):
     # Ensure that the type of employee_id matches the type of employment_id in EmployeeOnboarding
     employee_id = Column(String(100), ForeignKey('employee_onboarding.employment_id'))
     employee = relationship("EmployeeOnboarding", back_populates="employment_details")
+    leaves = relationship("EmployeeLeave", back_populates="employee")
 
     @validates('is_active')
     def validate_is_active(self, key, value):
