@@ -1,11 +1,18 @@
 {
-    "onboarding": {
-        "project": "onboarding",
+    "update personal details": {
+        "project": "update personal details",
         "project description": "Create a new user by providing their personal details.",
         "url": "https://example.com/onboard",
         "apikey": "YOUR_API_KEY",
-        "method": "POST",
+        "method": "PUT",
         "payload": {
+            "employee id": {
+                "description": "Unique ID of the employee",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "default": "None"
+            },
             "firstname": {
                 "description": "First name of the user",
                 "datatype": "string",
@@ -27,13 +34,13 @@
             },
             "contactnumber": {
                 "description": "Contact number of the user",
-                "datatype": "integer",
+                "datatype": "mobile",
                 "required": true,
                 "default": "None"
             },
             "emailaddress": {
                 "description": "Email address of the user",
-                "datatype": "string",
+                "datatype": "email",
                 "required": true,
                 "default": "None"
             },
@@ -51,13 +58,15 @@
             },
             "gender": {
                 "description": "Gender of the user",
-                "datatype": "string",
+                "datatype": "choices",
+                "choices" :["male","female","others"],
                 "required": true,
                 "default": "None"
             },
             "maritalstatus": {
                 "description": "Marital status of the user",
-                "datatype": "string",
+                "datatype": "choices",
+                "choices" :["single","married","divorced","widowed"],
                 "required": true,
                 "default": "None"
             }
@@ -70,24 +79,8 @@
         "apikey": "YOUR_API_KEY",
         "method": "GET",
         "payload": {
-            "employee_id": {
-                "description": "Unique ID of the employee",
-                "datatype": "regex",
-                "format": "^cds\\d{4}$",
-                "required": true,
-                "default": "None"
-            }
-        }
-    },
-    "update personal details": {
-        "project": "update personal details",
-        "project description": "update user details by employee ID (Admin only).",
-        "url": "https://example.com/onboard/{employee_id}",
-        "apikey": "YOUR_API_KEY",
-        "method": "PUT",
-        "payload": {
-            "employee_id": {
-                "description": "Unique ID of the employee",
+            "employee id": {
+                "description": "Employee Unique ID",
                 "datatype": "regex",
                 "format": "^cds\\d{4}$",
                 "required": true,
@@ -102,8 +95,8 @@
         "apikey": "YOUR_API_KEY",
         "method": "DELETE",
         "payload": {
-            "employee_id": {
-                "description": "Unique ID of the employee",
+            "employee id": {
+                "description": "Employee Unique ID",
                 "datatype": "regex",
                 "format": "^cds\\d{4}$",
                 "required": true,
@@ -111,14 +104,14 @@
             }
         }
     },
-    "employment details": {
-        "project": "employment details",
+    "create employment details": {
+        "project": "create employment details",
         "project description": "Create a new employment record for an employee.",
         "url": "https://example.com/employment",
         "apikey": "YOUR_API_KEY",
         "method": "POST",
         "payload": {
-            "job_position": {
+            "job position": {
                 "description": "Job position of the employee",
                 "datatype": "string",
                 "required": true,
@@ -130,32 +123,32 @@
                 "required": true,
                 "default": "None"
             },
-            "start_date": {
+            "start date": {
                 "description": "Employment start date in YYYY-MM-DD format",
                 "datatype": "date",
                 "format": "%Y-%m-%d",
                 "required": true,
                 "default": "None"
             },
-            "employment_type": {
+            "employment type": {
                 "description": "Type of employment (e.g., Full-time, Part-time)",
                 "datatype": "string",
                 "required": true,
                 "default": "None"
             },
-            "reporting_manager": {
+            "reporting manager": {
                 "description": "Name of the reporting manager",
                 "datatype": "string",
                 "required": true,
                 "default": "None"
             },
-            "work_location": {
+            "work location": {
                 "description": "Work location of the employee",
                 "datatype": "string",
                 "required": true,
                 "default": "None"
             },
-            "basic_salary": {
+            "basic salary": {
                 "description": "Basic salary of the employee",
                 "datatype": "integer",
                 "required": true,
@@ -170,8 +163,8 @@
         "apikey": "YOUR_API_KEY",
         "method": "GET",
         "payload": {
-            "employee_id": {
-                "description": "Unique ID of the employee",
+            "employee id": {
+                "description": "Employee Unique ID",
                 "datatype": "regex",
                 "format": "^cds\\d{4}$",
                 "required": true,
@@ -182,18 +175,61 @@
     "update employment details": {
         "project": "update employment details",
         "project description": "update employment records by employment ID (Admin only).",
-        "url": "https://example.com/employment/{employee_id}",
+        "url": "https://example.com/employment",
         "apikey": "YOUR_API_KEY",
         "method": "PUT",
         "payload": {
-            "employee_id": {
-                "description": "Unique ID of the employee",
+            "employee id": {
+                "description": "Employee Unique ID",
                 "datatype": "regex",
                 "format": "^cds\\d{4}$",
                 "required": true,
                 "default": "None"
+            },
+            "job position": {
+                "description": "Job position of the employee",
+                "datatype": "string",
+                "required": false,
+                "default": "None"
+            },
+            "department": {
+                "description": "Department of the employee",
+                "datatype": "string",
+                "required": false,
+                "default": "None"
+            },
+            "start date": {
+                "description": "Employment start date in YYYY-MM-DD format",
+                "datatype": "date",
+                "format": "%Y-%m-%d",
+                "required": false,
+                "default": "None"
+            },
+            "employment type": {
+                "description": "Type of employment (e.g., Full-time, Part-time)",
+                "datatype": "string",
+                "required": false,
+                "default": "None"
+            },
+            "reporting manager": {
+                "description": "Name of the reporting manager",
+                "datatype": "string",
+                "required": false,
+                "default": "None"
+            },
+            "work location": {
+                "description": "Work location of the employee",
+                "datatype": "string",
+                "required": false,
+                "default": "None"
+            },
+            "basic salary": {
+                "description": "Basic salary of the employee",
+                "datatype": "integer",
+                "required": false,
+                "default": "None"
             }
-        }
+        }       
     },
     "delete employment details": {
         "project": "delete employment details",
@@ -202,8 +238,8 @@
         "apikey": "YOUR_API_KEY",
         "method": "DELETE",
         "payload": {
-            "employee_id": {
-                "description": "Unique ID of the employee",
+            "employee id": {
+                "description": "Employee Unique ID",
                 "datatype": "regex",
                 "format": "^cds\\d{4}$",
                 "required": true,
@@ -218,23 +254,8 @@
         "apikey": "YOUR_API_KEY",
         "method": "POST",
         "payload": {
-            "role_name": {
+            "role name": {
                 "description": "Name of the new role",
-                "datatype": "string",
-                "required": true,
-                "default": "None"
-            }
-        }
-    },
-    "roles": {
-        "project": "roles get, put, delete",
-        "project description": "Retrieve, update, or delete roles by role ID (Admin only).",
-        "url": "https://example.com/roles/{role_id}",
-        "apikey": "YOUR_API_KEY",
-        "method": "GET, PUT, DELETE",
-        "payload": {
-            "role_id": {
-                "description": "Unique ID of the role",
                 "datatype": "string",
                 "required": true,
                 "default": "None"
@@ -248,7 +269,7 @@
         "apikey": "YOUR_API_KEY",
         "method": "GET",
         "payload": {
-            "role_id": {
+            "role id": {
                 "description": "Unique ID of the role",
                 "datatype": "string",
                 "required": true,
@@ -263,8 +284,14 @@
         "apikey": "YOUR_API_KEY",
         "method": "PUT",
         "payload": {
-            "role_id": {
+            "role id": {
                 "description": "Unique ID of the role",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "role name": {
+                "description": "Name of the new role",
                 "datatype": "string",
                 "required": true,
                 "default": "None"
@@ -278,7 +305,7 @@
         "apikey": "YOUR_API_KEY",
         "method": "DELETE",
         "payload": {
-            "role_id": {
+            "role id": {
                 "description": "Unique ID of the role",
                 "datatype": "string",
                 "required": true,
@@ -293,14 +320,14 @@
         "apikey": "YOUR_API_KEY",
         "method": "POST",
         "payload": {
-            "employee_id": {
-                "description": "Unique ID of the employee",
+            "employee id": {
+                "description": "Employee Unique ID",
                 "datatype": "regex",
                 "format": "^cds\\d{4}$",
                 "required": true,
                 "default": "None"
             },
-            "role_id": {
+            "role id": {
                 "description": "Unique ID of the role",
                 "datatype": "string",
                 "required": true,

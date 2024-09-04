@@ -37,9 +37,7 @@ async def get_project_details(websocket: WebSocket,query,jsonfile):
         projectinfo ={}
         for i in project_names:
             projectinfo[i] = json_config[i]['project description']
-        titles = projectinfo.keys()
-        details =projectinfo.items()
-        print("Project details :",details)
+            projectinfo
         
     client = Groq(api_key="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")
     response = client.chat.completions.create(
@@ -52,48 +50,28 @@ async def get_project_details(websocket: WebSocket,query,jsonfile):
 
                 Steps to follow:
                 1.Correct any grammatical or spelling errors in the query.
-                2.understand available project titles and its respective description {details} 
-                3.Analyze the user query: "{query}" to capture the related project title based on description.
-                4.capture project name based on description.If the project name matches, return the project name.
-                5.If you are not sure about the project name from user query, must return 'None'.
-                The project name must be either  'None' or from {titles}.
+                2.the details {projectinfo} have an pair of title{projectinfo.keys()} and description{projectinfo.values()}.
+                3.understand available project titles and its respective description from details.
+                4.Analyze the user query: "{query}" to capture the related project title based on description.
+                5.capture project name based on description.If the project name matches, return the project name.
+                6.If you are not sure about the project name from user query, must return 'None'.
+                7.The project name must be either  'None' or from {projectinfo.keys()}.
                 Do not make any assumptions by yourself.
                 Return the project name in JSON format within this symbol "~~~" as shown in the examples below:
 
-                query:"like to cancel leave request"
-                ~~~{{
-                    "project": "leave cancel"
-                }}~~~
-                
                 query:"how to cancel leave"
                 ~~~{{
                     "project": "None"
                 }}~~~
                 
-                query:'can you explain steps for apply leave request'
-                ~~~{{
-                    "project": "None"
-                }}~~~
-                
-                query:'want to apply new leave request'
-                ~~~{{
-                    "project": "leave apply"
-                }}~~~
-                
-                
                 """
-                
-                
             },
             {
                 "role": "user",
-                "content": f"Extract the project name from the following query: {query} and use this : {details}and project names {titles}."
+                "content": f"Extract the project name from the following query: {query} and Project Titles and Descriptions : {projectinfo}."
             }
         ]
     )
-                
-
-
     response_text = response.choices[0].message.content.strip()
     #print(response_text)
     json_start_idx = response_text.find("~~~")
@@ -123,7 +101,7 @@ def split_payload_fields(project_detail):
     return payload_detail
 
 async def fill_payload_values(websocket, query: str, payload_details: dict,jsonfile) -> Dict[str, Any]:    
-    client = Groq(api_key="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")
+    client = Groq(api_key="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")
 
     response = client.chat.completions.create(
         model='mixtral-8x7b-32768',
@@ -260,6 +238,94 @@ def validate(payload_detail, response_config):
         'payload': validated_payload
     }
     return final_response
+
+def correction_update_name(names, update_fields):    
+    client = Groq(api_key="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")
+
+    # Convert dict_keys to list for easier manipulation
+    update_payload_list = list(update_fields)
+
+    response = client.chat.completions.create(
+        model='mixtral-8x7b-32768',
+        messages=[
+            {
+                "role": "system",
+                "content": f""""You are a spelling correction expert. You have a list of valid names: {update_payload_list}.
+                    The user has provided the following names to check: {names}.
+                    Correct the names in the payload based on the valid names list. If a name in the payload matches a name in the list, return it as is.
+                    If a name does not match any name in the list, do not return it.
+                    Output only the selected values in the list like this ["employee id","details"].
+                    No need of any explanations
+                    Response Format: Return list response in the following format, enclosed with ~~~ before and after the response.
+
+
+                """
+            },
+            {
+                "role": "user",
+                "content": f"Analyze the following list of names: {names} and fields: {update_payload_list}."
+            }
+        ]
+    )
+    response_text = response.choices[0].message.content.strip()
+    json_start_idx = response_text.find("~~~") +3
+    json_end_idx = response_text.rfind("~~~") 
+    result = response_text[json_start_idx:json_end_idx].strip()
+    response = json.loads(result)
+    return response
+
+async def update_process_with_user_input(websocket: WebSocket, data: dict):
+    
+    if data['method'] == 'PUT':
+        update_payload = data['payload']
+        
+        # Send available fields to the user
+        available_fields = list(update_payload.keys())
+        await websocket.send_text(f"Enter the field names you want to update, separated by commas {available_fields}: ")
+        
+        # Receive field names from the user
+        fields_input = await websocket.receive_text()
+        fields_to_update = [field.strip() for field in fields_input.split(',')]
+        
+        update_fields = data['payload'].keys()
+        verified_fields = correction_update_name(fields_to_update, update_fields)
+
+        updated_fields = {}
+
+        for key in verified_fields:
+            if key in update_payload:
+                current_value = update_payload[key]
+
+                # Send current value to the user
+                await websocket.send_text(f"Current value for '{key}': {current_value}. Enter the new value for '{key}': ")
+                
+                # Receive new value from the user
+                user_value = await websocket.receive_text()
+                
+                if user_value:
+                    update_payload[key] = user_value
+                    updated_fields[key] = user_value  # Store only updated values
+                else:
+                    update_payload[key] = current_value
+
+        if updated_fields:
+            # Send updated fields to the user
+            await websocket.send_text(f"\nUpdated fields: {updated_fields}")
+            return updated_fields
+        else:
+            await websocket.send_text("\nNo fields were updated.")
+    else:
+        await websocket.send_text('Method is not PUT, no update performed.')
+        
+
+async def update_process(websocket: WebSocket, data: dict):
+    update_payload = data['payload']
+    if all(value is None or value == "None"  for value in update_payload.values()):
+        details = await update_process_with_user_input(websocket, data)
+        return details
+    else:
+        details = data
+        return details
 
 async def ask_user(websocket: WebSocket, pro, pay):
     abc = pay['payload'].copy()
