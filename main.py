@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from src.core.database import get_db, engine
 from src import models
-from src.routers import personal, employee, role
+from src.routers import personal, employee, role,leave
 from src.core.authentication import router as auth_router, authenticate_employee, create_access_token
 from pathlib import Path
 from fastapi.responses import HTMLResponse
@@ -29,6 +29,7 @@ app.mount("/templates", StaticFiles(directory=Path(__file__).resolve().parent / 
 app.include_router(personal.router)
 app.include_router(employee.router)
 app.include_router(role.router)
+app.include_router(leave.router)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 
 @app.get("/")
