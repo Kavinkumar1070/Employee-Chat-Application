@@ -129,8 +129,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 print("filled_cleaned :",filled_cleaned)
                 validate_payload = validate(project_details, filled_cleaned)
                 logger.info(f"Validated payload: {validate_payload}")
-                answer = await ask_user(websocket, project_details, validate_payload)
-                logger.info(f"Answer from ask_user: {answer}")
+                if validate_payload['method'] == 'PUT':
+                    data = await update_process(websocket,validate_payload)
+                    answer = ask_user(websocket, project_details, data)
+                    logger.info(f"Answer from ask_user: {answer}")
+                else:
+                    answer = await ask_user(websocket, project_details, validate_payload)
+                    logger.info(f"Answer from ask_user: {answer}")
 
                 model_op = nlp_response(answer)
 
