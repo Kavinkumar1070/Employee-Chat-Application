@@ -2,6 +2,7 @@ from fastapi import HTTPException,status
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from sqlalchemy.sql import func
+from src.core.utils import send_email_leave
 from src.models.leave import EmployeeLeave
 from src.models.employee import EmployeeEmploymentDetails
 from src.schemas.leave import EmployeeLeaveCreate, EmployeeLeaveUpdate, LeaveStatus
@@ -24,7 +25,8 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate,employee_id):
         leave_entries.append(db_leave)
         db.add(db_leave)
     db.commit()
-    return {"details":"leave applied successfully"}
+    send_email_leave(employee_data.employee_email,employee_data.employee.firstname,employee_data.employee.lastname,db_leave.id,db_leave.reason,db_leave.status)
+    return {"details":"leave applied successfully,Email send successfully"}
 
 def get_employee_leave_by_month(db: Session, employee_id: str, month: int, year: int):
     employee_data=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id==employee_id).first()
@@ -65,6 +67,7 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
             db_leave.reason = leave_update.reason
         db.commit()
         db.refresh(db_leave)
+
     return db_leave
 
 # Delete a leave

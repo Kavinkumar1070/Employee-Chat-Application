@@ -37,11 +37,11 @@ async def delete_role(id:int, db: Session = Depends(get_db)):
 
 
 @router.put("/{id}", dependencies=[Depends(roles_required("admin"))])
-async def update_role(id: int, request: UpdateRoleNameRequest, db: Session = Depends(get_db)):
-    exists_role=get(db,id)
+async def update_role( request: UpdateRoleNameRequest, db: Session = Depends(get_db)):
+    exists_role=get(db,request.role_id)
     if exists_role:
         new_name=normalize_string(request.new_name)
-        role =update(db, exists_role.id, new_name)
+        update(db, exists_role.id, new_name)
         raise HTTPException(status_code=status.HTTP_200_OK, detail="Role updated")
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Role not found")
@@ -53,7 +53,7 @@ async def get_role(id:int,db:Session=Depends(get_db)):
     return role
 
 
-@router.post("employee/role", dependencies=[Depends(roles_required("admin"))])
+@router.post("/employee/role", dependencies=[Depends(roles_required("admin"))])
 def assign_role_to_employee(data:EmployeeRole,db:Session=Depends(get_db)):
     data=assign_employee_role(db,data)
     if data:
@@ -61,15 +61,15 @@ def assign_role_to_employee(data:EmployeeRole,db:Session=Depends(get_db)):
     
 
 # RoleFunction endpoints
-@router.post("/{role_id}/functions/")
-def create_new_role_function(role_id: int, role_function: RoleFunctionCreate, db: Session = Depends(get_db)):
-    return create_role_function(db, role_function, role_id)
+@router.post("/functions/",dependencies=[Depends(roles_required("admin"))])
+def create_new_role_function(role_function: RoleFunctionCreate, db: Session = Depends(get_db)):
+    return create_role_function(db, role_function)
 
-@router.get("/roles/{role_id}/functions/")
+@router.get("/{role_id}/functions/",dependencies=[Depends(roles_required("admin"))])
 def read_role_functions(role_id: int, db: Session = Depends(get_db)): 
     return get_role_functions(db, role_id)
 
-@router.delete("/roles/functions/{role_function_id}")
+@router.delete("/functions/{role_function_id}",dependencies=[Depends(roles_required("admin"))])
 def delete_existing_role_function(role_function_id: int, db: Session = Depends(get_db)):
     db_role_function = delete_role_function(db, role_function_id)
     if db_role_function is None:

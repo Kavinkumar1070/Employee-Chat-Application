@@ -11,6 +11,7 @@ class Role(BaseModel):
  
  
 class UpdateRoleNameRequest(BaseModel):
+    role_id: int
     new_name: str
  
  
@@ -19,6 +20,7 @@ class EmployeeRole(BaseModel):
     role_id:int
 
 class RoleFunctionCreate(BaseModel):
+    role_id: int
     function: str
     jsonfile: str
 

@@ -21,7 +21,8 @@ def create_employee_employment_details(db: Session, employee_employment_data:Emp
         reporting_manager = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id == employee_employment_data.reporting_manager).first()
         if not employee_onboarding:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"No EmployeeOnboarding record found for id {employee_employment_data.reporting_manager}")
-        
+        if not reporting_manager:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Reporting_manager id should not be Empty or Not found")
         inter_data= db.query(employee_role).filter(
             employee_role.c.employee_id==reporting_manager.id
             ).first()
@@ -62,11 +63,14 @@ def update_employee_employment_details(db: Session, updates: EmployeeEmploymentD
         EmployeeEmploymentDetails.employee_id == updates.employment_id
     ).first()
 
+
     if not employee_employment:
         return None
-    
+    reporting_manager = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id == updates.reporting_manager).first()
+    if not reporting_manager:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Reporting_manager id should not be Empty or Not found")
     inter_data = db.query(employee_role).filter(
-        employee_role.c.employee_id == updates.reporting_manager
+        employee_role.c.employee_id == reporting_manager.id
     ).first()
     
     if not inter_data:

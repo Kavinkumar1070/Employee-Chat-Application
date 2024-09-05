@@ -32,7 +32,7 @@ async def create_employee(employee_employment: EmployeeEmploymentDetailsCreate, 
     return create_employee_employment_details(db,employee_employment)
     
 
-@router.get("/all-employees/{employee_id}", dependencies=[Depends(roles_required("admin"))])
+@router.get("/employees/{employee_id}", dependencies=[Depends(roles_required("admin"))])
 async def read_employee(employee_id: str, db: Session = Depends(get_db)):
     db_employee = get_all_employee_employment_details(db, employee_id)
     if db_employee is None:
@@ -65,7 +65,7 @@ async def read_employee(employee_id: str, db: Session = Depends(get_db)):
     return {"Full_Details": [employee_details]}
 
 
-@router.put("/employees/{employee_id}", dependencies=[Depends(roles_required("admin"))])
+@router.put("/employees/", dependencies=[Depends(roles_required("admin"))])
 async def update_employee( employee_update: EmployeeEmploymentDetailsUpdate, db: Session = Depends(get_db)):
     db_employee = update_employee_employment_details(db,employee_update)
     if db_employee is None:

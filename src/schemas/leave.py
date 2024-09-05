@@ -13,7 +13,6 @@ class LeaveStatus(str, Enum):
     REJECTED = "rejected"
 
 class EmployeeLeaveBase(BaseModel):
-    employee_id:str
     leave_type: str
     duration: LeaveDuration
     start_date: date
