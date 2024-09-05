@@ -39,7 +39,7 @@ async def get_project_details(websocket: WebSocket,query,jsonfile):
             projectinfo[i] = json_config[i]['project description']
             projectinfo
         
-    client = Groq(api_key="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")
+    client = Groq(api_key="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")
     response = client.chat.completions.create(
         model='mixtral-8x7b-32768',
         messages=[
@@ -120,7 +120,7 @@ async def fill_payload_values(websocket, query: str, payload_details: dict,jsonf
                         Use Default Values: If the user query does not provide a value that matches the required format or choice, use the default value from the configuration file if specified. For example, if the configuration file specifies "default": "None", return "None" if no valid input is found.
                         Date Handling: For date fields, use the year 2024 if the user does not specify the year clearly.
                         Strict Data Capture: Do not use values from provided examples. Capture values only from the user query or use the default values from the configuration file.
-                        JSON Response Format: Return only the payload JSON response in the following format, enclosed with ~~~ before and after the response.
+                        JSON Response Format: Return only the payload JSON response in the FOLLOWING FORMAT, enclosed with ~~~ before and after the response.
                     
                     Example output format:
                         query 1: like to apply leave for my employee id 25 from july 24 to july 25.
@@ -150,7 +150,7 @@ async def fill_payload_values(websocket, query: str, payload_details: dict,jsonf
                                 "reason": "None"
                             }}
                         }}~~~
-
+                    Just like above format return response
                 """
             },
             {
@@ -161,7 +161,7 @@ async def fill_payload_values(websocket, query: str, payload_details: dict,jsonf
     )
 
     response_text = response.choices[0].message.content.strip()
-    print("response_text: ",response_text)
+    #print("response_text: ",response_text)
     json_start_idx = response_text.find("~~~")
     json_end_idx = response_text.rfind("~~~") + 1
     result = response_text[json_start_idx:json_end_idx]
@@ -171,9 +171,12 @@ async def fill_payload_values(websocket, query: str, payload_details: dict,jsonf
     try:
         # Try to parse the JSON response
         result = json.loads(sanitized_response)
-        #print(result)
+        print("*********************")
+        print(result)
+        print("*********************")
         response_config = result.get('payload', {})
-        logger.info(f"Response config: {response_config}")
+        logger.info(f"Response config: {result}")
+        print("*********************")
 
     except (ValueError, json.JSONDecodeError) as e:
         #await websocket.send_text(f"Error parsing JSON in fill_payload_values: {e}")
@@ -190,46 +193,69 @@ async def fill_payload_values(websocket, query: str, payload_details: dict,jsonf
 
 
 def validate(payload_detail, response_config):
+    
+    #print(payload_detail)
+    #print('@@@@@@@@@@@@@@@@@@@@@@')
+    #print(response_config)
+    
     payload_details = payload_detail['payload']
     validated_payload = {}
 
     for key, values in payload_details.items():
-        value = response_config.get(key)
-        required = values.get('required', False)
+        if key in response_config.keys():
+            value = response_config.get(key)
+            required = values.get('required', False)
+            
+            # If the field is required and missing, set to None
+            if value is None:
+                if required:
+                    validated_payload[key] = None
+                continue
+            
+            # Check datatype and format
+            datatype = values['datatype']
+            if datatype == 'regex':
+                pattern = values['format']
+                if not re.match(pattern, value):
+                    validated_payload[key] = None
+                    continue
+            elif datatype == 'date':
+                date_format = values['format']
+                try:
+                    datetime.strptime(value, date_format)
+                except ValueError:
+                    validated_payload[key] = None
+                    continue
+            elif datatype == 'choices':
+                choices = values['choices']
+                if value not in choices:
+                    validated_payload[key] = None
+                    continue
+            elif datatype == 'string' and value != 'None':
+                if not isinstance(value, str):
+                    validated_payload[key] = None
+                    continue
+            elif datatype == 'integer':
+                try:
+                    # Try to cast the value to an integer
+                    int(value)
+                except ValueError:
+                    validated_payload[key] = None
+                    continue
+            elif datatype == 'mobile':
+                try:
+                    # Check if the value is an integer and has 10 digits
+                    int_value = int(value)
+                    if len(str(int_value)) != 10:
+                        validated_payload[key] = None
+                        continue
+                except ValueError:
+                    validated_payload[key] = None
+                    continue
+            
+            # If all checks pass, keep the value
+            validated_payload[key] = value
         
-        # If the field is required and missing, set to None
-        if value is None:
-            if required:
-                validated_payload[key] = None
-            continue
-        
-        # Check datatype and format
-        datatype = values['datatype']
-        if datatype == 'regex':
-            pattern = values['format']
-            if not re.match(pattern, value):
-                validated_payload[key] = None
-                continue
-        elif datatype == 'date':
-            date_format = values['format']
-            try:
-                datetime.strptime(value, date_format)
-            except ValueError:
-                validated_payload[key] = None
-                continue
-        elif datatype == 'choices':
-            choices = values['choices']
-            if value not in choices:
-                validated_payload[key] = None
-                continue
-        elif datatype == 'string' and value != 'None':
-            if not isinstance(value, str):
-                validated_payload[key] = None
-                continue
-        
-        # If all checks pass, keep the value
-        validated_payload[key] = value
-    
     final_response = {
         'project': payload_detail['project'],
         'url': payload_detail['url'],
@@ -238,6 +264,8 @@ def validate(payload_detail, response_config):
         'payload': validated_payload
     }
     return final_response
+
+
 
 def correction_update_name(names, update_fields):    
     client = Groq(api_key="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")
@@ -274,75 +302,60 @@ def correction_update_name(names, update_fields):
     response = json.loads(result)
     return response
 
-async def update_process_with_user_input(websocket: WebSocket, data: dict):
+async def update_process_with_user_input(websocket: WebSocket,project_details:dict, data: dict):
+    update_payload = data['payload']
     
-    if data['method'] == 'PUT':
-        update_payload = data['payload']
-        
-        # Send available fields to the user
-        available_fields = list(update_payload.keys())
-        await websocket.send_text(f"Enter the field names you want to update, separated by commas {available_fields}: ")
-        
-        # Receive field names from the user
-        fields_input = await websocket.receive_text()
-        fields_to_update = [field.strip() for field in fields_input.split(',')]
-        
-        update_fields = data['payload'].keys()
-        verified_fields = correction_update_name(fields_to_update, update_fields)
+    # Send available fields to the user
+    available_fields = list(update_payload.keys())
+    await websocket.send_text(f"Enter the field names you want to update, separated by commas {available_fields}: ")
+    
+    # Receive field names from the user
+    fields_input = await websocket.receive_text()
+    fields_to_update = [field.strip() for field in fields_input.split(',')]
+    
+    update_fields = data['payload'].keys()
+    verified_fields = correction_update_name(fields_to_update, update_fields)
+    updated_fields = {}
+    for i in verified_fields:
+        updated_fields[i] = 'None'
+    
+    #print('updated_fields:',updated_fields)
+    up = {'payload':updated_fields}
+    #print('new updated_fields:',up)
 
-        updated_fields = {}
+    response  = await ask_user(websocket, project_details, up)
+    #print('respones:',response)
+    return response
+    
 
-        for key in verified_fields:
-            if key in update_payload:
-                current_value = update_payload[key]
-
-                # Send current value to the user
-                await websocket.send_text(f"Current value for '{key}': {current_value}. Enter the new value for '{key}': ")
-                
-                # Receive new value from the user
-                user_value = await websocket.receive_text()
-                
-                if user_value:
-                    update_payload[key] = user_value
-                    updated_fields[key] = user_value  # Store only updated values
-                else:
-                    update_payload[key] = current_value
-
-        if updated_fields:
-            # Send updated fields to the user
-            await websocket.send_text(f"\nUpdated fields: {updated_fields}")
-            return updated_fields
-        else:
-            await websocket.send_text("\nNo fields were updated.")
-    else:
-        await websocket.send_text('Method is not PUT, no update performed.')
-        
-
-async def update_process(websocket: WebSocket, data: dict):
+async def update_process(websocket: WebSocket, project_details:dict,data: dict):
     update_payload = data['payload']
     if all(value is None or value == "None"  for value in update_payload.values()):
-        details = await update_process_with_user_input(websocket, data)
-        return details
+        updated_details = await update_process_with_user_input(websocket,project_details, data)
+        print("update output:",updated_details)
+        return updated_details
     else:
-        details = data
+        details = validate(project_details, data)
+        print("update output direct:",details)
         return details
-
+    
+    
 async def ask_user(websocket: WebSocket, pro, pay):
     abc = pay['payload'].copy()
-    for k, v in abc.items():
-        if v is None or v == "None":
-            des = pro['payload'][k]['description']
-            logger.info(f"Sending description to client for {k}: {des}")
+    for key, value in abc.items():
+        if value is None or value == "None":
+            des = pro['payload'][key]['description']
+            logger.info(f"Sending description to client for {key}: {des}")
             await websocket.send_text(f"Please provide: {des}")
             logger.info("Message sent to WebSocket, waiting for response...")
             user_input = await websocket.receive_text()
             user_input_data = json.loads(user_input)
-            abc[k] = user_input_data.get("message")
+            abc[key] = user_input_data.get("message")
             valid = validate(pro, abc)
-            if valid['payload'][k] is None:
+            if valid['payload'][key] is None:
                 return await ask_user(websocket, pro, valid)
             else:
-                pay['payload'][k] = abc[k]
+                pay['payload'][key] = abc[key]
     return pay
 
 def nlp_response(answer):       

@@ -40,7 +40,8 @@
             },
             "emailaddress": {
                 "description": "Email address of the user",
-                "datatype": "email",
+                "datatype": "regex",
+                "format": "^[a-z0-9]+@[a-z0-9]+\\.com$",
                 "required": true,
                 "default": "None"
             },
@@ -59,15 +60,15 @@
             "gender": {
                 "description": "Gender of the user",
                 "datatype": "choices",
-                "choices" :["male","female","others"],
                 "required": true,
+                "choices":["male","female","other"],
                 "default": "None"
             },
             "maritalstatus": {
                 "description": "Marital status of the user",
                 "datatype": "choices",
-                "choices" :["single","married","divorced","widowed"],
                 "required": true,
+                "choices":["single","married","divorced","widowed"],
                 "default": "None"
             }
         }

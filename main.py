@@ -130,8 +130,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 validate_payload = validate(project_details, filled_cleaned)
                 logger.info(f"Validated payload: {validate_payload}")
                 if validate_payload['method'] == 'PUT':
-                    data = await update_process(websocket,validate_payload)
-                    answer = ask_user(websocket, project_details, data)
+                    answer = await update_process(websocket,project_details,validate_payload)
                     logger.info(f"Answer from ask_user: {answer}")
                 else:
                     answer = await ask_user(websocket, project_details, validate_payload)

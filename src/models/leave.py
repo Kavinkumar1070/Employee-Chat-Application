@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Enum, Text, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Enum, Text, TIMESTAMP,DateTime
 from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
 from datetime import datetime
@@ -26,7 +26,7 @@ class EmployeeLeave(Base):
     status = Column(Enum(LeaveStatus), default=LeaveStatus.PENDING, nullable=False)
     reason = Column(Text, nullable=True)
     reject_reason = Column(Text, nullable=True)
-    created_at = Column(TIMESTAMP, default=func.now(), nullable=False)
-    updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now(), nullable=False)
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
 
     employee = relationship("EmployeeEmploymentDetails", back_populates="leaves")
