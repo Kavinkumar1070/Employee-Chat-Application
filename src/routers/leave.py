@@ -15,7 +15,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", dependencies=[Depends(roles_required("employee"))])
+@router.post("/", dependencies=[Depends(roles_required("employee","admin","teamleader"))])
 def apply_leave(
     leave: EmployeeLeaveCreate, 
     db: Session = Depends(get_db),
@@ -29,7 +29,7 @@ def apply_leave(
     return create_employee_leave(db, leave, employee_id)
 
 
-@router.get("/{employee_id}",dependencies=[Depends(roles_required("teamleader"))])
+@router.get("/{employee_id}",dependencies=[Depends(roles_required("teamleader","admin"))])
 def get_leaves_by_employee(employee_id: str, db: Session = Depends(get_db)):
     db_employee=get_leave_by_employee_id(db, employee_id)
     if not db_employee:
@@ -37,7 +37,7 @@ def get_leaves_by_employee(employee_id: str, db: Session = Depends(get_db)):
     return db_employee
 
 
-@router.get("/pending/teamleader",dependencies=[Depends(roles_required("teamleader"))])
+@router.get("/pending/teamleader",dependencies=[Depends(roles_required("teamleader","admin"))])
 def get_leave_by(db: Session = Depends(get_db)):
     db_leave = get_leave_by_id(db)
     if not db_leave:
@@ -48,14 +48,14 @@ def get_leave_by(db: Session = Depends(get_db)):
 
     return leave_details
 
-@router.get("/month/{month}/{year}",dependencies=[Depends(roles_required("employee"))])
+@router.get("/month/{month}/{year}",dependencies=[Depends(roles_required("employee","admin","teamleader"))])
 def get_leave_by_month(month: int, year: int, db: Session = Depends(get_db),current_employee: EmployeeOnboarding = Depends(get_current_employee)):
     employee_id = current_employee.employment_id
     return get_employee_leave_by_month(db, employee_id, month, year)
 
 
 
-@router.put("/update",dependencies=[Depends(roles_required("teamleader"))])
+@router.put("/update",dependencies=[Depends(roles_required("teamleader","admin"))])
 def update_leave( leave: EmployeeLeaveUpdate, db: Session = Depends(get_db)
 ):
     
@@ -79,9 +79,9 @@ def update_leave( leave: EmployeeLeaveUpdate, db: Session = Depends(get_db)
 
     return db_leave
 
-@router.delete("/{leave_id}",dependencies=[Depends(roles_required("employee"))])
-def delete_leave(leave_id: int, db: Session = Depends(get_db)):
-    success = delete_employee_leave(db, leave_id)
+@router.delete("/{leave_id}",dependencies=[Depends(roles_required("employee","admin","teamleader"))])
+def delete_leave(leave_id: int, db: Session = Depends(get_db),current_user=Depends(get_current_employee)):
+    success = delete_employee_leave(db,current_user.id ,leave_id)
     if not success:
         raise HTTPException(status_code=404, detail="Leave not found")
     return {"leave deleted successfully"}

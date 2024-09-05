@@ -23,10 +23,21 @@ def choose_json(role):
 def sanitize_json_string(response_text: str) -> str:
     # Remove any leading or trailing whitespace
     response_text = response_text.strip()
+    
     # Match the JSON object in the response text
     json_match = re.search(r'\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\}', response_text, re.DOTALL)
+    
     if json_match:
-        return json_match.group(0)
+        json_string = json_match.group(0)
+        # Remove any unnecessary escape characters (e.g., \_)
+        json_string = re.sub(r'\\_', '_', json_string)
+        
+        try:
+            # Validate and return formatted JSON
+            parsed_json = json.loads(json_string)
+            return json.dumps(parsed_json, indent=4)
+        except json.JSONDecodeError:
+            return "{}"
     return "{}"
 
 async def get_project_details(websocket: WebSocket,query,jsonfile):
@@ -39,7 +50,7 @@ async def get_project_details(websocket: WebSocket,query,jsonfile):
             projectinfo[i] = json_config[i]['project description']
             projectinfo
         
-    client = Groq(api_key="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")
+    client = Groq(api_key="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")
     response = client.chat.completions.create(
         model='mixtral-8x7b-32768',
         messages=[
@@ -101,7 +112,7 @@ def split_payload_fields(project_detail):
     return payload_detail
 
 async def fill_payload_values(websocket, query: str, payload_details: dict,jsonfile) -> Dict[str, Any]:    
-    client = Groq(api_key="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")
+    client = Groq(api_key="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")
 
     response = client.chat.completions.create(
         model='mixtral-8x7b-32768',
@@ -259,7 +270,6 @@ def validate(payload_detail, response_config):
     final_response = {
         'project': payload_detail['project'],
         'url': payload_detail['url'],
-        'apikey': payload_detail['apikey'],
         'method': payload_detail['method'],
         'payload': validated_payload
     }
@@ -268,7 +278,7 @@ def validate(payload_detail, response_config):
 
 
 def correction_update_name(names, update_fields):    
-    client = Groq(api_key="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")
+    client = Groq(api_key="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")
 
     # Convert dict_keys to list for easier manipulation
     update_payload_list = list(update_fields)
@@ -331,11 +341,13 @@ async def update_process_with_user_input(websocket: WebSocket,project_details:di
 async def update_process(websocket: WebSocket, project_details:dict,data: dict):
     update_payload = data['payload']
     if all(value is None or value == "None"  for value in update_payload.values()):
+        print('start1')
         updated_details = await update_process_with_user_input(websocket,project_details, data)
         print("update output:",updated_details)
         return updated_details
     else:
-        details = validate(project_details, data)
+        print('start2')
+        details = await ask_user(websocket,project_details, data)
         print("update output direct:",details)
         return details
     

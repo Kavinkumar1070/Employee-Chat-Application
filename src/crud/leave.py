@@ -71,9 +71,13 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
     return db_leave
 
 # Delete a leave
-def delete_employee_leave(db: Session, leave_id: int):
-    db_leave = db.query(EmployeeLeave).filter(EmployeeLeave.id == leave_id).first()
-    if db_leave:
-        db.delete(db_leave)
-        db.commit()
+def delete_employee_leave(db: Session,employee_id:str,leave_id: int):
+    db_leave = db.query(EmployeeLeave).filter(
+    EmployeeLeave.employee_id == employee_id,
+    EmployeeLeave.id == leave_id
+).first()
+    if not  db_leave:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail="No leave applied")
+    db.delete(db_leave)
+    db.commit()
     return db_leave

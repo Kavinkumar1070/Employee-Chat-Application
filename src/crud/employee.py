@@ -91,8 +91,8 @@ def update_employee_employment_details(db: Session, updates: EmployeeEmploymentD
     return employee_employment
 
 
-def delete_employee_employment_details(db: Session, employee_id: int):
-    employee_employment = db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.id == employee_id).first()
+def delete_employee_employment_details(db: Session, employee_id: str):
+    employee_employment = db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id).first()
     if employee_employment:
         employee_employment.is_active=False
         db.commit()

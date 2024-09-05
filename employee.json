@@ -1,0 +1,68 @@
+{
+    "update personal details": {
+        "project": "update personal details",
+        "project description": "Create a new user by providing their personal details.",
+        "url": "http://127.0.0.1:8000/personal/employees/",
+        "method": "PUT",
+        "payload": {
+            "firstname": {
+                "description": "First name of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "lastname": {
+                "description": "Last name of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "dateofbirth": {
+                "description": "Date of birth of the user in YYYY-MM-DD format",
+                "datatype": "date",
+                "format": "%Y-%m-%d",
+                "required": true,
+                "default": "None"
+            },
+            "contactnumber": {
+                "description": "Contact number of the user",
+                "datatype": "mobile",
+                "required": true,
+                "default": "None"
+            },
+            "emailaddress": {
+                "description": "Email address of the user",
+                "datatype": "regex",
+                "format": "^[a-z0-9]+@[a-z0-9]+\\.com$",
+                "required": true,
+                "default": "None"
+            },
+            "address": {
+                "description": "Residential address of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "nationality": {
+                "description": "Nationality of the user",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "gender": {
+                "description": "Gender of the user",
+                "datatype": "choices",
+                "required": true,
+                "choices":["male","female","other"],
+                "default": "None"
+            },
+            "maritalstatus": {
+                "description": "Marital status of the user",
+                "datatype": "choices",
+                "required": true,
+                "choices":["single","married","divorced","widowed"],
+                "default": "None"
+            }
+        }
+    }
+}

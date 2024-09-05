@@ -74,7 +74,7 @@ async def update_employee( employee_update: EmployeeEmploymentDetailsUpdate, db:
 
 
 @router.delete("/employees/{employee_id}", dependencies=[Depends(roles_required("admin"))])
-async def delete_employee(employee_id: int, db: Session = Depends(get_db)):
+async def delete_employee(employee_id: str, db: Session = Depends(get_db)):
     db_employee = delete_employee_employment_details(db, employee_id=employee_id)
     if db_employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")

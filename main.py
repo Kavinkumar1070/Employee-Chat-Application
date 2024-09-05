@@ -111,6 +111,7 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await websocket.receive_text()
             data_json = json.loads(data)
             print("data_json",data_json)
+            token = data_json.get("token")
             user_message = data_json.get("message")
             role = data_json.get("role")
 
@@ -135,8 +136,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 else:
                     answer = await ask_user(websocket, project_details, validate_payload)
                     logger.info(f"Answer from ask_user: {answer}")
-
-                model_op = nlp_response(answer)
+                    answer['bearer_token'] = token
+                    print(answer)
+                res=await onboard_personal_d(websocket,answer)
+                print(res)
+                model_op = nlp_response(res)
 
                 await websocket.send_text(model_op + " Thanks for using this app. Need anything, feel free to ask!")
     except WebSocketDisconnect:
