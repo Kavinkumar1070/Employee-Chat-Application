@@ -86,20 +86,21 @@ def assign_employee_role(db: Session, data: EmployeeRole):
     db.execute(update_statement)
     db.commit()
 
-    return {"message": f"Role updated successfully to ' {role_details.name}'"}
-
-
+    return {"message": f"Role updated successfully  ' {role_details.name}'"}
 
 # RoleFunction CRUD operations
-def create_role_function(db: Session, role_function: RoleFunctionCreate, role_id: int):
-    db_role_function = RoleFunction(role_id=role_id, function=role_function.function, jsonfile=role_function.jsonfile)
+def create_role_function(db: Session, role_function: RoleFunctionCreate):
+    role=db.query(Role).filter(Role.id == role_function.role_id).first()
+    if not role:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Role not found")
+    db_role_function = RoleFunction(role_id=role_function.role_id, function=role_function.function, jsonfile=role_function.jsonfile)
     db.add(db_role_function)
     db.commit()
     db.refresh(db_role_function)
     return db_role_function
 
 def get_role_functions(db: Session, role_id: int):
-    return db.query(RoleFunction).filter(RoleFunction.role_id == role_id).first()
+    return db.query(RoleFunction).filter(RoleFunction.role_id == role_id).all()
 
 def delete_role_function(db: Session, role_function_id: int):
     db_role_function = db.query(RoleFunction).filter(RoleFunction.id == role_function_id).first()

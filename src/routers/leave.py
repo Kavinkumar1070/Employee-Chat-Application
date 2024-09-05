@@ -15,7 +15,7 @@ router = APIRouter(
 )
 
 
-@router.post("/leave/", dependencies=[Depends(roles_required("teamleader"))])
+@router.post("/", dependencies=[Depends(roles_required("employee"))])
 def apply_leave(
     leave: EmployeeLeaveCreate, 
     db: Session = Depends(get_db),
@@ -23,14 +23,13 @@ def apply_leave(
 ):
     # Accessing employee_id directly from the object
     employee_id = current_employee.employment_id
-    print(employee_id)
     if not employee_id:
         raise HTTPException(status_code=400, detail="Invalid employee data")
 
     return create_employee_leave(db, leave, employee_id)
 
 
-@router.get("/leave/{employee_id}",dependencies=[Depends(roles_required("teamleader","employee"))])
+@router.get("/{employee_id}",dependencies=[Depends(roles_required("teamleader"))])
 def get_leaves_by_employee(employee_id: str, db: Session = Depends(get_db)):
     db_employee=get_leave_by_employee_id(db, employee_id)
     if not db_employee:
@@ -38,7 +37,7 @@ def get_leaves_by_employee(employee_id: str, db: Session = Depends(get_db)):
     return db_employee
 
 
-@router.get("/pending")
+@router.get("/pending/teamleader",dependencies=[Depends(roles_required("teamleader"))])
 def get_leave_by(db: Session = Depends(get_db)):
     db_leave = get_leave_by_id(db)
     if not db_leave:
@@ -80,7 +79,7 @@ def update_leave( leave: EmployeeLeaveUpdate, db: Session = Depends(get_db)
 
     return db_leave
 
-@router.delete("/leave/{leave_id}",dependencies=[Depends(roles_required("employee"))])
+@router.delete("/{leave_id}",dependencies=[Depends(roles_required("employee"))])
 def delete_leave(leave_id: int, db: Session = Depends(get_db)):
     success = delete_employee_leave(db, leave_id)
     if not success:

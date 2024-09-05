@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.core.database import SessionLocal
+from src.models.personal import EmployeeOnboarding
+from src.core.authentication import get_current_employee
 from src.crud.personal import create_employee, get_employee, update_employee, delete_employee
 from src.schemas.personal import EmployeeCreate,EmployeeUpdate
 from src.core.utils import normalize_string,send_email
@@ -57,15 +59,17 @@ async def create_employee_route(employee: EmployeeCreate, db: Session = Depends(
 
 @router.get("/employees/{employee_id}", dependencies=[Depends(roles_required("admin"))])
 async def read_employee_route(employee_id: str, db: Session = Depends(get_db)):
+  
     db_employee = get_employee(db, employee_id)
     if db_employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
     return db_employee
 
 
-@router.put("/employees/{employee_id}", dependencies=[Depends(roles_required("admin"))])
-async def update_employee_data(employee_id: str,employee_update: EmployeeUpdate,db: Session = Depends(get_db)):
-    updated_employee = update_employee(db, employee_id, employee_update)
+@router.put("/employees/", dependencies=[Depends(roles_required("employee"))])
+async def update_employee_data(employee_update: EmployeeUpdate,db: Session = Depends(get_db),current_employee: EmployeeOnboarding = Depends(get_current_employee)):
+    employee_id = current_employee.employment_id
+    updated_employee = update_employee(db,employee_id,employee_update)
     if updated_employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
     return updated_employee
@@ -76,4 +80,4 @@ async def delete_employee_route(employee_id: str, db: Session = Depends(get_db))
     db_employee = delete_employee(db, employee_id)
     if db_employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
-    return db_employee
+    return {"details":"employee deleted successfully"}

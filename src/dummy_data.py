@@ -28,7 +28,6 @@ def insert_dummy_data():
     # Create tables
     Base.metadata.create_all(bind=engine)
 
-    
     # Insert roles
     admin_role = Role(name="admin")
     teamleader_role = Role(name="teamleader")
@@ -63,24 +62,24 @@ def insert_dummy_data():
     # Insert employees
     admin_employee = EmployeeOnboarding(
         employment_id="cds0001",
-        firstname="Alice",
-        lastname="Smith",
+        firstname="admin",
+        lastname="admin",
         dateofbirth=date(1985, 7, 10),
         contactnumber=1112233445,
-        emailaddress="alice@company.com",
+        emailaddress="hariprathap670@gmail.com",
         address="123 Admin St",
         nationality="American",
-        gender="Female",
+        gender="male",
         maritalstatus="Single"
     )
 
     teamleader_employee = EmployeeOnboarding(
         employment_id="cds0002",
-        firstname="Bob",
-        lastname="Johnson",
+        firstname="teamlead",
+        lastname="tl",
         dateofbirth=date(1988, 3, 22),
         contactnumber=5556677889,
-        emailaddress="bob@company.com",
+        emailaddress="kavin@gmail.com",
         address="456 Leader Rd",
         nationality="American",
         gender="Male",
@@ -89,11 +88,11 @@ def insert_dummy_data():
 
     regular_employee = EmployeeOnboarding(
         employment_id="cds0003",
-        firstname="Charlie",
-        lastname="Brown",
+        firstname="employee",
+        lastname="emp",
         dateofbirth=date(1992, 11, 5),
         contactnumber=9998887770,
-        emailaddress="charlie@company.com",
+        emailaddress="employee@gmail.com",
         address="789 Worker Ave",
         nationality="American",
         gender="Non-Binary",
@@ -108,52 +107,49 @@ def insert_dummy_data():
     teamleader_password = hash_password("teamleadpass456")
     employee_password = hash_password("empass789")
 
-    employment_details = [
-        EmployeeEmploymentDetails(
-            employee_email="alice@company.com",
-            password=admin_password,
-            job_position="Administrator",
-            department="Administration",
-            start_date=date(2020, 1, 1),
-            employment_type="Full-time",
-            reporting_manager="team_leader1",
-            work_location="Main Office",
-            basic_salary=80000.00
-        ),
-        EmployeeEmploymentDetails(
-            employee_email="bob@company.com",
-            password=teamleader_password,
-            job_position="Team Leader",
-            department="Engineering",
-            start_date=date(2021, 6, 1),
-            employment_type="Full-time",
-            reporting_manager="admin1",
-            work_location="Main Office",
-            basic_salary=75000.00
-        ),
-        EmployeeEmploymentDetails(
-            employee_email="charlie@company.com",
-            password=employee_password,
-            job_position="Software Engineer",
-            department="Engineering",
-            start_date=date(2022, 3, 15),
-            employment_type="Full-time",
-            reporting_manager="team_leader1",
-            work_location="Main Office",
-            basic_salary=70000.00
-        )
-    ]
+    admin_employment_details = EmployeeEmploymentDetails(
+        employee_email="admin@conversedatasolution.com",
+        password=admin_password,
+        job_position="Administrator",
+        department="Administration",
+        start_date=date(2020, 1, 1),
+        employment_type="Full-time",
+        reporting_manager=None,
+        work_location="Main Office",
+        basic_salary=80000.00,
+        employee_id=admin_employee.employment_id  # Must match admin_employee.employment_id
+    )
 
-    session.add_all(employment_details)
+    teamleader_employment_details = EmployeeEmploymentDetails(
+        employee_email="teamleader@conversedatasolution.com",
+        password=teamleader_password,
+        job_position="Team Leader",
+        department="Engineering",
+        start_date=date(2021, 6, 1),
+        employment_type="Full-time",
+        reporting_manager="cds0001",
+        work_location="Main Office",
+        basic_salary=75000.00,
+        employee_id=teamleader_employee.employment_id  # Must match teamleader_employee.employment_id
+    )
+
+    regular_employment_details = EmployeeEmploymentDetails(
+        employee_email="employee@conversedatasolution.com",
+        password=employee_password,
+        job_position="Software Engineer",
+        department="Engineering",
+        start_date=date(2022, 3, 15),
+        employment_type="Full-time",
+        reporting_manager="cds0002",
+        work_location="Main Office",
+        basic_salary=70000.00,
+        employee_id=regular_employee.employment_id # Must match regular_employee.employment_id
+    )
+
+    session.add_all([admin_employment_details, teamleader_employment_details, regular_employment_details])
     session.commit()
 
-    # Associate employees with their employment details
-    for emp in [admin_employee, teamleader_employee, regular_employee]:
-        emp_details = session.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_email == emp.emailaddress).first()
-        emp.employment_details.append(emp_details)
-
-    session.commit()
-
+    # Insert roles
     employee_role_table = Table('employee_role', metadata, autoload_with=engine)
     
     session.execute(employee_role_table.insert().values([
@@ -163,10 +159,10 @@ def insert_dummy_data():
     ]))
     session.commit()
 
-
+    # Insert leaves
     leaves = [
         EmployeeLeave(
-            employee_id=1,  # Change this ID based on actual data
+            employee_id=admin_employee.id,
             leave_type="Sick Leave",
             duration=LeaveDuration.ONE_DAY,
             start_date=date(2024, 9, 10),
@@ -176,7 +172,7 @@ def insert_dummy_data():
             reject_reason=None
         ),
         EmployeeLeave(
-            employee_id=2,  # Change this ID based on actual data
+            employee_id=teamleader_employee.id,
             leave_type="Vacation",
             duration=LeaveDuration.HALF_DAY,
             start_date=date(2024, 9, 15),
@@ -186,7 +182,7 @@ def insert_dummy_data():
             reject_reason=None
         ),
         EmployeeLeave(
-            employee_id=3,  # Change this ID based on actual data
+            employee_id=regular_employee.id,
             leave_type="Personal",
             duration=LeaveDuration.ONE_DAY,
             start_date=date(2024, 9, 20),

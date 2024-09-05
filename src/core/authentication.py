@@ -169,10 +169,8 @@ def login_for_access_token(
     )
     role=get_current_employee_roles(employee.id,db)
     role_functions = db.query(RoleFunction).filter(RoleFunction.role_id == role.id).all()
-    print(role.id)
     role_function=[role_function.function for role_function in role_functions]
     role_file=[role_function.jsonfile for role_function in role_functions]
-    print(role_functions)
     return {"access_token": access_token, "token_type": "bearer","role":role.name,"Functions":role_function,"file":role_file}
 
 

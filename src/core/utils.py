@@ -54,6 +54,29 @@ async def send_email(recipient_email: EmailStr,name:str,lname:str,Email: str, Pa
         headers={"message": "OTP Send"}
     )
 
+async def send_email_leave(recipient_email: EmailStr,name:str,lname:str,Leave_id: int, reason:str,status:str):
+
+    sender_email = os.getenv("SENDER_EMAIL")
+    password = os.getenv("EMAIL_PASSWORD")
+    subject = "User Details"
+    body = f"Hi 'Mrs.{name} {lname}' \n Your leave_id is : {Leave_id} \n Leave_status:{status} \nYour reason is:{reason} "
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = recipient_email
+    message["Subject"] = subject
+    message.attach(MIMEText(body, "plain"))
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls() 
+            server.login(sender_email, password)
+            server.sendmail(sender_email, recipient_email, message.as_string())
+    except Exception as e:
+        raise HTTPException(
+        status_code=500,
+        detail=f"Failed to send OTP email: {str(e)}",
+        headers={"message": "OTP Send"}
+    )
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
