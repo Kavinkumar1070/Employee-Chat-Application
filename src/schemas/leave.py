@@ -1,16 +1,19 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import date,datetime
+from datetime import date, datetime
 from enum import Enum
+
 
 class LeaveDuration(str, Enum):
     ONE_DAY = "one_day"
     HALF_DAY = "half_day"
 
+
 class LeaveStatus(str, Enum):
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
+
 
 class EmployeeLeaveBase(BaseModel):
     leave_type: str
@@ -19,14 +22,17 @@ class EmployeeLeaveBase(BaseModel):
     total_days: int = Field(gt=0)
     reason: Optional[str] = None
 
+
 class EmployeeLeaveCreate(EmployeeLeaveBase):
     pass
 
+
 class EmployeeLeaveUpdate(BaseModel):
-    leave_id:int
-    employee_id:str
+    leave_id: int
+    employee_id: str
     status: Optional[LeaveStatus] = None
     reason: Optional[str] = None
+
 
 class EmployeeLeaveResponse(BaseModel):
     id: int

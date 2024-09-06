@@ -1,12 +1,23 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, DECIMAL, Boolean, func, DateTime
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Date,
+    ForeignKey,
+    DECIMAL,
+    Boolean,
+    func,
+    DateTime,
+)
 from sqlalchemy.orm import relationship
 from src.core.database import Base
 from sqlalchemy.orm import validates
 from datetime import date, datetime
 
+
 class EmployeeEmploymentDetails(Base):
-    __tablename__ = 'employee_employment_details'
-    
+    __tablename__ = "employee_employment_details"
+
     id = Column(Integer, primary_key=True, autoincrement=True)
     employee_email = Column(String(100), unique=True)
     password = Column(String(100), unique=True)
@@ -23,11 +34,11 @@ class EmployeeEmploymentDetails(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Ensure that the type of employee_id matches the type of employment_id in EmployeeOnboarding
-    employee_id = Column(String(100), ForeignKey('employee_onboarding.employment_id'))
+    employee_id = Column(String(100), ForeignKey("employee_onboarding.employment_id"))
     employee = relationship("EmployeeOnboarding", back_populates="employment_details")
     leaves = relationship("EmployeeLeave", back_populates="employee")
 
-    @validates('is_active')
+    @validates("is_active")
     def validate_is_active(self, key, value):
         if not value:
             self.releave_date = date.today()

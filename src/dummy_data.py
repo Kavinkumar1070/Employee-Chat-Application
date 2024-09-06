@@ -1,8 +1,15 @@
 from datetime import datetime, date
 from sqlalchemy import create_engine, Table, MetaData
-from sqlalchemy.orm import sessionmaker 
-from models import Base, EmployeeOnboarding, EmployeeEmploymentDetails, Role, RoleFunction, employee_role
-from src.models.leave import EmployeeLeave,LeaveDuration,LeaveStatus
+from sqlalchemy.orm import sessionmaker
+from models import (
+    Base,
+    EmployeeOnboarding,
+    EmployeeEmploymentDetails,
+    Role,
+    RoleFunction,
+    employee_role,
+)
+from src.models.leave import EmployeeLeave, LeaveDuration, LeaveStatus
 from src.core.utils import hash_password
 from fastapi import FastAPI
 from dotenv import load_dotenv
@@ -12,8 +19,7 @@ app = FastAPI()
 
 load_dotenv()
 
-DATABASE_URL=os.getenv("DATABASE_URL")
-
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 # Create a new engine and session
@@ -24,39 +30,150 @@ session = SessionLocal()
 # Create metadata
 metadata = MetaData()
 
+
 def insert_dummy_data():
     # Create tables
     Base.metadata.create_all(bind=engine)
 
     # Insert roles
     admin_role = Role(name="admin")
-    teamleader_role = Role(name="teamleader")
+    teamlead_role = Role(name="teamlead")
     employee_role = Role(name="employee")
-    
-    session.add_all([admin_role, teamleader_role, employee_role])
+
+    session.add_all([admin_role, teamlead_role, employee_role])
     session.commit()
 
     # Insert role functions
     admin_functions = [
-        RoleFunction(role_id=admin_role.id, function="edit employee", jsonfile="admin_edit_employee.json"),
-        RoleFunction(role_id=admin_role.id, function="approve leave", jsonfile="admin_approve_leave.json"),
-        RoleFunction(role_id=admin_role.id, function="share information", jsonfile="admin_share_info.json")
+        RoleFunction(
+            role_id=admin_role.id,
+            function="create personal employee",
+            jsonfile="admin_edit_employee.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="get personal employee by id",
+            jsonfile="admin_approve_leave.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="delete personal employee by id",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="delete personal employee by id",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="update personal employee",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="update employee details",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="create employee details",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="get employee by id",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="delete employee by id",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="create role",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="delete role by id",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="update role by id",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="get role by id",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="assign role to employee",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="create role function",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="get role functions by id",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="delete role function by id",
+            jsonfile="admin_share_info.json",
+        ),
     ]
 
-    teamleader_functions = [
-        RoleFunction(role_id=teamleader_role.id, function="approve leave", jsonfile="teamleader_approve_leave.json"),
-        RoleFunction(role_id=teamleader_role.id, function="apply leave", jsonfile="teamleader_apply_leave.json"),
-        RoleFunction(role_id=teamleader_role.id, function="edit details", jsonfile="teamleader_edit_details.json")
+    teamlead_functions = [
+        RoleFunction(
+            role_id=teamlead_role.id,
+            function="approve leave",
+            jsonfile="teamlead_approve_leave.json",
+        ),
+        RoleFunction(
+            role_id=teamlead_role.id,
+            function="apply leave",
+            jsonfile="teamlead_apply_leave.json",
+        ),
+        RoleFunction(
+            role_id=teamlead_role.id,
+            function="edit details",
+            jsonfile="teamlead_edit_details.json",
+        ),
     ]
 
     employee_functions = [
-        RoleFunction(role_id=employee_role.id, function="apply leave", jsonfile="employee_apply_leave.json"),
-        RoleFunction(role_id=employee_role.id, function="view leave by month", jsonfile="employee_view_leave.json"),
-        RoleFunction(role_id=employee_role.id, function="delete leave", jsonfile="employee_delete_leave.json"),
-        RoleFunction(role_id=employee_role.id, function="update personal details", jsonfile="employee_update_details.json")
+        RoleFunction(
+            role_id=employee_role.id,
+            function="apply leave",
+            jsonfile="employee_apply_leave.json",
+        ),
+        RoleFunction(
+            role_id=employee_role.id,
+            function="view leave by month",
+            jsonfile="employee_view_leave.json",
+        ),
+        RoleFunction(
+            role_id=employee_role.id,
+            function="delete leave",
+            jsonfile="employee_delete_leave.json",
+        ),
+        RoleFunction(
+            role_id=employee_role.id,
+            function="update personal details",
+            jsonfile="employee_update_details.json",
+        ),
     ]
 
-    session.add_all(admin_functions + teamleader_functions + employee_functions)
+    session.add_all(admin_functions + teamlead_functions + employee_functions)
     session.commit()
 
     # Insert employees
@@ -70,10 +187,10 @@ def insert_dummy_data():
         address="123 Admin St",
         nationality="American",
         gender="male",
-        maritalstatus="Single"
+        maritalstatus="Single",
     )
 
-    teamleader_employee = EmployeeOnboarding(
+    teamlead_employee = EmployeeOnboarding(
         employment_id="cds0002",
         firstname="teamlead",
         lastname="tl",
@@ -83,7 +200,7 @@ def insert_dummy_data():
         address="456 Leader Rd",
         nationality="American",
         gender="Male",
-        maritalstatus="Married"
+        maritalstatus="Married",
     )
 
     regular_employee = EmployeeOnboarding(
@@ -96,15 +213,15 @@ def insert_dummy_data():
         address="789 Worker Ave",
         nationality="American",
         gender="Non-Binary",
-        maritalstatus="Single"
+        maritalstatus="Single",
     )
-    
-    session.add_all([admin_employee, teamleader_employee, regular_employee])
+
+    session.add_all([admin_employee, teamlead_employee, regular_employee])
     session.commit()
 
     # Insert employment details
     admin_password = hash_password("adminpass123")
-    teamleader_password = hash_password("teamleadpass456")
+    teamlead_password = hash_password("teamleadpass456")
     employee_password = hash_password("empass789")
 
     admin_employment_details = EmployeeEmploymentDetails(
@@ -117,12 +234,12 @@ def insert_dummy_data():
         reporting_manager=None,
         work_location="Main Office",
         basic_salary=80000.00,
-        employee_id=admin_employee.employment_id  # Must match admin_employee.employment_id
+        employee_id=admin_employee.employment_id,  # Must match admin_employee.employment_id
     )
 
-    teamleader_employment_details = EmployeeEmploymentDetails(
-        employee_email="teamleader@conversedatasolution.com",
-        password=teamleader_password,
+    teamlead_employment_details = EmployeeEmploymentDetails(
+        employee_email="teamlead@conversedatasolution.com",
+        password=teamlead_password,
         job_position="Team Leader",
         department="Engineering",
         start_date=date(2021, 6, 1),
@@ -130,7 +247,7 @@ def insert_dummy_data():
         reporting_manager="cds0001",
         work_location="Main Office",
         basic_salary=75000.00,
-        employee_id=teamleader_employee.employment_id  # Must match teamleader_employee.employment_id
+        employee_id=teamlead_employee.employment_id,  # Must match teamlead_employee.employment_id
     )
 
     regular_employment_details = EmployeeEmploymentDetails(
@@ -143,20 +260,30 @@ def insert_dummy_data():
         reporting_manager="cds0002",
         work_location="Main Office",
         basic_salary=70000.00,
-        employee_id=regular_employee.employment_id # Must match regular_employee.employment_id
+        employee_id=regular_employee.employment_id,  # Must match regular_employee.employment_id
     )
 
-    session.add_all([admin_employment_details, teamleader_employment_details, regular_employment_details])
+    session.add_all(
+        [
+            admin_employment_details,
+            teamlead_employment_details,
+            regular_employment_details,
+        ]
+    )
     session.commit()
 
     # Insert roles
-    employee_role_table = Table('employee_role', metadata, autoload_with=engine)
-    
-    session.execute(employee_role_table.insert().values([
-        {"employee_id": admin_employee.id, "role_id": admin_role.id},
-        {"employee_id": teamleader_employee.id, "role_id": teamleader_role.id},
-        {"employee_id": regular_employee.id, "role_id": employee_role.id}
-    ]))
+    employee_role_table = Table("employee_role", metadata, autoload_with=engine)
+
+    session.execute(
+        employee_role_table.insert().values(
+            [
+                {"employee_id": admin_employee.id, "role_id": admin_role.id},
+                {"employee_id": teamlead_employee.id, "role_id": teamlead_role.id},
+                {"employee_id": regular_employee.id, "role_id": employee_role.id},
+            ]
+        )
+    )
     session.commit()
 
     # Insert leaves
@@ -169,17 +296,17 @@ def insert_dummy_data():
             end_date=date(2024, 9, 10),
             status=LeaveStatus.APPROVED,
             reason="Flu",
-            reject_reason=None
+            reject_reason=None,
         ),
         EmployeeLeave(
-            employee_id=teamleader_employee.id,
+            employee_id=teamlead_employee.id,
             leave_type="Vacation",
             duration=LeaveDuration.HALF_DAY,
             start_date=date(2024, 9, 15),
             end_date=date(2024, 9, 15),
             status=LeaveStatus.PENDING,
             reason="Family Event",
-            reject_reason=None
+            reject_reason=None,
         ),
         EmployeeLeave(
             employee_id=regular_employee.id,
@@ -189,12 +316,13 @@ def insert_dummy_data():
             end_date=date(2024, 9, 20),
             status=LeaveStatus.REJECTED,
             reason="Urgent Personal Matter",
-            reject_reason="Insufficient Leave Balance"
-        )
+            reject_reason="Insufficient Leave Balance",
+        ),
     ]
 
     session.add_all(leaves)
     session.commit()
+
 
 if __name__ == "__main__":
     insert_dummy_data()
