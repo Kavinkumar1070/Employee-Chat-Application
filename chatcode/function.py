@@ -90,7 +90,8 @@ async def get_project_details(websocket: WebSocket,query,jsonfile):
     result = response_text[json_start_idx:json_end_idx]
     result = sanitize_json_string(result)
     project_name = json.loads(result).get("project")
-    print("project_name :",project_name)
+    print("*****************************************************")
+    print("project_name Done")
     if project_name == "None" or project_name is None:
         await websocket.send_text("You have asked for irrelavant query ask anything from listed :")
         user_input = await websocket.receive_text()
@@ -105,10 +106,15 @@ def get_project_script(project_name,jsonfile):
     file = jsonfile
     with open(file, 'r') as f:
         json_config = json.load(f)
-    return json_config.get(project_name)
+        project_script = json_config.get(project_name)
+    print("*****************************************************")
+    print("project_detail Done")
+    return project_script
 
 def split_payload_fields(project_detail):
     payload_detail = project_detail['payload']
+    print("*****************************************************")
+    print("payload_detail Done")
     return payload_detail
 
 async def fill_payload_values(websocket, query: str, payload_details: dict,jsonfile) -> Dict[str, Any]:    
@@ -129,7 +135,6 @@ async def fill_payload_values(websocket, query: str, payload_details: dict,jsonf
                         No Assumptions: Do not make any assumptions. Return None only if there is no relevant information provided in the user query and no default value is specified in the configuration file.
                         Match Formats and Choices: Ensure that the captured values match the required formats or choices exactly. If a value does not match, use the default value specified in the configuration file.
                         Use Default Values: If the user query does not provide a value that matches the required format or choice, use the default value from the configuration file if specified. For example, if the configuration file specifies "default": "None", return "None" if no valid input is found.
-                        Date Handling: For date fields, use the year 2024 if the user does not specify the year clearly.
                         Strict Data Capture: Do not use values from provided examples. Capture values only from the user query or use the default values from the configuration file.
                         JSON Response Format: Return only the payload JSON response in the FOLLOWING FORMAT, enclosed with ~~~ before and after the response.
                     
@@ -178,19 +183,17 @@ async def fill_payload_values(websocket, query: str, payload_details: dict,jsonf
     result = response_text[json_start_idx:json_end_idx]
     # Sanitize the response
     sanitized_response = sanitize_json_string(result)
-    logger.info(f"Sanitized response: {sanitized_response}")
+    #logger.info(f"Sanitized response: {sanitized_response}")
     try:
         # Try to parse the JSON response
         result = json.loads(sanitized_response)
-        print("*********************")
-        print(result)
-        print("*********************")
         response_config = result.get('payload', {})
-        logger.info(f"Response config: {result}")
-        print("*********************")
-
-    except (ValueError, json.JSONDecodeError) as e:
-        #await websocket.send_text(f"Error parsing JSON in fill_payload_values: {e}")
+        print("*****************************************************")
+        print("Fill payload Done")
+        print(result)
+        
+    except Exception as e:
+        print('error',e)
         await websocket.send_text("Model Issue. Can you please try again :")
         user_input = await websocket.receive_text()
         user_input_data = json.loads(user_input)
@@ -202,16 +205,77 @@ async def fill_payload_values(websocket, query: str, payload_details: dict,jsonf
         return filled_cleaned
     return response_config
 
+def check_autofill(query, sanitized_response):
+    client = Groq(api_key="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")
+
+    response = client.chat.completions.create(
+        model='mixtral-8x7b-32768',
+        messages=[
+            {
+                "role": "system",
+                "content": f"""You are an expert in verifying and updating payload values based on a user query. Follow these instructions:
+
+                **Instructions:**
+                
+                1. **Analyze the Query:** 
+                    Examine the user query: `{query}`.
+                2. **Payload Verification:** 
+                    Compare the fields and values in the provided payload `{sanitized_response}` with the query.
+                    - For each field in the payload:
+                     - **If the field is explicitly mentioned in the query**, update the value based on the query. Use the value from the payload if provided.
+                     - **If the field is not mentioned in the query**, set the value to `"None"`.
+                3. **Response Formatting:**
+                    Return a JSON object with the same structure as the input payload.
+                    Enclose the entire response JSON with `~~~` before and after the response.
+                    Do not include any additional explanations.
+
+                **Example output format:**
+                payload:{{
+                                    "payload": {{
+                                        "month": "None",
+                                        "year": "None"
+                                    }}
+                                }}
+                And the user query: "get leave records by month and year"
+
+                The response from model should be:
+                ~~~
+                {{
+                    "payload": {{
+                        "month": "None",
+                        "year": "None"
+                    }}
+                }}
+                ~~~
+                """
+            },
+            {
+                "role": "user",
+                "content": f"Analyze the following query: `{query}` and the payload: `{sanitized_response}`. Provide the verified payload in JSON format enclosed with `~~~` before and after the response, without any explanations."
+            }
+        ]
+    )
+    response_text = response.choices[0].message.content.strip()
+    json_start_idx = response_text.find("~~~") + 3
+    json_end_idx = response_text.rfind("~~~") 
+    result = response_text[json_start_idx:json_end_idx]
+    sanitized_response = sanitize_json_string(result)
+    results = json.loads(sanitized_response)
+    results = results.get('payload')
+    print("*****************************************************")
+    print("Check Autofill Done")
+    print(results)
+    
+    return results
+
 
 def validate(payload_detail, response_config):
-    
-    #print(payload_detail)
-    #print('@@@@@@@@@@@@@@@@@@@@@@')
-    #print(response_config)
-    
     payload_details = payload_detail['payload']
     validated_payload = {}
-
+    
+    # print("payload_details",payload_details)
+    # print("response_config",response_config)
+    
     for key, values in payload_details.items():
         if key in response_config.keys():
             value = response_config.get(key)
@@ -273,6 +337,9 @@ def validate(payload_detail, response_config):
         'method': payload_detail['method'],
         'payload': validated_payload
     }
+    print("Validation Done")
+    print(final_response)
+    print("*****************************************************")
     return final_response
 
 
@@ -341,14 +408,14 @@ async def update_process_with_user_input(websocket: WebSocket,project_details:di
 async def update_process(websocket: WebSocket, project_details:dict,data: dict):
     update_payload = data['payload']
     if all(value is None or value == "None"  for value in update_payload.values()):
-        print('start1')
+        #print('start1')
         updated_details = await update_process_with_user_input(websocket,project_details, data)
-        print("update output:",updated_details)
+        #print("update output:",updated_details)
         return updated_details
     else:
-        print('start2')
+        #print('start2')
         details = await ask_user(websocket,project_details, data)
-        print("update output direct:",details)
+        #print("update output direct:",details)
         return details
     
     

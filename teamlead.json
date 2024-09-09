@@ -165,16 +165,15 @@
         "payload": {
             "monthnumber": {
                 "description": "Month of the leave records to retrieve",
-                "datatype": "int",
-                "format": "M",
+                "datatype": "integer",
                 "required": true,
                 "default":"None"
             },
             "yearnumber": {
                 "description": "Year of the leave records to retrieve",
-                "datatype": "int",
-                "format": "YYYY",
-                "required": true
+                "datatype": "integer",
+                "required": true,
+                "default":"None"
             }
         }
     },

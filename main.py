@@ -120,16 +120,12 @@ async def websocket_endpoint(websocket: WebSocket):
                 break
             else:
                 jsonfile = choose_json(role)
-                print("jsonfile selected :",jsonfile)
                 query, project_name = await get_project_details(websocket, user_message,jsonfile)
-                print("query :",query)
-                print("project_name :",project_name)
                 project_details = get_project_script(project_name,jsonfile)
                 payload_details = split_payload_fields(project_details)
                 filled_cleaned = await fill_payload_values(websocket, query, payload_details,jsonfile)
-                print("filled_cleaned :",filled_cleaned)
-                validate_payload = validate(project_details, filled_cleaned)
-                logger.info(f"Validated payload: {validate_payload}")
+                autochecked_payload = check_autofill(query, filled_cleaned)
+                validate_payload = validate(project_details, autochecked_payload)
                 if validate_payload['method'] == 'PUT':
                     answer = await update_process(websocket,project_details,validate_payload)
                     logger.info(f"Answer from ask_user: {answer}")
@@ -137,12 +133,15 @@ async def websocket_endpoint(websocket: WebSocket):
                     answer = await ask_user(websocket, project_details, validate_payload)
                     logger.info(f"Answer from ask_user: {answer}")
                     answer['bearer_token'] = token
-                    print(answer)
-                res=await onboard_personal_d(websocket,answer)
-                print(res)
-                model_op = nlp_response(res)
-
-                await websocket.send_text(model_op + " Thanks for using this app. Need anything, feel free to ask!")
+                    
+                result =await database_operation(websocket,answer)
+                if not result:
+                    await websocket.send_text(" Thanks for using this app. Need anything, feel free to ask!")
+                    continue
+                else:
+                    model_output = nlp_response(result)
+                    await websocket.send_text(model_output + " Thanks for using this app. Need anything, feel free to ask!")
+                    
     except WebSocketDisconnect:
         logger.info("Client disconnected")
     except Exception as e:

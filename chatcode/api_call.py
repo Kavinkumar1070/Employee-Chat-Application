@@ -12,11 +12,6 @@ import json
 logger = logging.getLogger(__name__)
 
 
-import httpx
-from fastapi import WebSocket
-
-import httpx
-from fastapi import WebSocket
 async def onboard_personal_details(websocket: WebSocket, details: Dict[str, str]):
     url = 'http://127.0.0.1:8000/personal/employees'
     payload = details
@@ -117,12 +112,10 @@ def generate_html_table(data):
     
     return table
 
-async def onboard_personal_d(websocket: WebSocket, details: Dict[str, str]):
+async def database_operation(websocket: WebSocket, details: Dict[str, str]):
     url_template = details.get('url')
     payload = details.get('payload', {})
-    print("1111111111111111111",payload)
     query_params = details.get('query_params', {})
-    print('222222222222222222222222222222',query_params)
     method = details.get('method', 'GET').upper()
     timeout_seconds = 30
 
@@ -160,15 +153,16 @@ async def onboard_personal_d(websocket: WebSocket, details: Dict[str, str]):
 
             response_data = response.json()
             print(response_data)
-            html_table = generate_html_table(response_data)
-
-            await websocket.send_text(f"Request successful. Data:<br>{html_table}")
-            return response_data
+            if method == 'GET':
+                html_table = generate_html_table(response_data)
+                await websocket.send_text(f"Request successful. Data:<br>{html_table}")
+            else:
+                return response_data
 
     except httpx.HTTPStatusError as e:
         error_message = (f"HTTP error occurred: {str(e)} - "
-                         f"Status Code: {e.response.status_code}\n"
-                         f"Response Content: {e.response.text}")
+                        f"Status Code: {e.response.status_code}\n"
+                        f"Response Content: {e.response.text}")
         await websocket.send_text(error_message)
         return error_message
 
