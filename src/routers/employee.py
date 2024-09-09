@@ -65,7 +65,10 @@ async def read_employee(
     elif employee_role.name == "admin":
         db_employee = get_all_employee_employment_details(db, employee_id)
     elif employee_role.name == "teamlead":
-        db_employee = get_all_employee_teamlead(db, employee_id, reporting_manager=current_employee_id)
+        if  employee_id==current_employee.employment_id:
+            db_employee = get_all_employee_employment_details(db, employee_id)
+        else:
+            db_employee = get_all_employee_teamlead(db, employee_id, reporting_manager=current_employee_id)
     else:
         raise HTTPException(status_code=403, detail="Forbidden")
 

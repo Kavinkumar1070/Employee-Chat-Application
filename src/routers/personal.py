@@ -86,7 +86,10 @@ async def read_employee_route(
         db_employee = get_employee_admin(db)
         return db_employee
     if employee_role.name == "teamlead":
-        db_employee = get_employee_teamlead(db, employee_id,current_employee_id)
+        if  employee_id==current_employee.employment_id:
+            db_employee = get_employee(db, employee_id)
+        else:
+            db_employee = get_employee_teamlead(db, employee_id,current_employee_id)
         return db_employee
     else:
         raise HTTPException(status_code=404, detail="Employee not found")
