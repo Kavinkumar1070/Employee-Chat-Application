@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query,Path
 from sqlalchemy.orm import Session
 from typing import Optional
 from src.core.utils import normalize_string
@@ -49,35 +49,32 @@ async def create_employee(
     dependencies=[Depends(roles_required("employee", "teamlead", "admin"))],
 )
 async def read_employee(
-    employee: Optional[str] = Query(None),  # Declare as optional query parameter
+    employee_id: str = Path(...),  # Path parameter is required, but use a placeholder
     db: Session = Depends(get_db),
     current_employee=Depends(get_current_employee),
 ):
     current_employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
 
+    # Handle the case where 'me' is passed as the employee_id
+    if employee_id == "me":
+        employee_id = current_employee_id
+
     if employee_role.name == "employee":
-        # An employee can only see their own details
         db_employee = get_all_employee_employment_details(db, current_employee_id)
     elif employee_role.name == "admin":
-        # An admin can see details of any employee specified
-        db_employee = get_all_employee_employment_details(
-            db, employee or current_employee_id
-        )
+        db_employee = get_all_employee_employment_details(db, employee_id)
     elif employee_role.name == "teamlead":
-        # A teamlead can see details of their direct reports
-        db_employee = get_all_employee_teamlead(
-            db, employee or current_employee_id, reporting_manager=current_employee_id
-        )
+        db_employee = get_all_employee_teamlead(db, employee_id, reporting_manager=current_employee_id)
     else:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     if db_employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
 
+    # Prepare the response with employee details
     employee_details = {
         "employee_email": db_employee.employee_email,
-        "employment_id": db_employee.employee.employment_id,
         "job_position": db_employee.job_position,
         "department": db_employee.department,
         "start_date": db_employee.start_date,
@@ -87,20 +84,11 @@ async def read_employee(
         "basic_salary": db_employee.basic_salary,
         "is_active": db_employee.is_active,
         "releave_date": str(db_employee.releave_date),
-        "employee_data": {
-            "firstname": db_employee.employee.firstname,
-            "lastname": db_employee.employee.lastname,
-            "dateofbirth": str(db_employee.employee.dateofbirth),
-            "contactnumber": db_employee.employee.contactnumber,
-            "emailaddress": db_employee.employee.emailaddress,
-            "address": db_employee.employee.address,
-            "nationality": db_employee.employee.nationality,
-            "gender": db_employee.employee.gender,
-            "maritalstatus": db_employee.employee.maritalstatus,
-        },
+        "employee_data":db_employee.employee.employment_id,
+        "employee_name":db_employee.employee.firstname
     }
 
-    return {"Full_Details": [employee_details]}
+    return employee_details
 
 
 @router.put("/employees/", dependencies=[Depends(roles_required("admin"))])

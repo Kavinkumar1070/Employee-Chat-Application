@@ -85,7 +85,7 @@ def get_leave_by_employee_id(db: Session, employee_id: str):
     )
 
 
-def get_leave_by_employee_Team(db: Session, employee_id: str, report_manager: str):
+def get_leave_by_employee_team(db: Session, employee_id: str, report_manager: str):
     # Query to get employee data based on employee_id and report_manager
     employee_data = (
         db.query(EmployeeEmploymentDetails)
@@ -95,36 +95,21 @@ def get_leave_by_employee_Team(db: Session, employee_id: str, report_manager: st
         )
         .first()
     )
-
-    if employee_data:
-        # If employee data is found, return their leave records
-        return (
-            db.query(EmployeeLeave)
-            .filter(EmployeeLeave.employee_id == employee_data.id)
-            .all()
+    if  employee_data:   # If employee data is found, return their leave records
+        leave_records = (
+                db.query(EmployeeLeave)
+                .filter(EmployeeLeave.employee_id == employee_data.id)
+                .all()
         )
-    else:
-        # If employee data is not found, get the reporting manager details
-        report = (
-            db.query(EmployeeEmploymentDetails)
-            .filter(EmployeeEmploymentDetails.employee_id == report_manager)
-            .first()
-        )
-        report_manager_data = (
-            db.query(EmployeeLeave)
-            .filter(EmployeeLeave.employee_id == report.id)
-            .first()
-        )
+        
+        return leave_records
+    tl= db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id).first()
+    if tl:
+        return db.query(EmployeeLeave).filter(EmployeeLeave.employee_id == tl.id).first()
+    if not tl:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Employee not found")
 
-        if not report_manager_data:
-            # If reporting manager data is also not found, raise a 404 error
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Employee and Reporting Manager Not Found",
-            )
 
-        # Return the reporting manager details
-        return report_manager_data
 
 
 def get_leave_by_id(db: Session, current_employee_id: str):
@@ -148,6 +133,7 @@ def get_leave_by_admin(db: Session):
 
 def get_leave_by_report_manager(db: Session, report_manager_id: str):
     # Query to get all employees reporting to the given manager
+    manager=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == report_manager_id).first()
     employees = (
         db.query(EmployeeEmploymentDetails)
         .filter(EmployeeEmploymentDetails.reporting_manager == report_manager_id)
@@ -163,7 +149,7 @@ def get_leave_by_report_manager(db: Session, report_manager_id: str):
 
     # Extract the employee IDs from the employment details
     employee_ids = [employee.id for employee in employees]
-
+    employee_ids.append(manager.id)
     # Query to get all pending leave records for the employees
     leave_details = (
         db.query(EmployeeLeave)

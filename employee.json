@@ -1,66 +1,185 @@
 {
-    "update personal details": {
-        "project": "update personal details",
-        "project description": "Create a new user by providing their personal details.",
+    "get personal employee by id": {
+        "project": "get personal employee by id",
+        "project description": "Retrieve personal employee record by employee ID.",
+        "url": "http://127.0.0.1:8000/personal/employees/{employee_id}",
+        "method": "GET",
+        "payload": {
+            "employee_id": {
+                "description": "ID of the employee to retrieve, please type anything or ('me')",
+                "datatype": "string",
+                "required": true
+            }
+        }
+    },
+    "update personal employee": {
+        "project": "update personal employee",
+        "project description": "Update personal employee record with new details.",
         "url": "http://127.0.0.1:8000/personal/employees/",
         "method": "PUT",
         "payload": {
-            "firstname": {
-                "description": "First name of the user",
+            "employee_update": {
+                "firstname": {
+                    "description": "First name of the employee",
+                    "datatype": "string",
+                    "required": true,
+                    "default": "None"
+                },
+                "lastname": {
+                    "description": "Last name of the employee",
+                    "datatype": "string",
+                    "required": true,
+                    "default": "None"
+                },
+                "dateofbirth": {
+                    "description": "Date of birth of the employee in YYYY-MM-DD format",
+                    "datatype": "date",
+                    "format": "%Y-%m-%d",
+                    "required": true,
+                    "default": "None"
+                },
+                "contactnumber": {
+                    "description": "Contact number of the employee",
+                    "datatype": "mobile",
+                    "required": true,
+                    "default": "None"
+                },
+                "emailaddress": {
+                    "description": "Email address of the employee",
+                    "datatype": "regex",
+                    "format": "^[a-z0-9]+@[a-z0-9]+\\.com$",
+                    "required": true,
+                    "default": "None"
+                },
+                "address": {
+                    "description": "Residential address of the employee",
+                    "datatype": "string",
+                    "required": true,
+                    "default": "None"
+                },
+                "nationality": {
+                    "description": "Nationality of the employee",
+                    "datatype": "string",
+                    "required": true,
+                    "default": "None"
+                },
+                "gender": {
+                    "description": "Gender of the employee",
+                    "datatype": "choices",
+                    "required": true,
+                    "choices": ["male", "female", "other"],
+                    "default": "None"
+                },
+                "maritalstatus": {
+                    "description": "Marital status of the employee",
+                    "datatype": "choices",
+                    "required": true,
+                    "choices": ["single", "married", "divorced", "widowed"],
+                    "default": "None"
+                }
+            }
+        }
+    },
+    "create leave record": {
+        "project": "create leave record",
+        "project description": "Create a new leave record with provided details.",
+        "url": "http://127.0.0.1:8000/leave/",
+        "method": "POST",
+        "payload": {
+            "leave_type": {
+                "description": "Type of leave",
                 "datatype": "string",
                 "required": true,
                 "default": "None"
             },
-            "lastname": {
-                "description": "Last name of the user",
+            "duration": {
+                "description": "Duration of the leave",
                 "datatype": "string",
+                "choices": ["one_day", "multiple_days"],
                 "required": true,
-                "default": "None"
+                "default": "one_day"
             },
-            "dateofbirth": {
-                "description": "Date of birth of the user in YYYY-MM-DD format",
+            "start_date": {
+                "description": "Start date of the leave in YYYY-MM-DD format",
                 "datatype": "date",
                 "format": "%Y-%m-%d",
                 "required": true,
                 "default": "None"
             },
-            "contactnumber": {
-                "description": "Contact number of the user",
-                "datatype": "mobile",
+            "total_days": {
+                "description": "Total number of leave days",
+                "datatype": "int",
                 "required": true,
-                "default": "None"
+                "default": 1
             },
-            "emailaddress": {
-                "description": "Email address of the user",
-                "datatype": "regex",
-                "format": "^[a-z0-9]+@[a-z0-9]+\\.com$",
-                "required": true,
-                "default": "None"
-            },
-            "address": {
-                "description": "Residential address of the user",
+            "reason": {
+                "description": "Reason for the leave",
                 "datatype": "string",
                 "required": true,
                 "default": "None"
-            },
-            "nationality": {
-                "description": "Nationality of the user",
+            }
+        }
+    },
+    "get leave records by employee id": {
+        "project": "get leave records by employee id",
+        "project description": "Retrieve leave records for a specific employee.",
+        "url": "http://127.0.0.1:8000/leave/",
+        "method": "GET",
+        "payload": {
+            "employee_id": {
+                "description": "ID of the employee to retrieve leave records for",
                 "datatype": "string",
                 "required": true,
                 "default": "None"
-            },
-            "gender": {
-                "description": "Gender of the user",
-                "datatype": "choices",
+            }
+        }
+    },
+    "get pending leave records for teamlead": {
+        "project": "get pending leave records for teamlead",
+        "project description": "Retrieve pending leave records for a teamlead.",
+        "url": "http://127.0.0.1:8000/leave/pending/teamlead",
+        "method": "GET",
+        "payload": {
+            "employee_id": {
+                "description": "ID of the teamlead requesting the pending leave records",
+                "datatype": "string",
                 "required": true,
-                "choices":["male","female","other"],
+                "default": "None"
+            }
+        }
+    },
+    "get leave records by month and year": {
+        "project": "get leave records by month and year",
+        "project description": "Retrieve leave records for a specific month and year.",
+        "url": "http://127.0.0.1:8000/leave/{month}/{year}",
+        "method": "GET",
+        "payload": {
+            "month": {
+                "description": "Month of the leave records to retrieve",
+                "datatype": "string",
+                "format": "MM",
+                "required": true,
                 "default": "None"
             },
-            "maritalstatus": {
-                "description": "Marital status of the user",
-                "datatype": "choices",
+            "year": {
+                "description": "Year of the leave records to retrieve",
+                "datatype": "string",
+                "format": "YYYY",
                 "required": true,
-                "choices":["single","married","divorced","widowed"],
+                "default": "None"
+            }
+        }
+    },
+    "delete leave record by id": {
+        "project": "delete leave record by id",
+        "project description": "Delete a leave record by leave ID.",
+        "url": "http://127.0.0.1:8000/leave/{leave_id}",
+        "method": "DELETE",
+        "payload": {
+            "leave_id": {
+                "description": "ID of the leave record to delete",
+                "datatype": "string",
+                "required": true,
                 "default": "None"
             }
         }

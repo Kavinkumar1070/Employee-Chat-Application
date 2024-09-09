@@ -17,7 +17,7 @@ from src.crud.leave import (
     get_leave_by_employee_id,
     get_leave_by_id,
     get_employee_leave_by_month,
-    get_leave_by_employee_Team,
+    get_leave_by_employee_team,
     get_leave_by_admin,
     get_leave_by_report_manager,
     update_employee_teamlead,
@@ -54,26 +54,24 @@ async def apply_leave(
 
 
 @router.get(
-    "/", dependencies=[Depends(roles_required("employee", "teamlead", "admin"))]
+    "/{employee_id}", dependencies=[Depends(roles_required("employee", "teamlead", "admin"))]
 )
 def get_leaves_by_employee(
-    employee_id: Optional[str] = Query(None),  # Declare as an optional query parameter
+    employee_id: str = Path(...),  # Declare as an optional query parameter
     db: Session = Depends(get_db),
     current_employee=Depends(get_current_employee),
 ):
-    if employee_id is None:
-        employee_id = current_employee.employment_id
-
     current_employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
-
+    if employee_id == "me":
+        employee_id = current_employee_id
     if employee_role.name == "employee":
         db_employee = get_leave_by_employee_id(db, current_employee_id)
     elif employee_role.name == "admin":
         db_employee = get_leave_by_employee_id(db, employee_id)
     elif employee_role.name == "teamlead":
-        db_employee = get_leave_by_employee_Team(
-            db, employee_id or current_employee, report_manager=current_employee_id
+        db_employee = get_leave_by_employee_team(
+            db, employee_id, report_manager=current_employee_id
         )
     else:
         raise HTTPException(status_code=403, detail="Forbidden")
@@ -93,7 +91,6 @@ def get_leave_by(
 ):
     current_employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
-
     if employee_role.name == "employee":
         db_leave = get_leave_by_id(db, current_employee_id)
     if employee_role.name == "admin":
@@ -111,23 +108,23 @@ def get_leave_by(
 
 
 @router.get(
-    "/month/{month}/{year}",
+    "/{monthnumber}/{yearnumber}",
     dependencies=[Depends(roles_required("employee", "admin", "teamlead"))],
 )
 def get_leave_by_month(
-    month: int,
-    year: int,
+    monthnumber: int,
+    yearnumber: int,
     db: Session = Depends(get_db),
     current_employee: EmployeeOnboarding = Depends(get_current_employee),
 ):
     employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
     if employee_role.name == "employee":
-        return get_employee_leave_by_month(db, employee_id, month, year)
+        return get_employee_leave_by_month(db, employee_id, monthnumber, yearnumber)
     if employee_role.name == "admin":
-        return get_employee_leave_by_month(db, employee_id, month, year)
+        return get_employee_leave_by_month(db, employee_id, monthnumber, yearnumber)
     if employee_role.name == "teamlead":
-        return get_employee_leave_by_month(db, employee_id, month, year)
+        return get_employee_leave_by_month(db, employee_id, monthnumber, yearnumber)
 
     return {"detail": "No leaves this Month"}
 

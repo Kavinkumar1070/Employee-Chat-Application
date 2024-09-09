@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException,Path
 from sqlalchemy.orm import Session
 from src.core.database import SessionLocal
 from src.models.personal import EmployeeOnboarding
@@ -73,10 +73,12 @@ async def create_employee_route(
     dependencies=[Depends(roles_required("employee", "teamlead", "admin"))],
 )
 async def read_employee_route(
-    db: Session = Depends(get_db), current_employee=Depends(get_current_employee)
+    employee_id: str = Path(...),db: Session = Depends(get_db), current_employee=Depends(get_current_employee)
 ):
-    employee_id = current_employee.employment_id
+    current_employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
+    if employee_id=="me":
+        employee_id=current_employee_id
     if employee_role.name == "employee":
         db_employee = get_employee(db, employee_id)
         return db_employee
@@ -84,11 +86,10 @@ async def read_employee_route(
         db_employee = get_employee_admin(db)
         return db_employee
     if employee_role.name == "teamlead":
-        db_employee = get_employee_teamlead(db, employee_id)
+        db_employee = get_employee_teamlead(db, employee_id,current_employee_id)
         return db_employee
     else:
         raise HTTPException(status_code=404, detail="Employee not found")
-
 
 @router.put(
     "/employees/",

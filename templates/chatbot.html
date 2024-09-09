@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot UI</title>
     <link rel="stylesheet" href="../templates/newstyle.css">
+    
 </head>
 <body>
     <div>
         <div class="headerbox">
-            <p id="welcome-message" class="para">Loading...</p>
+            <p id="welcome-message" class="para" style="width: 490px;">Loading...</p>
         </div>
-        <div class="chat-container">
+        <div class="chat-container" style="width: 500px;">
             <div class="chat-box" id="chat-box">
                 <div id="initial">
                     <p>Hello, I am Jarvis, an Employee Chatbot. Please ask a query related to the topics below:</p>
@@ -29,6 +30,7 @@
             const sendButton = document.getElementById('send-button');
             const initialMessage = document.getElementById('initial');
             let employeeId = null;
+            let role = null;
 
             const token = localStorage.getItem('token');
             console.log(token);
@@ -56,7 +58,6 @@
                     const profile = await response.json();
                     employeeId = profile.Employee_ID;
                     role = profile.Role;
-                    
 
                     setTimeout(() => {
                         (profile.Functions || []).forEach((data) => {
@@ -89,7 +90,27 @@
 
             websocket.onmessage = (event) => {
                 const message = event.data;
-                addMessageToChat(message, 'bot');
+            
+                // Check if the message starts with <!DOCTYPE html> indicating HTML content
+                if (message.startsWith("<!DOCTYPE html>")) {
+                    // Create a temporary element to safely insert the HTML content
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = message;
+            
+                    // Extract the table from the temporary element
+                    const table = tempDiv.querySelector('table');
+                    const otherContent = tempDiv.innerHTML;
+            
+                    // Append table or other content with specific styling
+                    if (table) {
+                        chatBox.innerHTML += `<div class="table-wrapper">${table.outerHTML}</div>`;
+                    } else {
+                        chatBox.innerHTML += `<div class="message-content">${otherContent}</div>`;
+                    }
+                } else {
+                    // Handle other types of messages
+                    addMessageChat(message, 'bot');
+                }
             };
 
             function sendMessage() {
@@ -101,14 +122,14 @@
                 }
 
                 addMessageToChat(message, 'user');
-                
+
                 const payload = {
                     message: message,
                     employee_id: employeeId,
-                    role :role,
+                    role: role,
                     token: token
                 };
-                console.log('payload',payload)
+                console.log('payload', payload);
                 websocket.send(JSON.stringify(payload));
 
                 userInput.value = "";
@@ -117,9 +138,32 @@
             function addMessageToChat(message, sender) {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', sender);
-                messageElement.textContent = message;
+                messageElement.classList.add('regular-message'); // Apply a specific class for regular messages
+                messageElement.innerHTML = message; // Use innerHTML to render HTML content
                 chatBox.appendChild(messageElement);
+            
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+            
+            function addMessageChat(message, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', sender);
+                messageElement.classList.add('message-content'); // Apply a specific class for all message types
+                messageElement.innerHTML = message; // Use innerHTML to render HTML content
+                        
+                // Check if the message contains a table
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = message;
+                const table = tempDiv.querySelector('table');
+            
+                if (table) {
+                    // Add a specific class for tables to apply unique styles
+                    messageElement.classList.add('table-message');
+                    messageElement.style.width ="100%"
 
+                }
+            
+                chatBox.appendChild(messageElement);
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
 

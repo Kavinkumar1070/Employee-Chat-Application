@@ -73,10 +73,8 @@
         "payload": {
             "employee_id": {
                 "description": "ID of the employee to retrieve",
-                "datatype": "regex",
-                "format": "^cds\\d{4}$",
-                "required": true,
-                "default": "None"
+                "datatype": "string",
+                "required": false
             }
         }
     },
@@ -293,9 +291,8 @@
         "method": "GET",
         "payload": {
             "employee_id": {
-                "description": "ID of the employee to retrieve",
-                "datatype": "regex",
-                "format": "^cds\\d{4}$",
+                "description": "ID of the employee to retrieve please type employee_id or ('me')",
+                "datatype": "string",
                 "required": true,
                 "default": "None"
             }
@@ -371,7 +368,7 @@
         "method": "GET",
         "payload": {
             "id": {
-                "description": "ID of the role to retrieve",
+                "description": "ID of the role to retrieve please type anything or ('me')",
                 "datatype": "number",
                 "required": true,
                 "default": "None"
@@ -452,5 +449,143 @@
                 "default": "None"
             }
         }
+    },
+    "create leave record": {
+        "project": "create leave record",
+        "project description": "Create a new leave record with provided details.",
+        "url": "http://127.0.0.1:8000/leave/",
+        "method": "POST",
+        "payload": {
+            "leave_type": {
+                "description": "Type of leave",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "duration": {
+                "description": "Duration of the leave",
+                "datatype": "choices",
+                "choices": ["one_day", "half_days"],
+                "required": true,
+                "default": "None"
+            },
+            "start_date": {
+                "description": "Start date of the leave in YYYY-MM-DD format",
+                "datatype": "date",
+                "format": "%Y-%m-%d",
+                "required": true,
+                "default": "None"
+            },
+            "total_days": {
+                "description": "Total number of leave days",
+                "datatype": "int",
+                "required": true,
+                "default": "None"
+            },
+            "reason": {
+                "description": "Reason for the leave",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "get leave records by employee id": {
+        "project": "get leave records by employee id",
+        "project description": "Retrieve leave records for a specific employee.",
+        "url": "http://127.0.0.1:8000/leave/{employee_id}",
+        "method": "GET",
+        "payload": {
+            "employee_id": {
+                "description": "ID of the employee to retrieve leave records type me or employee_id",
+                "datatype": "string",
+                "required": true,
+                "default":"None"
+            }
+        }
+    },
+    "get pending leave records for teamlead": {
+        "project": "get pending leave records for teamlead",
+        "project description": "Retrieve pending leave records for a teamlead.",
+        "url": "http://127.0.0.1:8000/leave/pending/teamlead",
+        "method": "GET",
+        "payload": {
+            "employee_id": {
+                "description": "ID of the teamlead requesting the pending leave records type 'all'",
+                "datatype": "string",
+                "required": true,
+                "default": "all"
+            }
+        }
+    },
+    "get leave records by month and year": {
+        "project": "get leave records by month and year",
+        "project description": "Retrieve leave records for a specific month and year.",
+        "url": "http://127.0.0.1:8000/leave/{month}/{year}",
+        "method": "GET",
+        "payload": {
+            "month": {
+                "description": "Month of the leave records to retrieve",
+                "datatype": "string",
+                "format": "MM",
+                "required": true,
+                "default": "None"
+            },
+            "year": {
+                "description": "Year of the leave records to retrieve",
+                "datatype": "string",
+                "format": "YYYY",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "delete leave record by id": {
+        "project": "delete leave record by id",
+        "project description": "Delete a leave record by leave ID.",
+        "url": "http://127.0.0.1:8000/leave/{leave_id}",
+        "method": "DELETE",
+        "payload": {
+            "leave_id": {
+                "description": "ID of the leave record to delete",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            }
+        }
+    },
+    "update leave record": {
+        "project": "update leave record",
+        "project description": "Update an existing leave record.",
+        "url": "http://127.0.0.1:8000/leave/update",
+        "method": "PUT",
+        "payload": {
+            "leave_id": {
+                "description": "ID of the leave record to update",
+                "datatype": "int",
+                "required": true,
+                "default": 0
+            },
+            "employee_id": {
+                "description": "ID of the employee associated with the leave record",
+                "datatype": "string",
+                "required": true,
+                "default": "None"
+            },
+            "status": {
+                "description": "Status of the leave record",
+                "datatype": "string",
+                "choices": ["pending", "approved", "rejected"],
+                "required": true,
+                "default": "pending"
+            },
+            "reason": {
+                "description": "Reason for updating the leave record",
+                "datatype": "string",
+                "required": false,
+                "default": "None"
+            }
+        }
     }
+    
 }

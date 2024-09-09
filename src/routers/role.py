@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from src.core.utils import normalize_string
-from src.core.authentication import roles_required
+from src.core.authentication import roles_required,get_current_employee,get_current_employee_roles
 from src.core.database import get_db
 
 from src.crud.role import *
@@ -71,8 +71,13 @@ def create_new_role_function(
 
 
 @router.get("/{id}/functions/", dependencies=[Depends(roles_required("admin"))])
-def read_role_functions(id: int, db: Session = Depends(get_db)):
-    return get_role_functions(db, id)
+def read_role_functions(id: int, db: Session = Depends(get_db),current_employee=Depends(get_current_employee)):
+    employee_id = current_employee.employment_id
+    employee_role = get_current_employee_roles(current_employee.id, db)
+    print(employee_id)
+    
+    if employee_role.name == "admin":
+        return get_role_functions(db, employee_role.name)
 
 
 @router.delete("/functions/{id}", dependencies=[Depends(roles_required("admin"))])

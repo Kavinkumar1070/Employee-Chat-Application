@@ -116,12 +116,24 @@ def get_employee_admin(db: Session):
     return db.query(EmployeeOnboarding).all()
 
 
-def get_employee_teamlead(db: Session, report_manager_id: str):
-    return (
+def get_employee_teamlead(db: Session,employee_id:str,report_manager_id: str):
+    # Fetch the reporting manager's details
+    db_employee = (
         db.query(EmployeeEmploymentDetails)
-        .filter(EmployeeEmploymentDetails.reporting_manager == report_manager_id)
-        .all()
+        .filter(
+            EmployeeEmploymentDetails.employee_id == employee_id,
+            EmployeeEmploymentDetails.reporting_manager == report_manager_id,
+        )
+        .first()
     )
+    if  db_employee:
+       return db_employee
+    data= db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id).first()
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Employee not found")
+    return data
+    
+    
 
 
 def update_employee(db: Session, employee_id: str, update_data: EmployeeUpdate):

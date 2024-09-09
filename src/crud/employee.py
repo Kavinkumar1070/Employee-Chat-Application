@@ -95,7 +95,7 @@ def get_all_employee_employment_details(db: Session, employee_id: str):
 
 
 def get_all_employee_teamlead(db: Session, employee_id: str, reporting_manager: str):
-    emp = (
+    db_employee = (
         db.query(EmployeeEmploymentDetails)
         .filter(
             EmployeeEmploymentDetails.employee_id == employee_id,
@@ -103,8 +103,12 @@ def get_all_employee_teamlead(db: Session, employee_id: str, reporting_manager: 
         )
         .first()
     )
-    return emp
-
+    if  db_employee:
+       return db_employee
+    data= db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id).first()
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Employee not found")
+    return data
 
 def update_employee_employment_details(
     db: Session, updates: EmployeeEmploymentDetailsUpdate

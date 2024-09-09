@@ -62,11 +62,6 @@ def insert_dummy_data():
         ),
         RoleFunction(
             role_id=admin_role.id,
-            function="delete personal employee by id",
-            jsonfile="admin_share_info.json",
-        ),
-        RoleFunction(
-            role_id=admin_role.id,
             function="update personal employee",
             jsonfile="admin_share_info.json",
         ),
@@ -130,22 +125,82 @@ def insert_dummy_data():
             function="delete role function by id",
             jsonfile="admin_share_info.json",
         ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="get personal employee by id",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="update personal employee",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="create leave record",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="get leave records by employee id",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="get pending leave records for teamlead",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="get leave records by month and year",
+            jsonfile="admin_share_info.json",
+        ),
+        RoleFunction(
+            role_id=admin_role.id,
+            function="delete leave record by id",
+            jsonfile="admin_share_info.json",
+        )
     ]
 
     teamlead_functions = [
         RoleFunction(
             role_id=teamlead_role.id,
-            function="approve leave",
+            function="get personal employee by id",
             jsonfile="teamlead_approve_leave.json",
         ),
         RoleFunction(
             role_id=teamlead_role.id,
-            function="apply leave",
+            function="update personal employee",
             jsonfile="teamlead_apply_leave.json",
         ),
         RoleFunction(
             role_id=teamlead_role.id,
-            function="edit details",
+            function="create leave record",
+            jsonfile="teamlead_edit_details.json",
+        ),
+        RoleFunction(
+            role_id=teamlead_role.id,
+            function="get leave records by employee id",
+            jsonfile="teamlead_edit_details.json",
+        ),
+        RoleFunction(
+            role_id=teamlead_role.id,
+            function="get pending leave records for teamlead",
+            jsonfile="teamlead_edit_details.json",
+        ),
+        RoleFunction(
+            role_id=teamlead_role.id,
+            function="get leave records by month and year",
+            jsonfile="teamlead_edit_details.json",
+        ),
+        RoleFunction(
+            role_id=teamlead_role.id,
+            function="delete leave record by id",
+            jsonfile="teamlead_edit_details.json",
+        ),
+        RoleFunction(
+            role_id=teamlead_role.id,
+            function="update leave record",
             jsonfile="teamlead_edit_details.json",
         ),
     ]
@@ -153,22 +208,37 @@ def insert_dummy_data():
     employee_functions = [
         RoleFunction(
             role_id=employee_role.id,
-            function="apply leave",
+            function="get personal employee by id",
             jsonfile="employee_apply_leave.json",
         ),
         RoleFunction(
             role_id=employee_role.id,
-            function="view leave by month",
+            function="update personal employee",
             jsonfile="employee_view_leave.json",
         ),
         RoleFunction(
             role_id=employee_role.id,
-            function="delete leave",
+            function="create leave record",
             jsonfile="employee_delete_leave.json",
         ),
         RoleFunction(
             role_id=employee_role.id,
-            function="update personal details",
+            function="get leave records by employee id",
+            jsonfile="employee_update_details.json",
+        ),
+        RoleFunction(
+            role_id=employee_role.id,
+            function="get pending leave records for teamlead",
+            jsonfile="employee_update_details.json",
+        ),
+        RoleFunction(
+            role_id=employee_role.id,
+            function="get leave records by month and year",
+            jsonfile="employee_update_details.json",
+        ),
+        RoleFunction(
+            role_id=employee_role.id,
+            function="delete leave record by id",
             jsonfile="employee_update_details.json",
         ),
     ]
