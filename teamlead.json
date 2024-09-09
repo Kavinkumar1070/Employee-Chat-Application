@@ -160,21 +160,28 @@
     "get leave records by month and year": {
         "project": "get leave records by month and year",
         "project description": "Retrieve leave records for a specific month and year.",
-        "url": "http://127.0.0.1:8000/leave/{monthnumber}/{yearnumber}",
+        "url": "http://127.0.0.1:8000/leave/{monthnumber}/{yearnumber}/{employee_id}",
         "method": "GET",
         "payload": {
+            "employee_id": {
+                "description": "ID of the employee to retrieve, please type anything or ('me')",
+                "datatype": "string",
+                "required": true,
+                "default":"None"
+            },
             "monthnumber": {
                 "description": "Month of the leave records to retrieve",
                 "datatype": "int",
                 "format": "M",
                 "required": true,
-                "default":"None"
+                "default":9
             },
             "yearnumber": {
                 "description": "Year of the leave records to retrieve",
                 "datatype": "int",
                 "format": "YYYY",
-                "required": true
+                "required": true,
+                "default":2024
             }
         }
     },
