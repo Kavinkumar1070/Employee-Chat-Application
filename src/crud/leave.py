@@ -48,16 +48,18 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: 
 
 
 def get_employee_leave_by_month(db: Session, employee_id: str, month: int, year: int):
+    print("ssss",employee_id)
     employee_data = (
         db.query(EmployeeEmploymentDetails)
         .filter(EmployeeEmploymentDetails.employee_id == employee_id)
         .first()
     )
-    if not employee_data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Employee Not found"
-        )
-    return (
+    print(employee_data.id)
+    # if not employee_data:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND, detail="Employee Not found"
+    #     )
+    data= (
         db.query(EmployeeLeave)
         .filter(
             EmployeeLeave.employee_id == employee_data.id,
@@ -66,7 +68,27 @@ def get_employee_leave_by_month(db: Session, employee_id: str, month: int, year:
         )
         .all()
     )
-
+    return data
+    
+def get_employee_leave_by_month_tl(db: Session, employee_id: str  ,report_manager:str , month: int, year: int):
+    data= (
+            db.query(EmployeeEmploymentDetails)
+            .filter(EmployeeEmploymentDetails.employee_id == employee_id,
+                    EmployeeEmploymentDetails.reporting_manager == report_manager)
+            .first()
+        )
+    if data:   
+        return (
+            db.query(EmployeeLeave)
+            .filter(
+                EmployeeLeave.employee_id == data.id,
+                func.extract("month", EmployeeLeave.start_date) == month,
+                func.extract("year", EmployeeLeave.start_date) == year,
+            )
+            .all()
+            )
+    
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Employee not found")
 
 def get_leave_by_employee_id(db: Session, employee_id: str):
     employee_data = (
@@ -103,11 +125,8 @@ def get_leave_by_employee_team(db: Session, employee_id: str, report_manager: st
         )
         
         return leave_records
-    tl= db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id).first()
-    if tl:
-        return db.query(EmployeeLeave).filter(EmployeeLeave.employee_id == tl.id).first()
-    if not tl:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Employee not found")
+    
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Can Not Access Employee Details")
 
 
 

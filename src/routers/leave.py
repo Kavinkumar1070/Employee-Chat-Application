@@ -21,6 +21,7 @@ from src.crud.leave import (
     get_leave_by_admin,
     get_leave_by_report_manager,
     update_employee_teamlead,
+    get_employee_leave_by_month_tl,
 )
 
 router = APIRouter(
@@ -43,7 +44,7 @@ async def apply_leave(
     db_leave = create_employee_leave(db, leave, employee_id)
 
     await send_email_leave(
-        "gowthamsakthivel@conversedatasolutions.com",
+        db_leave["employee_email"],
         db_leave["employee_firstname"],
         db_leave["employee_lastname"],
         db_leave["leave"],
@@ -70,9 +71,12 @@ def get_leaves_by_employee(
     elif employee_role.name == "admin":
         db_employee = get_leave_by_employee_id(db, employee_id)
     elif employee_role.name == "teamlead":
-        db_employee = get_leave_by_employee_team(
-            db, employee_id, report_manager=current_employee_id
-        )
+        if  employee_id==current_employee.employment_id:
+            db_employee = get_leave_by_employee_id(db, employee_id)
+        else:    
+            db_employee = get_leave_by_employee_team(
+                db, employee_id, report_manager=current_employee_id
+            )
     else:
         raise HTTPException(status_code=403, detail="Forbidden")
 
@@ -108,24 +112,29 @@ def get_leave_by(
 
 
 @router.get(
-    "/{monthnumber}/{yearnumber}",
+    "/{monthnumber}/{yearnumber}/{employee_id}",
     dependencies=[Depends(roles_required("employee", "admin", "teamlead"))],
 )
 def get_leave_by_month(
     monthnumber: int,
     yearnumber: int,
+    employee_id: str = Path(...),
     db: Session = Depends(get_db),
     current_employee: EmployeeOnboarding = Depends(get_current_employee),
 ):
-    employee_id = current_employee.employment_id
+    current_employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
+    if employee_id == "me":
+        employee_id = current_employee_id
     if employee_role.name == "employee":
-        return get_employee_leave_by_month(db, employee_id, monthnumber, yearnumber)
+        return get_employee_leave_by_month(db, current_employee_id, monthnumber, yearnumber)
     if employee_role.name == "admin":
         return get_employee_leave_by_month(db, employee_id, monthnumber, yearnumber)
     if employee_role.name == "teamlead":
-        return get_employee_leave_by_month(db, employee_id, monthnumber, yearnumber)
-
+        if  employee_id==current_employee.employment_id:
+            return get_employee_leave_by_month(db, employee_id, monthnumber, yearnumber)
+        else:
+            return get_employee_leave_by_month_tl(db, employee_id=employee_id,report_manager=current_employee_id, month=monthnumber, year=yearnumber)
     return {"detail": "No leaves this Month"}
 
 
