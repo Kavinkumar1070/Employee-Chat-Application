@@ -80,6 +80,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 details['dateofbirth'] = datetime.strptime(details['dateofbirth'], '%Y-%m-%d').strftime('%Y-%m-%d')
                 details['contactnumber'] = int(details['contactnumber'])
                 response = await onboard_personal_details(websocket,details)
+                print(response)
                 if response != "Email Send Successfully":
                     await websocket.send_text(response)
                     await websocket.send_text("You will be Navigated to Login Screen")  # Redirect to the new page
@@ -124,11 +125,14 @@ async def websocket_endpoint(websocket: WebSocket):
                 project_details = get_project_script(project_name,jsonfile)
                 payload_details = split_payload_fields(project_details)
                 filled_cleaned = await fill_payload_values(websocket, query, payload_details,jsonfile)
-                autochecked_payload = check_autofill(query, filled_cleaned)
-                validate_payload = validate(project_details, autochecked_payload)
+                #print(filled_cleaned)
+                #autochecked_payload = check_autofill(query, filled_cleaned)
+                validate_payload = validate(project_details, filled_cleaned)
+                
                 if validate_payload['method'] == 'PUT':
                     answer = await update_process(websocket,project_details,validate_payload)
                     logger.info(f"Answer from ask_user: {answer}")
+                    answer['bearer_token'] = token
                 else:
                     answer = await ask_user(websocket, project_details, validate_payload)
                     logger.info(f"Answer from ask_user: {answer}")

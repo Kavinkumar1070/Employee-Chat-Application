@@ -7,12 +7,9 @@ from src.crud.personal import (
     create_employee,
     get_employee,
     update_employee,
-    delete_employee,
-    get_employee_admin,
-    get_employee_teamlead,
-    update_employee_teamlead,
+    delete_employee
 )
-from src.schemas.personal import EmployeeCreate, EmployeeUpdate, UpdateEmployeeAdmin
+from src.schemas.personal import EmployeeCreate, EmployeeUpdate
 from src.core.utils import normalize_string, send_email
 from src.core.authentication import roles_required
 from datetime import datetime
@@ -32,11 +29,11 @@ def get_db():
 
 def convert_date_format(date_str):
     try:
-        date_obj = datetime.strptime(date_str, "%m/%d/%Y")
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
         return date_obj.strftime("%Y-%m-%d")
     except ValueError:
         raise HTTPException(
-            status_code=400, detail="Incorrect date format. Use MM/DD/YYYY."
+            status_code=400, detail="Incorrect date format. Use YYYY-MM-DD."
         )
 
 
@@ -48,6 +45,7 @@ async def create_employee_route(
     employee.firstname = normalize_string(employee.firstname)
     employee.lastname = normalize_string(employee.lastname)
     employee.address = normalize_string(employee.address)
+    employee.dateofbirth = convert_date_format(employee.dateofbirth)
     employee.nationality = normalize_string(employee.nationality)
     employee.gender = normalize_string(employee.gender)
     employee.maritalstatus = normalize_string(employee.maritalstatus)
@@ -77,45 +75,43 @@ async def read_employee_route(
 ):
     current_employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
-    if employee_id=="me":
-        employee_id=current_employee_id
     if employee_role.name == "employee":
-        db_employee = get_employee(db, employee_id)
+        db_employee = get_employee(db,current_employee_id)
         return db_employee
     if employee_role.name == "admin":
-        db_employee = get_employee_admin(db)
+        db_employee = get_employee(db,employee_id)
         return db_employee
     if employee_role.name == "teamlead":
-        if  employee_id==current_employee.employment_id:
-            db_employee = get_employee(db, employee_id)
-        else:
-            db_employee = get_employee_teamlead(db, employee_id,current_employee_id)
-        return db_employee
+            db_employee = get_employee(db,current_employee_id)
+            return db_employee
     else:
         raise HTTPException(status_code=404, detail="Employee not found")
 
 @router.put(
-    "/employees/",
+    "/employees/{employee_id}",
     dependencies=[Depends(roles_required("employee", "teamlead", "admin"))],
 )
 async def update_employee_data(
     employee_update: EmployeeUpdate,
-    emp_data: UpdateEmployeeAdmin,
+    employee_id: str = Path(...),
     db: Session = Depends(get_db),
     current_employee=Depends(get_current_employee),
 ):
-    employee_id = current_employee.employment_id
-    employee_role = get_current_employee_roles(current_employee.id, db)
-    if employee_role.name == "employee":
+    employee_id_c = current_employee.employment_id
+    employee_role = get_current_employee_roles(current_employee.id, db).name.lower()
+    
+    # Perform update based on role
+    if employee_role in ["employee", "teamlead"]:
+        updated_employee = update_employee(db, employee_id_c, employee_update)
+    elif employee_role == "admin":
         updated_employee = update_employee(db, employee_id, employee_update)
-    if employee_role.name == "admin":
-        updated_employee = update_employee(db, emp_data.employee_id, employee_update)
-    if employee_role.name == "teamlead":
-        updated_employee = update_employee_teamlead(
-            db, emp_data.employee_id, employee_id, employee_update
-        )
+    else:
+        raise HTTPException(status_code=403, detail="Unauthorized role")
+    
+    # Check if update was successful
     if updated_employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
+    
     return updated_employee
 
 

@@ -2,7 +2,7 @@
     "create personal employee": {
         "project": "create personal employee",
         "project description": "Create a new personal employee record with provided details.",
-        "url": "http://127.0.0.1:8000/personal/employees/",
+        "url": "http://127.0.0.1:8000/personal/employees",
         "method": "POST",
         "payload": {
             "firstname": {
@@ -96,9 +96,16 @@
     "update personal employee": {
         "project": "update personal employee",
         "project description": "Update personal employee record with new details.",
-        "url": "http://127.0.0.1:8000/personal/employees/",
+        "url": "http://127.0.0.1:8000/personal/employees/{employee_id}",
         "method": "PUT",
         "payload": {
+            "employee_id": {
+                "description": "ID of the employee to delete",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "default": "None"
+            },
             "firstname": {
                 "description": "First name of the employee",
                 "datatype": "string",

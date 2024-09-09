@@ -46,5 +46,3 @@ class EmployeeUpdate(BaseModel):
             return value  # Skip validation if the value is None
 
 
-class UpdateEmployeeAdmin(BaseModel):
-    employee_id: Optional[str] = None

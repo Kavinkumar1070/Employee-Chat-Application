@@ -1,25 +1,25 @@
 {
-    "get personal employee by id": {
-        "project": "get personal employee by id",
+    "get personal details": {
+        "project": "get personal details",
         "project description": "Retrieve personal employee record by employee ID.",
         "url": "http://127.0.0.1:8000/personal/employees/{employee_id}",
         "method": "GET",
         "payload": {
             "employee_id": {
-                "description": "ID of the employee to retrieve, please type anything or ('me')",
-                "datatype": "string",
+                "description": "Employee ID to retrieve employee details",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
                 "required": true,
-                "default":"None"
+                "default": "None"
             }
         }
     },
-    "update personal employee": {
-        "project": "update personal employee",
+    "update personal details": {
+        "project": "update personal details",
         "project description": "Update personal employee record with new details.",
         "url": "http://127.0.0.1:8000/personal/employees/",
         "method": "PUT",
         "payload": {
-            "employee_update": {
                 "firstname": {
                     "description": "First name of the employee",
                     "datatype": "string",
@@ -78,15 +78,7 @@
                     "choices": ["single", "married", "divorced", "widowed"],
                     "default": "None"
                 }
-            },
-            "emp_data": {
-                "employee_id": {
-                    "description": "ID of the employee being updated",
-                    "datatype": "string",
-                    "required": true,
-                    "default": "None"
-                }
-            }
+            
         }
     },
     "create leave record": {
@@ -97,8 +89,9 @@
         "payload": {
             "leave_type": {
                 "description": "Type of leave",
-                "datatype": "string",
+                "datatype": "choices",
                 "required": true,
+                "choices":["sick","personal","vacation"],
                 "default": "None"
             },
             "duration": {
@@ -137,9 +130,10 @@
         "payload": {
             "employee_id": {
                 "description": "ID of the employee to retrieve leave records type me or employee_id",
-                "datatype": "string",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
                 "required": true,
-                "default":"None"
+                "default": "None"
             }
         }
     },
@@ -151,29 +145,38 @@
         "payload": {
             "employee_id": {
                 "description": "ID of the teamlead requesting the pending leave records",
-                "datatype": "string",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
                 "required": true,
-                "default": "me"
+                "default": "None"
             }
         }
     },
     "get leave records by month and year": {
         "project": "get leave records by month and year",
         "project description": "Retrieve leave records for a specific month and year.",
-        "url": "http://127.0.0.1:8000/leave/{monthnumber}/{yearnumber}",
+        "url": "http://127.0.0.1:8000/leave/{monthnumber}/{yearnumber}/{employee_id}",
         "method": "GET",
         "payload": {
-            "monthnumber": {
-                "description": "Month of the leave records to retrieve",
-                "datatype": "integer",
+            "employee_id": {
+                "description": "ID of the employee to retrieve leave records type me or employee_id",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
                 "required": true,
-                "default":"None"
+                "default": "None"
+            },
+            "monthnumber": {
+                "description": "Month of the leave records to retrieve (1-12)",
+                "datatype": "integer",  
+                "required": true,
+                "default": "None"
             },
             "yearnumber": {
-                "description": "Year of the leave records to retrieve",
+                "description": "Year of the leave records to retrieve (4-digit year)",
                 "datatype": "integer",
+                "format": "yyyy",  
                 "required": true,
-                "default":"None"
+                "default": "None"
             }
         }
     },
@@ -205,7 +208,8 @@
             },
             "employee_id": {
                 "description": "ID of the employee associated with the leave record",
-                "datatype": "string",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
                 "required": true,
                 "default": "None"
             },

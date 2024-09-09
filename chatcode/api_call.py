@@ -12,42 +12,42 @@ import json
 logger = logging.getLogger(__name__)
 
 
-async def onboard_personal_details(websocket: WebSocket, details: Dict[str, str]):
+async def onboard_personal_details(websocket: WebSocket, details: dict):
     url = 'http://127.0.0.1:8000/personal/employees'
+    print(details)
+    print(type(details))
     payload = details
     timeout_seconds = 30  # Timeout in seconds
     
-
     try:
         # Initialize HTTP client with timeout
         async with httpx.AsyncClient(timeout=timeout_seconds) as client:
 
             response = await client.post(url, json=payload)
-
-            response.raise_for_status()  # Raise an exception for HTTP errors
+            response.raise_for_status()             
             response_data = response.json()
-
+            response_data = response_data.get('detail')
             return response_data
  
     except httpx.HTTPStatusError as e:
         # Include response text in error message for better diagnostics
         error_message = f"HTTP error occurred: {str(e)} - Status Code: {e.response.status_code}\nResponse Content: {e.response.text}"
         await websocket.send_text(error_message)
-        print(error_message)
+        print("S",error_message)
         return error_message
  
     except httpx.RequestError as e:
         # General request error handling
         error_message = f"Request error occurred: {str(e)}"
         await websocket.send_text(error_message)
-        print(error_message)
+        print("R",error_message)
         return error_message
  
     except Exception as e:
         # Catch all other unexpected errors
         error_message = f"An unexpected error occurred: {str(e)}"
         await websocket.send_text(error_message)
-        print(error_message)
+        print('E',error_message)
         return error_message
     
 def generate_html_table(data):
@@ -112,7 +112,7 @@ def generate_html_table(data):
     
     return table
 
-async def database_operation(websocket: WebSocket, details: Dict[str, str]):
+async def database_operation(websocket: WebSocket, details: dict):
     url_template = details.get('url')
     payload = details.get('payload', {})
     query_params = details.get('query_params', {})
@@ -126,7 +126,10 @@ async def database_operation(websocket: WebSocket, details: Dict[str, str]):
         return "Bearer token is missing."
 
     try:
+        print('11111111111111111111111111')
+        print(url_template)
         url = url_template.format(**payload)
+        
         print(url)
     except KeyError as e:
         missing_key = str(e).strip("'")
@@ -175,6 +178,23 @@ async def database_operation(websocket: WebSocket, details: Dict[str, str]):
         error_message = f"An unexpected error occurred: {str(e)}"
         await websocket.send_text(error_message)
         return error_message
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # def post_permission(answer):
 #     url = answer['url']

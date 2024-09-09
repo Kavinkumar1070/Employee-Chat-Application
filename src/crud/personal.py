@@ -105,32 +105,9 @@ def create_employee(db: Session, employee: EmployeeCreate):
 
 
 def get_employee(db: Session, employee_id: str):
-    return (
-        db.query(EmployeeOnboarding)
-        .filter(EmployeeOnboarding.employment_id == employee_id)
-        .first()
-    )
+    data=db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id == employee_id).first()
+    return data
 
-
-def get_employee_admin(db: Session):
-    return db.query(EmployeeOnboarding).all()
-
-
-def get_employee_teamlead(db: Session,employee_id:str,report_manager_id: str):
-    # Fetch the reporting manager's details
-    db_employee = (
-        db.query(EmployeeEmploymentDetails)
-        .filter(
-            EmployeeEmploymentDetails.employee_id == employee_id,
-            EmployeeEmploymentDetails.reporting_manager == report_manager_id,
-        )
-        .first()
-    )
-    if not  db_employee:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Can Not Access Employee Details")
-    return db_employee
-    
-    
 
 
 def update_employee(db: Session, employee_id: str, update_data: EmployeeUpdate):
@@ -186,66 +163,6 @@ def update_employee(db: Session, employee_id: str, update_data: EmployeeUpdate):
     return db_employee
 
 
-def update_employee_teamlead(
-    db: Session, employee_id: str, reportmanager: str, update_data: EmployeeUpdate
-):
-    # Fetch the employee record
-    db_employee = (
-        db.query(EmployeeEmploymentDetails)
-        .filter(
-            EmployeeEmploymentDetails.employee_id == employee_id,
-            EmployeeEmploymentDetails.reporting_manager == reportmanager,
-        )
-        .first()
-    )
-    if db_employee is None:
-        return (
-            db.query(EmployeeEmploymentDetails)
-            .filter(EmployeeEmploymentDetails.employee_id == reportmanager)
-            .first()
-        )
-
-    if update_data.contactnumber is not None:
-        exist_number = (
-            db.query(EmployeeOnboarding)
-            .filter(EmployeeOnboarding.contactnumber == update_data.contactnumber)
-            .first()
-        )
-        if exist_number and exist_number.employment_id != employee_id:
-            raise HTTPException(
-                status_code=status.HTTP_208_ALREADY_REPORTED,
-                detail="Contact number already exists",
-            )
-
-    if update_data.emailaddress is not None:
-        exist_email = (
-            db.query(EmployeeOnboarding)
-            .filter(EmployeeOnboarding.emailaddress == update_data.emailaddress)
-            .first()
-        )
-        if exist_email and exist_email.employment_id != employee_id:
-            raise HTTPException(
-                status_code=status.HTTP_208_ALREADY_REPORTED,
-                detail="Email address already exists",
-            )
-
-    for key, value in update_data.dict(exclude_unset=True).items():
-        if key in [
-            "firstname",
-            "lastname",
-            "address",
-            "nationality",
-            "gender",
-            "maritalstatus",
-            "emailaddress",
-        ]:
-            setattr(db_employee, key, normalize_string(value))
-        else:
-            setattr(db_employee, key, value)
-
-    db.commit()
-    db.refresh(db_employee)
-    return db_employee
 
 
 def delete_employee(db: Session, employee_id: str):
