@@ -149,7 +149,7 @@ def get_current_employee_roles(
     roles = (
         db.query(Role)
         .join(employee_role)
-        .filter(employee_role.c.employee_id == current_user)
+        .filter(employee_role.c.role_id == current_user)
         .first()
     )
     if not roles:

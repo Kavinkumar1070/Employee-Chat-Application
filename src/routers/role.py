@@ -70,14 +70,13 @@ def create_new_role_function(
     return create_role_function(db, role_function)
 
 
-@router.get("/{id}/functions/", dependencies=[Depends(roles_required("admin"))])
-def read_role_functions(id: int, db: Session = Depends(get_db),current_employee=Depends(get_current_employee)):
+@router.get("/{role_id}/functions/", dependencies=[Depends(roles_required("admin"))])
+def read_role_functions(role_id: int, db: Session = Depends(get_db),current_employee=Depends(get_current_employee)):
     employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
     print(employee_id)
-    
     if employee_role.name == "admin":
-        return get_role_functions(db, employee_role.name)
+        return get_role_functions(db, role_id)
 
 
 @router.delete("/functions/{id}", dependencies=[Depends(roles_required("admin"))])
