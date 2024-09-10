@@ -126,17 +126,19 @@ async def websocket_endpoint(websocket: WebSocket):
                 project_details = get_project_script(project_name,jsonfile)
                 payload_details = split_payload_fields(project_details)
                 filled_cleaned = await fill_payload_values(websocket, query, payload_details,jsonfile)
-                #print(filled_cleaned)
-                #autochecked_payload = check_autofill(query, filled_cleaned)
                 validate_payload = validate(project_details, filled_cleaned)
                 
                 if validate_payload['method'] == 'PUT':
                     answer = await update_process(websocket,project_details,validate_payload)
+                    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
                     logger.info(f"Answer from ask_user: {answer}")
+                    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
                     answer['bearer_token'] = token
                 else:
                     answer = await ask_user(websocket, project_details, validate_payload)
+                    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
                     logger.info(f"Answer from ask_user: {answer}")
+                    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
                     answer['bearer_token'] = token
                     
                 result =await database_operation(websocket,answer)

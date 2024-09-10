@@ -157,7 +157,7 @@ def update_employee(db: Session, employee_id: str, update_data: EmployeeUpdate):
             setattr(db_employee, key, normalize_string(value))
         else:
             setattr(db_employee, key, value)
-
+    
     db.commit()
     db.refresh(db_employee)
     return db_employee
@@ -165,14 +165,30 @@ def update_employee(db: Session, employee_id: str, update_data: EmployeeUpdate):
 
 
 
-def delete_employee(db: Session, employee_id: str):
-    db_employee = (
-        db.query(EmployeeOnboarding)
-        .filter(EmployeeOnboarding.employment_id == employee_id)
-        .first()
-    )
-    if db_employee:
-        db.delete(db_employee)
-        db.commit()
-        return db_employee
-    return None
+# def delete_employee(db: Session, employee_id: str):
+
+#     db_employee = (
+#         db.query(EmployeeEmploymentDetails)
+#         .filter(EmployeeEmploymentDetails.employee_id == employee_id)
+#         .first()
+#     )
+    
+#     if db_employee:
+#         try:
+            
+#             # Mark employee as inactive
+#             db_employee.is_active = False
+            
+#             # Commit the changes
+#             db.commit()
+            
+#             # Refresh to get the updated data from the DB
+#             db.refresh(db_employee)
+            
+#             return db_employee  # Return the updated employee record
+#         except Exception as e:
+#             db.rollback()  # Rollback in case of an error
+#             raise HTTPException(status_code=500, detail=f"Error updating employee status: {str(e)}")
+    
+#     # If no employee is found, return a 404
+#     raise HTTPException(status_code=404, detail="Employee not found")

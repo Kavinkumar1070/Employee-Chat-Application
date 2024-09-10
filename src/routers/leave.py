@@ -39,10 +39,11 @@ async def apply_leave(
 ):
     # Accessing employee_id directly from the object
     employee_id = current_employee.employment_id
+    print("*****")
+    print(employee_id)
     if not employee_id:
         raise HTTPException(status_code=400, detail="Invalid employee data")
     db_leave = create_employee_leave(db, leave, employee_id)
-
     await send_email_leave(
         db_leave["employee_email"],
         db_leave["employee_firstname"],
@@ -50,6 +51,7 @@ async def apply_leave(
         db_leave["leave"],
         db_leave["reason"],
         db_leave["status"],
+        db_leave["other_entires"],
     )
     return {"leave applied successfully check your mail"}
 

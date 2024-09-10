@@ -68,29 +68,30 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
             model='mixtral-8x7b-32768',
             messages=[
                 {
-                    "role": "system",
-                    "content": f"""
-                    You are an AI assistant trained to extract the project name from a user query based on the provided project descriptions.
+            "role": "system",
+            "content": f"""
+            You are an AI assistant trained to extract project names based on project descriptions. Follow these steps:
 
-                    Steps to follow:
-                    1. Correct any grammatical or spelling errors in the query.
-                    2. The details {projectinfo} have a pair of title {list(projectinfo.keys())} and description {list(projectinfo.values())}.
-                    3. Understand available project titles and their respective descriptions from details.
-                    4. Analyze the user query: "{query}" to capture the related project title based on the description.
-                    5. Capture the project name based on the description. If the project name matches, return the project name.
-                    6. If you are not sure about the project name from the user query, return 'None'.
-                    7. The project name must be either 'None' or from {list(projectinfo.keys())}.
-                    Do not make any assumptions by yourself.
-                    Return the project name in JSON format within these symbols "~~~" as shown in the examples below:
+            1. Correct any grammatical or spelling errors in the query.
+            2. Review the provided project descriptions: {projectinfo}.
+            3. Analyze the user query: "{query}" to determine which project name, if any, is referenced based on the descriptions.
+            4. If a project name matches the query context, return that project name.
+            5. If no project name matches or the query is unclear, return 'None'.
+            6. The result should be a JSON object with the format shown below.
 
-                    query: "how to cancel leave"
-                    ~~~
-                    {{
-                        "project": "None"
-                    }}
-                    ~~~
-                    """
-                },
+            Example:
+            Query: "How do I update my project?"
+            Project Titles and Descriptions: {projectinfo}
+            Response:
+            ~~~
+            {{
+                "project": "Project XYZ"
+            }}
+            ~~~
+
+            Ensure the response is enclosed with `~~~` before and after the JSON output. Do not include any additional explanations.
+            """
+        },
                 {
                     "role": "user",
                     "content": f"Extract the project name from the following query: {query} and Project Titles and Descriptions: {projectinfo}."
@@ -137,6 +138,7 @@ def get_project_script(project_name: str, jsonfile: str):
             project_script = json_config.get(project_name)
             print("*****************************************************")
             print("project_detail Done")
+            print("*****************************************************")
             return project_script
     
     except FileNotFoundError:
@@ -152,6 +154,7 @@ def split_payload_fields(project_detail: dict):
         payload_detail = project_detail['payload']
         print("*****************************************************")
         print("payload_detail Done")
+        print("*****************************************************")
         return payload_detail
 
     except KeyError as e:
@@ -168,50 +171,39 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
 
     try:
         response = client.chat.completions.create(
-            model='mixtral-8x7b-32768',
-            messages=[
-                {
-                    "role": "system",
-                    "content": f"""You are an expert in filling payload values from the user query and configuration file as follows:
+        model='mixtral-8x7b-32768',
+        messages=[
+            {
+                "role": "system",
+                "content": f"""You are an expert in filling payload values from a user query based on a configuration file.
 
-                    Steps to Process:
+                        Strict Instructions:
+                        
+                        1. **Capture Only from User Query:** Extract values strictly from the user query: {query}. Do **not** infer or assume any values.
+                        
+                        2. **Use Assigned Values:** If a value is missing in the user query or doesn't match the required format/choices, **use the assigned value** specified in the configuration file {payload_details}.
+                        
+                        3. **Fill Missing Fields with Assigned Values:** For each field not found in the user query, refer to the configuration file for the field's assigned value. If no valid input is found in the query and no assigned value is provided, use "None".
+                        
+                        4. **JSON Response Format:** Return only the payload JSON response in the following format, enclosed with `~~~` before and after the response.
                     
-                    Identify Payload Fields: Extract the fields listed in {payload_details.keys()} that need to be filled.
-                    Use Configuration File: Refer to the configuration file {payload_details} to understand the details of each field, such as description, data types, formats, choices, and default values.
-                    Analyze User Query: Examine the user query {query} to capture values for the payload fields based on their descriptions.
-                    NO ASSUMPTIONS: Do not make any assumptions. Return None only if there is no relevant information provided in the user query and no default value is specified in the configuration file.
-                    Match Formats and Choices: Ensure that the captured values match the required formats or choices exactly. If a value does not match, use the default value specified in the configuration file.
-                    Use Default Values: If the user query does not provide a value that matches the required format or choice, use the default value from the configuration file if specified. For example, if the configuration file specifies "default": "None", return "None" if no valid input is found.
-                    Strict Data Capture: Do not use values from provided examples. Capture values only from the user query or use the default values from the configuration file.
-                    JSON Response Format: Return only the payload JSON response in the following format, enclosed with ~~~ before and after the response.
-
-                Example output format:
-                    query 1: like to apply leave for my employee id 25 from july 24 to july 25.
-                    ~~~{{
-                        "payload": {{
-                            "empid": "None",
-                            "startdate": "None",
-                            "enddate": "None", 
-                            "reason": "None"
-                        }}
-                    }}~~~
-                    
-                    query 2: i don't want an leave on saturday for id L12.
-                    ~~~{{
-                        "payload": {{
-                            "leaveid": "L12",
-                            "reason": "None"
-                        }}
-                    }}~~~
-                Do NOT make any assumptions by yourself.
+                    Example output format:
+                        query: get leave records by month and year
+                        ~~~{{
+                            "payload": {{
+                                "employee_id": "None",
+                                "month": "None",
+                                "year": "None"
+                            }}
+                        }}~~~
                 """
-                },
-                {
-                    "role": "user",
-                    "content": f"Analyze the following query: {query} with config file: {payload_details} to extract and verify the details."
-                }
-            ]
-        )
+            },
+            {
+                "role": "user",
+                "content": f"Analyze the following query: {query} with config file: {payload_details} and extract values based on the user input or use assigned values from the config file."
+            }
+        ]
+    )
     
     except Exception as e:
         logger.error(f"Error during API call: {e}")
@@ -226,7 +218,7 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
         
         # Sanitize the response
         sanitized_response = sanitize_json_string(result)
-        logger.info(f"Sanitized response: {sanitized_response}")
+        #logger.info(f"Sanitized response: {sanitized_response}")
         
         try:
             # Try to parse the JSON response
@@ -235,6 +227,7 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
             print("*****************************************************")
             print("Fill payload Done")
             print(result)
+            print("*****************************************************")
             return response_config
         
         except json.JSONDecodeError:
@@ -313,6 +306,7 @@ def validate(payload_detail, response_config):
         'method': payload_detail['method'],
         'payload': validated_payload
     }
+    print("*****************************************************")
     print("Validation Done")
     print(final_response)
     print("*****************************************************")
@@ -347,13 +341,19 @@ def correction_update_name(names, update_fields):
         )
 
         response_text = response.choices[0].message.content.strip()
+        print(response_text)
         json_start_idx = response_text.find("~~~") + 3
         json_end_idx = response_text.rfind("~~~")
         result = response_text[json_start_idx:json_end_idx].strip()
-
+        json_string = re.sub(r'\\_', '_', result)
+        print("*****************************************************")
+        print("list convert sanitized_response")
+        print(json_string)
+        print("*****************************************************")
+        
         # Try to parse the result to JSON, handle any parsing errors
         try:
-            response = json.loads(result)
+            response = json.loads(json_string)
         except json.JSONDecodeError as e:
             print(f"Error decoding JSON response: {e}")
             return []  # Return an empty list in case of parsing failure
@@ -378,7 +378,9 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
         fields_input = json.loads(fields_input)
         fields_input = fields_input.get('message')
         
+        print("*****************************************************")
         print('fields_input  :',fields_input)
+        print("*****************************************************")
         
         # Handle the case where the user might not input anything or input invalid data
         if not fields_input:
@@ -401,10 +403,17 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
         for i in verified_fields:
             updated_fields[i] = 'None'
         
-        up = {'payload': updated_fields}
-        print('new updated_fields:', up)
+        
+        updated = {'project': project_details['project'],
+                'url': project_details['url'],
+                'method': project_details['method'],
+                'payload': updated_fields}
+        
+        print("*****************************************************")
+        print('new updated_fields:', updated)
+        print("*****************************************************")
 
-        response = await ask_user(websocket, project_details, up)
+        response = await ask_user(websocket, project_details, updated)
         return response
 
     except Exception as e:
@@ -418,13 +427,31 @@ async def update_process(websocket: WebSocket, project_details:dict,data: dict):
     if all(value is None or value == "None"  for value in update_payload.values()):
         print('start1')
         updated_details = await update_process_with_user_input(websocket,project_details, data)
+        print("*****************************************************")
         print("update output:",updated_details)
+        print("*****************************************************")
         return updated_details
     else:
         print('start2')
-        details = await ask_user(websocket,project_details, data)
-        print("update output direct:",details)
-        return details
+        b = data['payload']
+        filtered_payload = {}
+        
+        # Filter out None and "None" values from the payload
+        for key, value in b.items():
+            if value is not None and value != "None":
+                filtered_payload[key] = value
+        
+        # Create a new dictionary including project, url, method, and filtered payload
+        result = {
+            'project': data['project'],
+            'url': data['url'],
+            'method': data['method'],
+            'payload': filtered_payload
+        }
+        print("*****************************************************")
+        print("update output direct:",result)
+        print("*****************************************************")
+        return result
     
     
 async def ask_user(websocket: WebSocket, pro, pay):
@@ -432,9 +459,9 @@ async def ask_user(websocket: WebSocket, pro, pay):
     for key, value in abc.items():
         if value is None or value == "None":
             des = pro['payload'][key]['description']
-            logger.info(f"Sending description to client for {key}: {des}")
+            #logger.info(f"Sending description to client for {key}: {des}")
             await websocket.send_text(f"Please provide: {des}")
-            logger.info("Message sent to WebSocket, waiting for response...")
+            #logger.info("Message sent to WebSocket, waiting for response...")
             user_input = await websocket.receive_text()
             user_input_data = json.loads(user_input)
             abc[key] = user_input_data.get("message")

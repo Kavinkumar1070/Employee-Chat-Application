@@ -7,7 +7,6 @@ from src.crud.personal import (
     create_employee,
     get_employee,
     update_employee,
-    delete_employee
 )
 from src.schemas.personal import EmployeeCreate, EmployeeUpdate
 from src.core.utils import normalize_string, send_email,hash_password
@@ -49,8 +48,6 @@ async def create_employee_route(
     # Normalize strings
     employee.firstname = normalize_string(employee.firstname)
     employee.lastname = normalize_string(employee.lastname)
-    employee.email = normalize_string(employee.email)
-    employee.password = hash_password(employee.password)
     employee.address = normalize_string(employee.address)
     employee.dateofbirth = convert_date_format(employee.dateofbirth)
     employee.nationality = normalize_string(employee.nationality)

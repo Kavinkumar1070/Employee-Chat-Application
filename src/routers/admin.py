@@ -9,15 +9,8 @@ from src.schemas.personal import  EmployeeUpdate
 from src.crud.personal import (
     get_employee,
     update_employee,
-    delete_employee
 )
-from src.crud.leave import (
-    delete_employee_leave,
-    get_leave_by_employee_id,
-    get_employee_leave_by_month,
-    get_leave_by_id,
 
-)
 
 from src.crud.employee import (
     create_employee_employment_details,
@@ -102,14 +95,14 @@ async def update_employee_data(
     
     return updated_employee
 
-@router.delete(
-    "/personal/{employee_id}", dependencies=[Depends(roles_required("admin"))]
-)
-async def delete_employee_route(employee_id: str, db: Session = Depends(get_db)):
-    db_employee = delete_employee(db, employee_id)
-    if db_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
-    return {"details": "employee deleted successfully"}
+# @router.delete(
+#     "/personal/{employee_id}", dependencies=[Depends(roles_required("admin"))]
+# )
+# async def delete_employee_route(employee_id: str, db: Session = Depends(get_db)):
+#     db_employee = delete_employee(db, employee_id)
+#     if db_employee is None:
+#         raise HTTPException(status_code=404, detail="Employee not found")
+#     return {"details": "employee deleted successfully"}
 
 
 @router.delete(
@@ -187,7 +180,7 @@ async def update_employee_admin(
 @router.delete(
     "/employees/{employee_id}", dependencies=[Depends(roles_required("admin"))]
 )
-async def delete_employee(employee_id: str, db: Session = Depends(get_db)):
+async def delete_employee_details(employee_id: str, db: Session = Depends(get_db)):
     db_employee = delete_employee_employment_details(db, employee_id=employee_id)
     if db_employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")

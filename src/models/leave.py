@@ -15,16 +15,15 @@ from datetime import datetime
 from sqlalchemy.sql import func
 from src.core.database import Base
 
-
 class LeaveDuration(PyEnum):
-    ONE_DAY = "one_day"
-    HALF_DAY = "half_day"
+    ONE_DAY = "oneday"
+    HALF_DAY = "halfday"
 
 
 class LeaveStatus(PyEnum):
-    PENDING = "Pending"
-    APPROVED = "Approved"
-    REJECTED = "Rejected"
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
 
 
 class EmployeeLeave(Base):

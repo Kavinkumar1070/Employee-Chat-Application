@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from sqlalchemy.sql import func
 from src.core.utils import send_email_leave
-from src.models.leave import EmployeeLeave
+from src.models.leave import EmployeeLeave,LeaveDuration
 from src.models.employee import EmployeeEmploymentDetails
 from src.schemas.leave import EmployeeLeaveCreate, EmployeeLeaveUpdate, LeaveStatus
 
@@ -19,6 +19,14 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Employee Not found"
         )
+    def map_leave_duration(leave_duration_str: str):
+        if leave_duration_str.lower() == 'oneday':
+            return LeaveDuration.ONE_DAY
+        elif leave_duration_str.lower() == 'halfday':
+            return LeaveDuration.HALF_DAY
+        else:
+            raise ValueError("Invalid leave duration")
+    leave.duration = map_leave_duration(leave.duration.value)
     for i in range(leave.total_days):
         end_date = leave.start_date + timedelta(days=i)
         db_leave = EmployeeLeave(
@@ -36,6 +44,7 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: 
     employee_email = employee_data.employee_email
     employee_firstname = employee_data.employee.firstname
     employee_lastname = employee_data.employee.lastname
+    other_leave=[leave.id for leave in leave_entries ]
     return {
         "leave": db_leave.id,
         "reason": db_leave.reason,
@@ -44,6 +53,7 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: 
         "employee_code": employee_code,
         "employee_firstname": employee_firstname,
         "employee_lastname": employee_lastname,
+        "other_entires":other_leave
     }
 
 

@@ -5,8 +5,8 @@ from enum import Enum
 
 
 class LeaveDuration(str, Enum):
-    ONE_DAY = "one_day"
-    HALF_DAY = "half_day"
+    ONE_DAY = "oneday"
+    HALF_DAY = "halfday"
 
 
 class LeaveStatus(str, Enum):

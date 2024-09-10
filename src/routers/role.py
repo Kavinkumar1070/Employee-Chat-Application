@@ -26,9 +26,9 @@ async def create_role(name: Role, db: Session = Depends(get_db)):
     return {"message": f"{name} Role is Already Exists"}
 
 
-@router.delete("/{id}", dependencies=[Depends(roles_required("admin"))])
-async def delete_role(id: int, db: Session = Depends(get_db)):
-    role = get(db, id)
+@router.delete("/{role_id}", dependencies=[Depends(roles_required("admin"))])
+async def delete_role(role_id: int, db: Session = Depends(get_db)):
+    role = get_single(db, role_id)
     if not role:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Role not found"
@@ -36,9 +36,9 @@ async def delete_role(id: int, db: Session = Depends(get_db)):
     return delete(db, role.id)
 
 
-@router.put("/{id}", dependencies=[Depends(roles_required("admin"))])
+@router.put("/", dependencies=[Depends(roles_required("admin"))])
 async def update_role(request: UpdateRoleNameRequest, db: Session = Depends(get_db)):
-    exists_role = get(db, request.role_id)
+    exists_role = get_single(db, request.role_id)
     if exists_role:
         new_name = normalize_string(request.new_name)
         update(db, exists_role.id, new_name)
@@ -49,9 +49,9 @@ async def update_role(request: UpdateRoleNameRequest, db: Session = Depends(get_
         )
 
 
-@router.get("/{id}", dependencies=[Depends(roles_required("admin"))])
-async def get_role(id: int, db: Session = Depends(get_db)):
-    role = get(db, id)
+@router.get("/", dependencies=[Depends(roles_required("admin"))])
+async def get_role( db: Session = Depends(get_db)):
+    role = get(db)
     return role
 
 

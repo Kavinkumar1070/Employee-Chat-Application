@@ -64,12 +64,13 @@ async def send_email_leave(
     Leave_id: int,
     reason: str,
     status: str,
+    other_entires:list
 ):
 
     sender_email = os.getenv("SENDER_EMAIL")
     password = os.getenv("EMAIL_PASSWORD")
     subject = "User Details"
-    body = f"Hi 'Mrs.{name} {lname}' \n Your leave_id is : {" "}{Leave_id} \n Leave_status:{" "} {status} \n Your reason is:{" "} {reason} "
+    body = f"Hi 'Mrs.{name} {lname}' \n Your leave_id is : {" "}{Leave_id} \n Leave_status:{" "} {status} \n Your reason is:{" "} {reason}  \n Other_entires:{" "} {other_entires}"
     message = MIMEMultipart()
     message["From"] = sender_email
     message["To"] = recipient_email

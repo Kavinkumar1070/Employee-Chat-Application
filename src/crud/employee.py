@@ -121,48 +121,74 @@ def get_all_employee_teamlead(db: Session, employee_id: str, reporting_manager: 
 def update_employee_employment_details(
     db: Session, updates: EmployeeEmploymentDetailsUpdate
 ):
+    # Fetch the employee employment details by employee_id
     employee_employment = (
         db.query(EmployeeEmploymentDetails)
         .filter(EmployeeEmploymentDetails.employee_id == updates.employment_id)
         .first()
     )
-
+    
     if not employee_employment:
+        # Return None or raise an exception if the employee is not found
         return None
-    reporting_manager = (
-        db.query(EmployeeOnboarding)
-        .filter(EmployeeOnboarding.employment_id == updates.reporting_manager)
-        .first()
-    )
-    if not reporting_manager:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Reporting_manager id should not be Empty or Not found",
-        )
-    inter_data = (
-        db.query(employee_role)
-        .filter(employee_role.c.employee_id == reporting_manager.id)
-        .first()
-    )
 
-    if not inter_data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Reporting manager is not associated with a role",
+    # If reporting_manager is provided in the update payload
+    if updates.reporting_manager:
+        # Fetch the reporting manager details
+        reporting_manager = (
+            db.query(EmployeeOnboarding)
+            .filter(EmployeeOnboarding.employment_id == updates.reporting_manager)
+            .first()
         )
 
+        # If no reporting manager is found, raise an HTTP exception
+        if not reporting_manager:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Reporting_manager id should not be empty or was not found",
+            )
+
+        # Check if the reporting manager is associated with a role
+        inter_data = (
+            db.query(employee_role)
+            .filter(employee_role.c.employee_id == reporting_manager.id)
+            .first()
+        )
+
+        if not inter_data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Reporting manager is not associated with a role",
+            )
+        
+        # Update the employee employment record with the reporting manager
+        employee_employment.reporting_manager = reporting_manager.employment_id
+
+    # Loop through all the fields in the updates that are set (exclude unset)
     for key, value in updates.dict(exclude_unset=True).items():
+        # Normalize specific string fields if present in the update payload
         if key in ["job_position", "department", "work_location", "employee_email"]:
             setattr(employee_employment, key, normalize_string(value))
+        # Convert basic_salary to float if it’s not None
         elif key == "basic_salary" and value is not None:
             setattr(employee_employment, key, float(value))
+        # Check for a valid start_date and apply
         elif key == "start_date" and isinstance(value, date):
             setattr(employee_employment, key, value)
+        # Set other fields directly
         else:
             setattr(employee_employment, key, value)
 
+    # Ensure the employee is marked as active
+    employee_employment.is_active = True
+
+    # Commit the transaction to persist the changes in the database
     db.commit()
+
+    # Refresh the employee employment object to get the updated state
     db.refresh(employee_employment)
+
+    # Return the updated employee employment details
     return employee_employment
 
 

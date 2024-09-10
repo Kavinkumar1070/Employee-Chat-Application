@@ -118,10 +118,12 @@ def authenticate_employee(db: Session, employee_email: str, password: str):
         .filter(EmployeeEmploymentDetails.employee_email == employee_email)
         .first()
     )
+    
     if not employee:
         return None
     if not verify_password(password, employee.password):
         return None
+
     return employee
 
 
@@ -149,7 +151,7 @@ def get_current_employee_roles(
     roles = (
         db.query(Role)
         .join(employee_role)
-        .filter(employee_role.c.role_id == current_user)
+        .filter(employee_role.c.employee_id == current_user)
         .first()
     )
     if not roles:

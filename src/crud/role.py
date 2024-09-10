@@ -49,10 +49,13 @@ def update(db: Session, role_id: int, new_name: str):
         )
 
 
-def get(db: Session, role_id: int):
-    single_role = db.query(Role).filter(Role.id == role_id).first()
+def get(db: Session):
+    single_role = db.query(Role).all()
     return single_role
 
+def get_single(db: Session, role_id: int):
+    single_role=db.query(Role).filter(Role.id == role_id).first()
+    return single_role
 
 def assign_employee_role(db: Session, data: EmployeeRole):
     # Check if the employee exists
@@ -131,7 +134,16 @@ def create_role_function(db: Session, role_function: RoleFunctionCreate):
 
 
 def get_role_functions(db: Session, role_id: int):
-    return db.query(RoleFunction).filter(RoleFunction.role_id == role_id).all()
+    response = db.query(RoleFunction).filter(RoleFunction.role_id == role_id).all()
+    # Reorganize the result in the desired order and return it
+    formatted_result = [
+        {
+            'id': item.id,
+            'role_id': item.role_id,   # Renamed to match requested 'roleid'
+            'function': item.function }
+        for item in response
+    ]
+    return formatted_result
 
 
 def delete_role_function(db: Session, role_function_id: int):
