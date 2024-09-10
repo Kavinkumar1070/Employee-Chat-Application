@@ -6,6 +6,8 @@ from datetime import date
 class EmployeeEmploymentDetailsBase(BaseModel):
     employment_id: str
     job_position: str
+    email:EmailStr
+    password:str
     department: str
     start_date: date
     employment_type: str

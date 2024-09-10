@@ -48,13 +48,11 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: 
 
 
 def get_employee_leave_by_month(db: Session, employee_id: str, month: int, year: int):
-    print("ssss",employee_id)
     employee_data = (
         db.query(EmployeeEmploymentDetails)
         .filter(EmployeeEmploymentDetails.employee_id == employee_id)
         .first()
     )
-    print(employee_data.id)
     # if not employee_data:
     #     raise HTTPException(
     #         status_code=status.HTTP_404_NOT_FOUND, detail="Employee Not found"
@@ -224,7 +222,10 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
 
         db.commit()  # Commit the changes
         db.refresh(db_leave)  # Refresh the instance
-
+    if not db_leave or db_leave.id is None:
+         raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="leave not found"
+        )
         # Set the employee email for sending a notification
 
         # Send an email notification asynchronously
@@ -284,6 +285,10 @@ def update_employee_teamlead(
 
         # Send an email notification asynchronously
     # Make sure to return a regular, synchronous object (not a coroutine)
+    if not db_leave or db_leave.id is None:
+         raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="leave not found"
+        )
     employee_code = employee_data.employee_id
     employee_email = employee_data.employee_email
     employee_firstname = employee_data.employee.firstname

@@ -55,30 +55,20 @@ async def apply_leave(
 
 
 @router.get(
-    "/{employee_id}", dependencies=[Depends(roles_required("employee", "teamlead", "admin"))]
+    "/details", dependencies=[Depends(roles_required("employee", "teamlead"))]
 )
-def get_leaves_by_employee(
-    employee_id: str = Path(...),  # Declare as an optional query parameter
+def get_leaves_by_employee( 
     db: Session = Depends(get_db),
     current_employee=Depends(get_current_employee),
 ):
     current_employee_id = current_employee.employment_id
-    employee_role = get_current_employee_roles(current_employee.id, db)
-    if employee_id == "me":
-        employee_id = current_employee_id
-    if employee_role.name == "employee":
+    employee_role = get_current_employee_roles(current_employee.id, db).name
+    
+    # Determine employee to fetch leave details for
+    if employee_role == "employee" or employee_role == "teamlead":
         db_employee = get_leave_by_employee_id(db, current_employee_id)
-    elif employee_role.name == "admin":
-        db_employee = get_leave_by_employee_id(db, employee_id)
-    elif employee_role.name == "teamlead":
-        if  employee_id==current_employee.employment_id:
-            db_employee = get_leave_by_employee_id(db, employee_id)
-        else:    
-            db_employee = get_leave_by_employee_team(
-                db, employee_id, report_manager=current_employee_id
-            )
     else:
-        raise HTTPException(status_code=403, detail="Forbidden")
+        raise HTTPException(status_code=404, detail="Employee not found")
 
     if not db_employee:
         raise HTTPException(status_code=404, detail="Employee not applied for leave")
@@ -87,8 +77,8 @@ def get_leaves_by_employee(
 
 
 @router.get(
-    "/pending/teamlead",
-    dependencies=[Depends(roles_required("employee", "teamlead", "admin"))],
+    "/pending/leave",
+    dependencies=[Depends(roles_required("employee", "teamlead"))],
 )
 def get_leave_by(
     db: Session = Depends(get_db), current_employee=Depends(get_current_employee)
@@ -97,8 +87,6 @@ def get_leave_by(
     employee_role = get_current_employee_roles(current_employee.id, db)
     if employee_role.name == "employee":
         db_leave = get_leave_by_id(db, current_employee_id)
-    if employee_role.name == "admin":
-        db_leave = get_leave_by_admin(db)
     if employee_role.name == "teamlead":
         db_leave = get_leave_by_report_manager(db, current_employee_id)
     if not db_leave:
@@ -112,33 +100,25 @@ def get_leave_by(
 
 
 @router.get(
-    "/{monthnumber}/{yearnumber}/{employee_id}",
-    dependencies=[Depends(roles_required("employee", "admin", "teamlead"))],
+    "/{monthnumber}/{yearnumber}",
+    dependencies=[Depends(roles_required("employee","teamlead"))],
 )
 def get_leave_by_month(
     monthnumber: int,
     yearnumber: int,
-    employee_id: str = Path(...),
     db: Session = Depends(get_db),
     current_employee: EmployeeOnboarding = Depends(get_current_employee),
 ):
     current_employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
-    if employee_id == "me":
-        employee_id = current_employee_id
     if employee_role.name == "employee":
         return get_employee_leave_by_month(db, current_employee_id, monthnumber, yearnumber)
-    if employee_role.name == "admin":
-        return get_employee_leave_by_month(db, employee_id, monthnumber, yearnumber)
     if employee_role.name == "teamlead":
-        if  employee_id==current_employee.employment_id:
-            return get_employee_leave_by_month(db, employee_id, monthnumber, yearnumber)
-        else:
-            return get_employee_leave_by_month_tl(db, employee_id=employee_id,report_manager=current_employee_id, month=monthnumber, year=yearnumber)
+            return get_employee_leave_by_month(db, current_employee_id, monthnumber, yearnumber)
     return {"detail": "No leaves this Month"}
 
 
-@router.put("/update", dependencies=[Depends(roles_required("teamlead", "admin"))])
+@router.put("/admin/teamlead/update", dependencies=[Depends(roles_required("teamlead", "admin"))])
 async def update_leave(
     leave: EmployeeLeaveUpdate,
     db: Session = Depends(get_db),
@@ -190,7 +170,7 @@ async def update_leave(
 
 @router.delete(
     "/{leave_id}",
-    dependencies=[Depends(roles_required("employee", "admin", "teamlead"))],
+    dependencies=[Depends(roles_required("employee", "teamlead"))],
 )
 def delete_leave(
     leave_id: int,

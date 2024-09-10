@@ -20,37 +20,43 @@ def create_employee_employment_details(
     db: Session, employee_employment_data: EmployeeEmploymentDetailsBase
 ):
     try:
+        # Check if the employee already exists based on employee_id or employee_email
+        existing_employee = db.query(EmployeeEmploymentDetails).filter(
+            (EmployeeEmploymentDetails.employee_id == employee_employment_data.employment_id) |
+            (EmployeeEmploymentDetails.employee_email == employee_employment_data.email)
+        ).first()
+
+        if existing_employee:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Employee with the given employee_id or email already exists."
+            )
+
+        # Validate EmployeeOnboarding record exists
         employee_onboarding = (
             db.query(EmployeeOnboarding)
-            .filter(
-                EmployeeOnboarding.employment_id
-                == employee_employment_data.employment_id
-            )
+            .filter(EmployeeOnboarding.employment_id == employee_employment_data.employment_id)
             .first()
         )
         if not employee_onboarding:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"No EmployeeOnboarding record found for id {employee_employment_data.employment_id}",
+                detail=f"No EmployeeOnboarding record found for id {employee_employment_data.employment_id}"
             )
+
+        # Validate reporting_manager exists and has a role
         reporting_manager = (
             db.query(EmployeeOnboarding)
-            .filter(
-                EmployeeOnboarding.employment_id
-                == employee_employment_data.reporting_manager
-            )
+            .filter(EmployeeOnboarding.employment_id == employee_employment_data.reporting_manager)
             .first()
         )
-        if not employee_onboarding:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"No EmployeeOnboarding record found for id {employee_employment_data.reporting_manager}",
-            )
         if not reporting_manager:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reporting_manager id should not be Empty or Not found",
+                detail=f"No EmployeeOnboarding record found for reporting manager {employee_employment_data.reporting_manager}"
             )
+
+        # Validate that reporting manager has an associated role
         inter_data = (
             db.query(employee_role)
             .filter(employee_role.c.employee_id == reporting_manager.id)
@@ -59,11 +65,14 @@ def create_employee_employment_details(
         if not inter_data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reporting_manager is Not  Association With the  role",
+                detail="Reporting manager is not associated with a role."
             )
 
+        # Create new employee employment details
         new_employment_details = EmployeeEmploymentDetails(
             job_position=employee_employment_data.job_position,
+            employee_email=employee_employment_data.email,
+            password=employee_employment_data.password,
             department=employee_employment_data.department,
             start_date=employee_employment_data.start_date,
             employment_type=employee_employment_data.employment_type,
@@ -73,16 +82,18 @@ def create_employee_employment_details(
             is_active=True,
             employee_id=employee_employment_data.employment_id,
         )
+
         db.add(new_employment_details)
         db.commit()
         db.refresh(new_employment_details)
         return new_employment_details
 
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         db.rollback()
         raise
-    except ValueError as e:
+    except ValueError:
         raise
+
 
 
 def get_all_employee_employment_details(db: Session, employee_id: str):
@@ -110,7 +121,6 @@ def get_all_employee_teamlead(db: Session, employee_id: str, reporting_manager: 
 def update_employee_employment_details(
     db: Session, updates: EmployeeEmploymentDetailsUpdate
 ):
-
     employee_employment = (
         db.query(EmployeeEmploymentDetails)
         .filter(EmployeeEmploymentDetails.employee_id == updates.employment_id)

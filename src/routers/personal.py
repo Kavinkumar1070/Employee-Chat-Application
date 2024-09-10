@@ -10,9 +10,9 @@ from src.crud.personal import (
     delete_employee
 )
 from src.schemas.personal import EmployeeCreate, EmployeeUpdate
-from src.core.utils import normalize_string, send_email
+from src.core.utils import normalize_string, send_email,hash_password
 from src.core.authentication import roles_required
-from datetime import datetime
+from datetime import datetime,date
 
 router = APIRouter(
     prefix="/personal", tags=["Personal"], responses={400: {"message": "Not found"}}
@@ -27,9 +27,14 @@ def get_db():
         db.close()
 
 
-def convert_date_format(date_str):
+def convert_date_format(date_input):
+    # Check if the input is already a date object
+    if isinstance(date_input, date):
+        return date_input.strftime("%Y-%m-%d")
+    
+    # If the input is a string, try to parse it
     try:
-        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        date_obj = datetime.strptime(date_input, "%Y-%m-%d")
         return date_obj.strftime("%Y-%m-%d")
     except ValueError:
         raise HTTPException(
@@ -44,6 +49,8 @@ async def create_employee_route(
     # Normalize strings
     employee.firstname = normalize_string(employee.firstname)
     employee.lastname = normalize_string(employee.lastname)
+    employee.email = normalize_string(employee.email)
+    employee.password = hash_password(employee.password)
     employee.address = normalize_string(employee.address)
     employee.dateofbirth = convert_date_format(employee.dateofbirth)
     employee.nationality = normalize_string(employee.nationality)
@@ -67,19 +74,16 @@ async def create_employee_route(
 
 
 @router.get(
-    "/employees/{employee_id}",
-    dependencies=[Depends(roles_required("employee", "teamlead", "admin"))],
+    "/employees",
+    dependencies=[Depends(roles_required("employee", "teamlead"))],
 )
 async def read_employee_route(
-    employee_id: str = Path(...),db: Session = Depends(get_db), current_employee=Depends(get_current_employee)
+    db: Session = Depends(get_db), current_employee=Depends(get_current_employee)
 ):
     current_employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
     if employee_role.name == "employee":
         db_employee = get_employee(db,current_employee_id)
-        return db_employee
-    if employee_role.name == "admin":
-        db_employee = get_employee(db,employee_id)
         return db_employee
     if employee_role.name == "teamlead":
             db_employee = get_employee(db,current_employee_id)
@@ -88,12 +92,11 @@ async def read_employee_route(
         raise HTTPException(status_code=404, detail="Employee not found")
 
 @router.put(
-    "/employees/{employee_id}",
-    dependencies=[Depends(roles_required("employee", "teamlead", "admin"))],
+    "/employees",
+    dependencies=[Depends(roles_required("employee", "teamlead"))],
 )
 async def update_employee_data(
     employee_update: EmployeeUpdate,
-    employee_id: str = Path(...),
     db: Session = Depends(get_db),
     current_employee=Depends(get_current_employee),
 ):
@@ -103,23 +106,11 @@ async def update_employee_data(
     # Perform update based on role
     if employee_role in ["employee", "teamlead"]:
         updated_employee = update_employee(db, employee_id_c, employee_update)
-    elif employee_role == "admin":
-        updated_employee = update_employee(db, employee_id, employee_update)
     else:
         raise HTTPException(status_code=403, detail="Unauthorized role")
-    
-    # Check if update was successful
     if updated_employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
     
     return updated_employee
 
 
-@router.delete(
-    "/employees/{employee_id}", dependencies=[Depends(roles_required("admin"))]
-)
-async def delete_employee_route(employee_id: str, db: Session = Depends(get_db)):
-    db_employee = delete_employee(db, employee_id)
-    if db_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
-    return {"details": "employee deleted successfully"}

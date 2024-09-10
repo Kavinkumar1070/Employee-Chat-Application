@@ -14,7 +14,7 @@ from src.schemas.role import (
 )
 
 router = APIRouter(
-    prefix="/roles", tags=["role"], responses={400: {"message": "Not found"}}
+    prefix="/admin/roles", tags=["admin/role"], responses={400: {"message": "Not found"}}
 )
 
 

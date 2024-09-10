@@ -1,8 +1,8 @@
 {
-    "create personal employee": {
-        "project": "create personal employee",
+    "create new employee detail": {
+        "project": "create new employee detail",
         "project description": "Create a new personal employee record with provided details.",
-        "url": "http://127.0.0.1:8000/personal/employees",
+        "url": "http://127.0.0.1:8000/admin/employees/{employee_id}",
         "method": "POST",
         "payload": {
             "firstname": {
@@ -65,23 +65,25 @@
             }
         }
     },
-    "get personal employee by id": {
+    "get personal details by id": {
         "project": "get personal employee by id",
         "project description": "Retrieve personal employee record by employee ID.",
-        "url": "http://127.0.0.1:8000/personal/employees/{employee_id}",
+        "url": "http://127.0.0.1:8000/admin/personal/{employee_id}",
         "method": "GET",
         "payload": {
             "employee_id": {
-                "description": "ID of the employee to retrieve",
-                "datatype": "string",
-                "required": false
+                "description": "Employee ID to retrieve employee details",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "default": "None"
             }
         }
     },
     "delete personal employee by id": {
         "project": "delete personal employee by id",
         "project description": "Delete personal employee record by employee ID.",
-        "url": "http://127.0.0.1:8000/personal/employees/{employee_id}",
+        "url": "http://127.0.0.1:8000/admin/personal/{employee_id}}",
         "method": "DELETE",
         "payload": {
             "employee_id": {
@@ -93,10 +95,10 @@
             }
         }
     },
-    "update personal employee": {
-        "project": "update personal employee",
+    "update personal details of employee": {
+        "project": "update personal details of employee",
         "project description": "Update personal employee record with new details.",
-        "url": "http://127.0.0.1:8000/personal/employees/{employee_id}",
+        "url": "http://127.0.0.1:8000/admin/employees/{employee_id}",
         "method": "PUT",
         "payload": {
             "employee_id": {
@@ -169,7 +171,7 @@
     "update employee details": {
         "project": "update employee details",
         "project description": "Update employee details with new information.",
-        "url": "http://127.0.0.1:8000/employee/employees/",
+        "url": "http://127.0.0.1:8000/admin/employees/update/admin",
         "method": "PUT",
         "payload": {
             "employment_id": {
@@ -235,7 +237,7 @@
     "create employee details": {
         "project": "create employee details",
         "project description": "Create a new employee record with provided details.",
-        "url": "http://127.0.0.1:8000/employee/employees/",
+        "url": "http://127.0.0.1:8000/admin/employees/",
         "method": "POST",
         "payload": {
             "employment_id": {
@@ -294,12 +296,13 @@
     "get employee by id": {
         "project": "get employee by id",
         "project description": "Retrieve employee record by employee ID.",
-        "url": "http://127.0.0.1:8000/employee/employees/{employee_id}",
+        "url": "http://127.0.0.1:8000/admin/employees/{employee_id}",
         "method": "GET",
         "payload": {
             "employee_id": {
-                "description": "ID of the employee to retrieve please type employee_id or ('me')",
-                "datatype": "string",
+                "description": "ID of the employee to retrieve leave records type me or employee_id",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
                 "required": true,
                 "default": "None"
             }
@@ -308,11 +311,11 @@
     "delete employee by id": {
         "project": "delete employee by id",
         "project description": "Delete employee record by employee ID.",
-        "url": "http://127.0.0.1:8000/employee/employees/{employee_id}",
+        "url": "http://127.0.0.1:8000/admin/employees/{employee_id}",
         "method": "DELETE",
         "payload": {
             "employee_id": {
-                "description": "ID of the employee to delete",
+                "description": "ID of the emsployee to delete",
                 "datatype": "regex",
                 "format": "^cds\\d{4}$",
                 "required": true,
@@ -323,7 +326,7 @@
     "create role": {
         "project": "create role",
         "project description": "Create a new role with provided details.",
-        "url": "http://127.0.0.1:8000/roles/",
+        "url": "http://127.0.0.1:8000/admin/roles",
         "method": "POST",
         "payload": {
             "name": {
@@ -334,10 +337,10 @@
             }
         }
     },
-    "delete role by id": {
-        "project": "delete role by id",
+    "delete role ": {
+        "project": "delete role ",
         "project description": "Delete role by role ID.",
-        "url": "http://127.0.0.1:8000/roles/{id}",
+        "url": "http://127.0.0.1:8000/admin/roles/{id}",
         "method": "DELETE",
         "payload": {
             "id": {
@@ -348,10 +351,10 @@
             }
         }
     },
-    "update role by id": {
-        "project": "update role by id",
+    "update role": {
+        "project": "update role ",
         "project description": "Update role details by role ID.",
-        "url": "http://127.0.0.1:8000/roles/{id}",
+        "url": "http://127.0.0.1:8000/admin/roles/{id}",
         "method": "PUT",
         "payload": {
             "role_id": {
@@ -368,10 +371,10 @@
             }
         }
     },
-    "get role by id": {
-        "project": "get role by id",
+    "get role ": {
+        "project": "get role ",
         "project description": "Retrieve role details by role ID.",
-        "url": "http://127.0.0.1:8000/roles/{id}",
+        "url": "http://127.0.0.1:8000/admin/roles/{id}",
         "method": "GET",
         "payload": {
             "id": {
@@ -385,7 +388,7 @@
     "assign role to employee": {
         "project": "assign role to employee",
         "project description": "Assign a role to an employee.",
-        "url": "http://127.0.0.1:8000/roles/employee/role",
+        "url": "http://127.0.0.1:8000/admin/roles/employee/role",
         "method": "POST",
         "payload": {
             "employee_id": {
@@ -406,7 +409,7 @@
     "create role function": {
         "project": "create role function",
         "project description": "Create a new role function with provided details.",
-        "url": "http://127.0.0.1:8000/roles/functions/",
+        "url": "http://127.0.0.1:8000/admin/roles/functions/",
         "method": "POST",
         "payload": {
             "role_id": {
@@ -432,7 +435,7 @@
     "get role functions by id": {
         "project": "get role functions by id",
         "project description": "Retrieve functions associated with a role by role ID.",
-        "url": "http://127.0.0.1:8000/roles/{id}/functions/",
+        "url": "http://127.0.0.1:8000/admin/roles/{id}/functions/",
         "method": "GET",
         "payload": {
             "id": {
@@ -446,7 +449,7 @@
     "delete role function by id": {
         "project": "delete role function by id",
         "project description": "Delete a role function by function ID.",
-        "url": "http://127.0.0.1:8000/roles/functions/{id}",
+        "url": "http://127.0.0.1:8000/admin/roles/functions/{id}",
         "method": "DELETE",
         "payload": {
             "id": {
@@ -457,16 +460,17 @@
             }
         }
     },
-    "create leave record": {
-        "project": "create leave record",
+    "create leave": {
+        "project": "create leave",
         "project description": "Create a new leave record with provided details.",
         "url": "http://127.0.0.1:8000/leave/",
         "method": "POST",
         "payload": {
             "leave_type": {
                 "description": "Type of leave",
-                "datatype": "string",
+                "datatype": "choices",
                 "required": true,
+                "choices":["sick","personal","vacation"],
                 "default": "None"
             },
             "duration": {
@@ -497,51 +501,44 @@
             }
         }
     },
-    "get leave records by employee id": {
-        "project": "get leave records by employee id",
-        "project description": "Retrieve leave records for a specific employee.",
-        "url": "http://127.0.0.1:8000/leave/{employee_id}",
-        "method": "GET",
-        "payload": {
-            "employee_id": {
-                "description": "ID of the employee to retrieve leave records type me or employee_id",
-                "datatype": "string",
-                "required": true,
-                "default":"None"
-            }
-        }
-    },
-    "get pending leave records for teamlead": {
-        "project": "get pending leave records for teamlead",
-        "project description": "Retrieve pending leave records for a teamlead.",
-        "url": "http://127.0.0.1:8000/leave/pending/teamlead",
+    "get pending leave records": {
+        "project": "get pending leave records",
+        "project description": "Retrieve pending leave records.",
+        "url": "http://127.0.0.1:8000/admin/pending/leave/{employee_id}",
         "method": "GET",
         "payload": {
             "employee_id": {
                 "description": "ID of the teamlead requesting the pending leave records type 'all'",
-                "datatype": "string",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
                 "required": true,
-                "default": "all"
+                "default": "None"
             }
         }
     },
     "get leave records by month and year": {
         "project": "get leave records by month and year",
         "project description": "Retrieve leave records for a specific month and year.",
-        "url": "http://127.0.0.1:8000/leave/{month}/{year}",
+        "url": "http://127.0.0.1:8000/admin/{monthnumber}/{yearnumber}/{employee_id}",
         "method": "GET",
         "payload": {
-            "month": {
-                "description": "Month of the leave records to retrieve",
-                "datatype": "string",
-                "format": "MM",
+            "employee_id": {
+                "description": "ID of the employee to retrieve leave records type me or employee_id",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
                 "required": true,
                 "default": "None"
             },
-            "year": {
-                "description": "Year of the leave records to retrieve",
-                "datatype": "string",
-                "format": "YYYY",
+            "monthnumber": {
+                "description": "Month of the leave records to retrieve (1-12)",
+                "datatype": "integer",  
+                "required": true,
+                "default": "None"
+            },
+            "yearnumber": {
+                "description": "Year of the leave records to retrieve (4-digit year)",
+                "datatype": "integer",
+                "format": "yyyy",  
                 "required": true,
                 "default": "None"
             }
@@ -550,7 +547,7 @@
     "delete leave record by id": {
         "project": "delete leave record by id",
         "project description": "Delete a leave record by leave ID.",
-        "url": "http://127.0.0.1:8000/leave/{leave_id}",
+        "url": "http://127.0.0.1:8000/admin/{leave_id}",
         "method": "DELETE",
         "payload": {
             "leave_id": {
@@ -574,8 +571,9 @@
                 "default": 0
             },
             "employee_id": {
-                "description": "ID of the employee associated with the leave record",
-                "datatype": "string",
+                "description": "ID of the employee to retrieve leave records type me or employee_id",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
                 "required": true,
                 "default": "None"
             },

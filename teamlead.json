@@ -81,8 +81,8 @@
             
         }
     },
-    "create leave record": {
-        "project": "create leave record",
+    "create leave ": {
+        "project": "create leave ",
         "project description": "Create a new leave record with provided details.",
         "url": "http://127.0.0.1:8000/leave/",
         "method": "POST",
@@ -137,9 +137,9 @@
             }
         }
     },
-    "get pending leave records for teamlead": {
-        "project": "get pending leave records for teamlead",
-        "project description": "Retrieve pending leave records for a teamlead.",
+    "get pending leave records ": {
+        "project": "get pending leave records ",
+        "project description": "Retrieve pending leave records .",
         "url": "http://127.0.0.1:8000/leave/pending/teamlead",
         "method": "GET",
         "payload": {
