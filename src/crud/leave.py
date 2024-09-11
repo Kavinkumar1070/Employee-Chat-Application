@@ -230,12 +230,9 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
                 db_leave.reject_reason = leave_update.reason
             else:    
                 db_leave.reject_reason = "Leave Granted"  
-        if leave_update.status == LeaveStatus.REJECTED.value:
+        if leave_update.reason and leave_update.status == LeaveStatus.REJECTED.value:
             db_leave.status = LeaveStatus.REJECTED
-            if leave_update.reason:
-                db_leave.reject_reason = leave_update.reason
-            else:    
-                db_leave.reject_reason = "Leave Not Granted" 
+            db_leave.reject_reason = leave_update.reason
 
         db.commit()  # Commit the changes
         db.refresh(db_leave)  # Refresh the instance
@@ -266,10 +263,19 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
 def update_employee_teamlead(
     db: Session, report_manager: str, leave_update: EmployeeLeaveUpdate
 ):
+    db_leave = (
+        db.query(EmployeeLeave)
+        .filter(
+            EmployeeLeave.id == leave_update.leave_id
+        )
+        .first()
+    )
+    print(db_leave.leave_type)
+    employee_id=db_leave.employee_id
     employee_data = (
         db.query(EmployeeEmploymentDetails)
         .filter(
-            EmployeeEmploymentDetails.employee_id == leave_update.employee_id,
+            EmployeeEmploymentDetails.id == employee_id,
             EmployeeEmploymentDetails.reporting_manager == report_manager,
         )
         .first()
@@ -277,49 +283,44 @@ def update_employee_teamlead(
     # If employee not found, raise an exception
     if not employee_data:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found or not authenticated to access the employee"
         )
-    db_leave = (
-        db.query(EmployeeLeave)
-        .filter(
-            EmployeeLeave.id == leave_update.leave_id,
-            EmployeeLeave.employee_id == employee_data.id,
-        )
-        .first()
-    )
 
     # If leave request found, update the details
     if db_leave:
-        if leave_update.status:
-            db_leave.status = leave_update.status
-            db_leave.reason = "Leave Granted"
-        if leave_update.reason and leave_update.status == LeaveStatus.REJECTED:
-            db_leave.reason = leave_update.reason
+        if leave_update.status == LeaveStatus.APPROVED.value:
+            db_leave.status = LeaveStatus.APPROVED
+            if leave_update.reason:
+                db_leave.reject_reason = leave_update.reason
+            else:    
+                db_leave.reject_reason = "Leave Granted"  
+        if leave_update.reason and leave_update.status == LeaveStatus.REJECTED.value:
+            db_leave.status = LeaveStatus.REJECTED
+            db_leave.reject_reason = leave_update.reason
 
         db.commit()  # Commit the changes
         db.refresh(db_leave)  # Refresh the instance
-
+    if not db_leave or db_leave.id is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="leave not found"
+        )
         # Set the employee email for sending a notification
 
         # Send an email notification asynchronously
     # Make sure to return a regular, synchronous object (not a coroutine)
-    if not db_leave or db_leave.id is None:
-         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="leave not found"
-        )
     employee_code = employee_data.employee_id
     employee_email = employee_data.employee_email
     employee_firstname = employee_data.employee.firstname
     employee_lastname = employee_data.employee.lastname
-    print(type(db_leave))
     return {
         "leave": db_leave.id,
         "reason": db_leave.reason,
-        "status": db_leave.status,
+        "status": db_leave.status.value,
         "employee_email": employee_email,
         "employee_code": employee_code,
         "employee_firstname": employee_firstname,
         "employee_lastname": employee_lastname,
+        "other_entires":" "
     }
 
 
