@@ -6,6 +6,7 @@ from datetime import date
 from fastapi import HTTPException, status
 
 from sqlalchemy.orm import Session
+from src.core.authentication import get_current_employee_roles
 from sqlalchemy.exc import SQLAlchemyError
 from src.core.utils import normalize_string
 from src.schemas.employee import (
@@ -139,7 +140,13 @@ def update_employee_employment_details(
             db.query(EmployeeOnboarding)
             .filter(EmployeeOnboarding.employment_id == updates.reporting_manager)
             .first()
-        )
+        ) 
+        role=get_current_employee_roles(reporting_manager.id,db)
+        if not role.name == "teamlead":
+                raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Reporting_manager is not associated with role",
+            )
 
         # If no reporting manager is found, raise an HTTP exception
         if not reporting_manager:

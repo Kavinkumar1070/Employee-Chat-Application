@@ -343,7 +343,7 @@ def insert_dummy_data():
     leaves = [
         EmployeeLeave(
             employee_id=admin_employee.id,
-            leave_type="Sick Leave",
+            leave_type="sick",
             duration=LeaveDuration.ONE_DAY,
             start_date=date(2024, 9, 10),
             end_date=date(2024, 9, 10),
@@ -353,7 +353,7 @@ def insert_dummy_data():
         ),
         EmployeeLeave(
             employee_id=teamlead_employee.id,
-            leave_type="Vacation",
+            leave_type="vacation",
             duration=LeaveDuration.HALF_DAY,
             start_date=date(2024, 9, 15),
             end_date=date(2024, 9, 15),
@@ -363,7 +363,7 @@ def insert_dummy_data():
         ),
         EmployeeLeave(
             employee_id=regular_employee.id,
-            leave_type="Personal",
+            leave_type="personal",
             duration=LeaveDuration.ONE_DAY,
             start_date=date(2024, 9, 20),
             end_date=date(2024, 9, 20),

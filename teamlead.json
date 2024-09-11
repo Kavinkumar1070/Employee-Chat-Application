@@ -79,10 +79,10 @@
         "method": "POST",
         "payload": {
             "leave_type": {
-                "description": "Type of leave  ['sick','personal','vacation']",
+                "description": "Type of leave  ['sick','personal','vacation','unpaid']",
                 "datatype": "choices",
                 "required": true,
-                "choices":["sick","personal","vacation"],
+                "choices":["sick","personal","vacation","unpaid"],
                 "assigned": "None"
             },
             "duration": {

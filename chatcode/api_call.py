@@ -163,7 +163,6 @@ async def database_operation(websocket: WebSocket, details: dict):
         print('**************')
         error_message = json.loads(error_message)
         await websocket.send_text(error_message['detail'])
-        return error_message['detail']
 
     except httpx.RequestError as e:
         error_message = f"Request error occurred: {str(e)}"

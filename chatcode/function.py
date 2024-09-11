@@ -90,7 +90,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
         )
     except Exception as e:
         print(f"Error during API call: {e}")
-        await websocket.send_text("Error: Failed to process the query.")
+        await websocket.send_text("LLM Model Internal server error.")
         return None
     
     try:
@@ -118,7 +118,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
         return None
     except Exception as e:
         print(f"Error while processing the response: {e}")
-        await websocket.send_text("Error: An unexpected error occurred.")
+        await websocket.send_text("LLM Model Internal server error")
         return None
 
 def get_project_script(project_name: str, jsonfile: str):
@@ -219,7 +219,7 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
         
     except Exception as e:
         logger.error(f"Error while processing the response: {e}")
-        await websocket.send_text("Error: An unexpected error occurred. Please try again.")
+        await websocket.send_text("LLM Model Internal Server Error.")
         return {}
 
 def validate(payload_detail, response_config):
@@ -292,55 +292,55 @@ def validate(payload_detail, response_config):
     print("*****************************************************************************************************")
     return final_response
 
-def correction_update_name(names, update_fields):
-    try:
-        client = Groq(api_key="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")
+# def correction_update_name(names, update_fields):
+#     try:
+#         client = Groq(api_key="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")
 
-        # Convert dict_keys to list for easier manipulation
-        update_payload_list = list(update_fields)
+#         # Convert dict_keys to list for easier manipulation
+#         update_payload_list = list(update_fields)
 
-        response = client.chat.completions.create(
-            model='mixtral-8x7b-32768',
-            messages=[
-                {
-                    "role": "system",
-                    "content": f""""You are a spelling correction expert. You have a list of valid names: {update_payload_list}.
-                        The user has provided the following names to check: {names}.
-                        Correct the names in the payload based on the valid names list. If a name in the payload matches a name in the list, return it as is.
-                        If a name does not match any name in the list, do not return it.
-                        Output only the selected values in the list like this ["employee id","details"].
-                        No need of any explanations
-                        Response Format: Return list response in the following format, enclosed with ~~~ before and after the response.
-                    """
-                },
-                {
-                    "role": "user",
-                    "content": f"Analyze the following list of names: {names} and fields: {update_payload_list}."
-                }
-            ]
-        )
+#         response = client.chat.completions.create(
+#             model='mixtral-8x7b-32768',
+#             messages=[
+#                 {
+#                     "role": "system",
+#                     "content": f""""You are a spelling correction expert. You have a list of valid names: {update_payload_list}.
+#                         The user has provided the following names to check: {names}.
+#                         Correct the names in the payload based on the valid names list. If a name in the payload matches a name in the list, return it as is.
+#                         If a name does not match any name in the list, do not return it.
+#                         Output only the selected values in the list like this ["employee id","details"].
+#                         No need of any explanations
+#                         Response Format: Return list response in the following format, enclosed with ~~~ before and after the response.
+#                     """
+#                 },
+#                 {
+#                     "role": "user",
+#                     "content": f"Analyze the following list of names: {names} and fields: {update_payload_list}."
+#                 }
+#             ]
+#         )
 
-        response_text = response.choices[0].message.content.strip()
-        print(response_text)
-        json_start_idx = response_text.find("~~~") + 3
-        json_end_idx = response_text.rfind("~~~")
-        result = response_text[json_start_idx:json_end_idx].strip()
-        json_string = re.sub(r'\\_', '_', result)
-        print("*****************************************************")
-        print("update model list convert")
-        print(json_string)
-        print("*****************************************************")
-        # Try to parse the result to JSON, handle any parsing errors
-        try:
-            response = json.loads(json_string)
-        except json.JSONDecodeError as e:
-            print(f"Error decoding JSON response: {e}")
-            return []  # Return an empty list in case of parsing failure
-        return response
+#         response_text = response.choices[0].message.content.strip()
+#         print(response_text)
+#         json_start_idx = response_text.find("~~~") + 3
+#         json_end_idx = response_text.rfind("~~~")
+#         result = response_text[json_start_idx:json_end_idx].strip()
+#         json_string = re.sub(r'\\_', '_', result)
+#         print("*****************************************************")
+#         print("update model list convert")
+#         print(json_string)
+#         print("*****************************************************")
+#         # Try to parse the result to JSON, handle any parsing errors
+#         try:
+#             response = json.loads(json_string)
+#         except json.JSONDecodeError as e:
+#             print(f"Error decoding JSON response: {e}")
+#             return []  # Return an empty list in case of parsing failure
+#         return response
 
-    except Exception as e:
-        print(f"Error occurred in correction_update_name: {e}")
-        return []  # Return an empty list in case of any unexpected failure
+#     except Exception as e:
+#         print(f"Error occurred in correction_update_name: {e}") 
+#         return []  # Return an empty list in case of any unexpected failure
 
 async def update_process_with_user_input(websocket: WebSocket, project_details: dict, data: dict):
     try:
@@ -363,10 +363,11 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
             fields_to_update = [field.strip() for field in fields_input.split(',')]
             
             update_fields = update_payload.keys()
-            verified_fields = correction_update_name(fields_to_update, update_fields)
+            verified_fields = fields_to_update
+            #verified_fields = correction_update_name(fields_to_update, update_fields)
     
             if not verified_fields:
-                await websocket.send_text("No valid fields to update. Please try again.")
+                await websocket.send_text("LLM Model Internal server Error.")
                 return None
             
         # Initialize updated fields with 'None'
