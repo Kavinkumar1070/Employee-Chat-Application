@@ -6,8 +6,6 @@ from datetime import datetime
 from fastapi import WebSocket
 import groq
 from groq import Groq
-
-import logging
 from fastapi import WebSocket
 
 # Setup logging
@@ -23,15 +21,12 @@ def choose_json(role):
 def sanitize_json_string(response_text: str) -> str:
     # Remove any leading or trailing whitespace
     response_text = response_text.strip()
-    
     # Match the JSON object in the response text
     json_match = re.search(r'\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\}', response_text, re.DOTALL)
-    
     if json_match:
         json_string = json_match.group(0)
         # Remove any unnecessary escape characters (e.g., \_)
         json_string = re.sub(r'\\_', '_', json_string)
-        
         try:
             # Validate and return formatted JSON
             parsed_json = json.loads(json_string)
@@ -40,29 +35,24 @@ def sanitize_json_string(response_text: str) -> str:
             return "{}"
     return "{}"
 
-
 async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
     projectinfo = {}
-    
     try:
         with open(jsonfile, 'r') as f:
             json_config = json.load(f)
             project_names = json_config.keys()
             for i in project_names:
                 projectinfo[i] = json_config[i]['project description']
-    
     except FileNotFoundError:
         print("Error: The file was not found.")
         await websocket.send_text("Error: The configuration file was not found.")
         return None
-
     except json.JSONDecodeError:
         print("Error: Failed to decode JSON from the file.")
         await websocket.send_text("Error: Failed to read the configuration file.")
         return None
 
     client = Groq(api_key="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")
-    
     try:
         response = client.chat.completions.create(
             model='mixtral-8x7b-32768',
@@ -98,12 +88,11 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
                 }
             ]
         )
-    
     except Exception as e:
         print(f"Error during API call: {e}")
         await websocket.send_text("Error: Failed to process the query.")
         return None
-
+    
     try:
         response_text = response.choices[0].message.content.strip()
         json_start_idx = response_text.find("~~~")
@@ -119,7 +108,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
             query = user_input_data.get("message")
             return await get_project_details(websocket, query, jsonfile)
         print("*****************************************************")
-        print("project_name Done :",project_name)
+        print("project_name :",project_name)
         print("*****************************************************")
         return query, project_name
 
@@ -127,7 +116,6 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
         print("Error: Failed to decode JSON from the response.")
         await websocket.send_text("Error: Failed to process the response.")
         return None
-
     except Exception as e:
         print(f"Error while processing the response: {e}")
         await websocket.send_text("Error: An unexpected error occurred.")
@@ -138,15 +126,14 @@ def get_project_script(project_name: str, jsonfile: str):
         with open(jsonfile, 'r') as f:
             json_config = json.load(f)
             project_script = json_config.get(project_name)
-            print("*****************************************************")
+            print("+++++++++++++++++++++++++++++++++++++++++++++++++++++")
             print("project_detail Done")
-            print("*****************************************************")
+            print("+++++++++++++++++++++++++++++++++++++++++++++++++++++")
             return project_script
     
     except FileNotFoundError:
         print("Error: The file was not found.")
         return "Error: The configuration file was not found."
-    
     except json.JSONDecodeError:
         print("Error: Failed to decode JSON from the file.")
         return "Error: Failed to read the configuration file."
@@ -180,13 +167,9 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
                 "content": f"""You are an expert in filling payload values from a user query based on a configuration file.
 
                         Strict Instructions:
-                        
-                        1. **Capture Only from User Query:** Extract values strictly from the user query: {query}. Do **not** infer or assume any values.
-                        
-                        2. **Use Assigned Values:** If a value is missing in the user query or doesn't match the required format/choices, **use the assigned value** specified in the configuration file {payload_details}.
-                        
+                        1. **Capture Only from User Query:** Extract values strictly from the user query: {query}. Do **not** infer or assume any values.                        
+                        2. **Use Assigned Values:** If a value is missing in the user query or doesn't match the required format/choices, **use the assigned value** specified in the configuration file {payload_details}.        
                         3. **Fill Missing Fields with Assigned Values:** For each field not found in the user query, refer to the configuration file for the field's assigned value. If no valid input is found in the query and no assigned value is provided, use "None".
-                        
                         4. **JSON Response Format:** Return only the payload JSON response in the following format, enclosed with `~~~` before and after the response.
                     
                     Example output format:
@@ -211,25 +194,22 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
         logger.error(f"Error during API call: {e}")
         await websocket.send_text("Error: Failed to process the query. Please try again.")
         return {}
-
     try:
         response_text = response.choices[0].message.content.strip()
         json_start_idx = response_text.find("~~~")
         json_end_idx = response_text.rfind("~~~") + 1
         result = response_text[json_start_idx:json_end_idx]
-        
         # Sanitize the response
         sanitized_response = sanitize_json_string(result)
         #logger.info(f"Sanitized response: {sanitized_response}")
-        
         try:
             # Try to parse the JSON response
             result = json.loads(sanitized_response)
             response_config = result.get('payload', {})
-            print("*****************************************************")
+            print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
             print("Fill payload Done")
             print(result)
-            print("*****************************************************")
+            print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
             return response_config
         
         except json.JSONDecodeError:
@@ -241,8 +221,6 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
         logger.error(f"Error while processing the response: {e}")
         await websocket.send_text("Error: An unexpected error occurred. Please try again.")
         return {}
-
-
 
 def validate(payload_detail, response_config):
     payload_details = payload_detail['payload']
@@ -308,10 +286,10 @@ def validate(payload_detail, response_config):
         'method': payload_detail['method'],
         'payload': validated_payload
     }
-    print("*****************************************************")
+    print("*****************************************************************************************************")
     print("Validation Done")
     print(final_response)
-    print("*****************************************************")
+    print("*****************************************************************************************************")
     return final_response
 
 def correction_update_name(names, update_fields):
@@ -349,28 +327,24 @@ def correction_update_name(names, update_fields):
         result = response_text[json_start_idx:json_end_idx].strip()
         json_string = re.sub(r'\\_', '_', result)
         print("*****************************************************")
-        print("list convert sanitized_response")
+        print("update model list convert")
         print(json_string)
         print("*****************************************************")
-        
         # Try to parse the result to JSON, handle any parsing errors
         try:
             response = json.loads(json_string)
         except json.JSONDecodeError as e:
             print(f"Error decoding JSON response: {e}")
             return []  # Return an empty list in case of parsing failure
-
         return response
 
     except Exception as e:
         print(f"Error occurred in correction_update_name: {e}")
         return []  # Return an empty list in case of any unexpected failure
 
-
 async def update_process_with_user_input(websocket: WebSocket, project_details: dict, data: dict):
     try:
         update_payload = data['payload']
-        
         # Send available fields to the user
         available_fields = list(update_payload.keys())
         if len(available_fields) <= 2:
@@ -381,19 +355,12 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
             fields_input = await websocket.receive_text()
             fields_input = json.loads(fields_input)
             fields_input = fields_input.get('message')
-        
-            print("*****************************************************")
-            print('fields_input  :',fields_input)
-            print("*****************************************************")
             
             # Handle the case where the user might not input anything or input invalid data
             if not fields_input:
                 await websocket.send_text("No fields provided. Please try again.")
                 return None
-            #if len(fields_input) != 1:
             fields_to_update = [field.strip() for field in fields_input.split(',')]
-            #else:
-            #    fields_to_update = [fields_input.strip()]
             
             update_fields = update_payload.keys()
             verified_fields = correction_update_name(fields_to_update, update_fields)
@@ -411,12 +378,10 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
         updated = {'project': project_details['project'],
                 'url': project_details['url'],
                 'method': project_details['method'],
-                'payload': updated_fields}
-        
-        print("*****************************************************")
-        print('new updated_fields:', updated)
-        print("*****************************************************")
-
+                'payload': updated_fields}       
+        # print("*****************************************************")
+        # print('New updated fields:', updated)
+        # print("*****************************************************")
         response = await ask_user(websocket, project_details, updated)
         return response
 
@@ -425,15 +390,14 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
         await websocket.send_text("An error occurred while processing your request. Please try again.")
         return None
 
-
 async def update_process(websocket: WebSocket, project_details:dict,data: dict):
     update_payload = data['payload']
     if all(value is None or value == "None"  for value in update_payload.values()):
         print('start1')
         updated_details = await update_process_with_user_input(websocket,project_details, data)
-        print("*****************************************************")
+        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         print("update output:",updated_details)
-        print("*****************************************************")
+        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         return updated_details
     else:
         print('start2')
@@ -452,9 +416,9 @@ async def update_process(websocket: WebSocket, project_details:dict,data: dict):
             'method': data['method'],
             'payload': filtered_payload
         }
-        print("*****************************************************")
+        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         print("update output direct:",result)
-        print("*****************************************************")
+        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         return result
     
     
@@ -483,14 +447,17 @@ def nlp_response(answer):
         messages=[
             {
                 "role": "system",
-                "content": f"""
-                You are an AI assistant good at writing response for user understanding manner from dictionary to string with meaningful manner.
-                convert dictionary into string as meaningful response.
+                "content": """
+                You are an AI assistant responsible for explaining technical SQL operation results in simple and user-friendly terms. 
+                The user has performed a CRUD operation (Create, Read, Update, Delete) using an API that interacts with a database. 
+                Your goal is to provide clear, concise summaries that explain what happened during the operation.
+                
+                Please avoid technical jargon and ensure that your response is easy to understand for someone without technical knowledge.
                 """
             },
             {
                 "role": "user",
-                "content": f"summarise the user response {answer}."
+                "content": f"The API response is: {answer}. Please summarize the result in a user-friendly way."
             }
         ]
     )
