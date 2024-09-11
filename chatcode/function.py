@@ -194,8 +194,8 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
                         ~~~{{
                             "payload": {{
                                 "employee_id": "None",
-                                "month": "None",
-                                "year": "None"
+                                "monthnumber": "None",
+                                "yearnumber": "None"
                             }}
                         }}~~~
                 """

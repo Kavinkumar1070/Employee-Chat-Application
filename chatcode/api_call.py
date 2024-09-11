@@ -31,22 +31,19 @@ async def onboard_personal_details(websocket: WebSocket, details: dict):
  
     except httpx.HTTPStatusError as e:
         # Include response text in error message for better diagnostics
-        error_message = f"HTTP error occurred: {str(e)} - Status Code: {e.response.status_code}\nResponse Content: {e.response.text}"
-        await websocket.send_text(error_message)
+        error_message = f"HTTP error occurred: {str(e)} - Status Code: {e.response.status_code}"
         print("S",error_message)
         return error_message
  
     except httpx.RequestError as e:
         # General request error handling
         error_message = f"Request error occurred: {str(e)}"
-        await websocket.send_text(error_message)
         print("R",error_message)
         return error_message
  
     except Exception as e:
         # Catch all other unexpected errors
         error_message = f"An unexpected error occurred: {str(e)}"
-        await websocket.send_text(error_message)
         print('E',error_message)
         return error_message
     
@@ -126,7 +123,6 @@ async def database_operation(websocket: WebSocket, details: dict):
         return "Bearer token is missing."
 
     try:
-        print('11111111111111111111111111')
         print(url_template)
         url = url_template.format(**payload)
         
@@ -163,11 +159,11 @@ async def database_operation(websocket: WebSocket, details: dict):
                 return response_data
 
     except httpx.HTTPStatusError as e:
-        error_message = (f"HTTP error occurred: {str(e)} - "
-                        f"Status Code: {e.response.status_code}\n"
-                        f"Response Content: {e.response.text}")
-        await websocket.send_text(error_message)
-        return error_message
+        error_message = e.response.text
+        print('**************')
+        error_message = json.loads(error_message)
+        await websocket.send_text(error_message['detail'])
+        return error_message['detail']
 
     except httpx.RequestError as e:
         error_message = f"Request error occurred: {str(e)}"

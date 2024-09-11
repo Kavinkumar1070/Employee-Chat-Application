@@ -80,8 +80,8 @@
             }
         }
     },
-    "update personal details": {
-        "project": "update personal details",
+    "update personal detail": {
+        "project": "update personal detail",
         "project description": "Update personal record with new details.",
         "url": "http://127.0.0.1:8000/admin/employees/{employee_id}",
         "method": "PUT",
@@ -183,8 +183,8 @@
             }
         }
     },
-    "update employee details": {
-        "project": "update employee details",
+    "update employee detail": {
+        "project": "update employee detail",
         "project description": "Update employee or employment details with new information.",
         "url": "http://127.0.0.1:8000/admin/employees/update/admin",
         "method": "PUT",
@@ -334,7 +334,7 @@
     },
     "create role function": {
         "project": "create role function",
-        "project description": "Create a new role based function or work with provided details.",
+        "project description": "Create a new role based  work or function with provided details.",
         "url": "http://127.0.0.1:8000/admin/roles/functions/",
         "method": "POST",
         "payload": {
@@ -345,7 +345,7 @@
                 "assigned": "None"
             },
             "function": {
-                "description": "Function to display on bot",
+                "description": "new work allocated to role",
                 "datatype": "string",
                 "required": true,
                 "assigned": "None"
@@ -358,8 +358,8 @@
             }
         }
     },
-    "get role functions": {
-        "project": "get role functions",
+    "get role function": {
+        "project": "get role function",
         "project description": "Retrieve functions associated with a role by role ID.",
         "url": "http://127.0.0.1:8000/admin/roles/{role_id}/functions/",
         "method": "GET",
@@ -386,9 +386,9 @@
             }
         }
     },
-    "create leave": {
-        "project": "create leave",
-        "project description": "Create a new leave  record with provided details.",
+    "create new leave": {
+        "project": "create new leave",
+        "project description": "Create or apply a new leave record or request with provided details.",
         "url": "http://127.0.0.1:8000/leave/",
         "method": "POST",
         "payload": {

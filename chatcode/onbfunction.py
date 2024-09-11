@@ -61,13 +61,16 @@ async def collect_user_input(websocket: WebSocket, jsonfile, validate_input):
         while True:
             # Prepare the message for the user
             if props['datatype'] == 'gender':
-                options = " (options: Male, Female, Other)"
-                message = f"Please provide {field}{options}: "
+                options = "['Male', 'Female', 'Other']"
+                message = f"Please provide {field.capitalize()} {options}: "
             elif props['datatype'] == 'maritalstatus':
-                options = " (options: Single, Married, Divorced, Widowed)"
-                message = f"Please provide {field}{options}: "
+                options = "['Single', 'Married', 'Divorced', 'Widowed']"
+                message = f"Please provide {field.capitalize()} {options}: "
+            elif props['datatype'] == 'date':
+                options = "in YYYY-MM-DD format"  
+                message = f"Please provide {field.capitalize()} {options}: "  
             else:
-                message = f"Please provide {field} ({props['datatype']}): "
+                message = f"Please provide {field.capitalize()}: "
 
             # Send the message to the WebSocket client
             await websocket.send_text(message)

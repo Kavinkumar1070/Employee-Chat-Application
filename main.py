@@ -76,10 +76,12 @@ async def websocket_endpoint(websocket: WebSocket):
 
             elif user_message == 'onboard':
                 file = get_jsonfile()
-                await websocket.send_text(f"You said: {user_message}")
                 details = await collect_user_input(websocket, file, validate_input)
                 details['dateofbirth'] = datetime.strptime(details['dateofbirth'], '%Y-%m-%d').strftime('%Y-%m-%d')
                 details['contactnumber'] = int(details['contactnumber'])
+                print('*****************************')
+                print(details)
+                print('*****************************')
                 response = await onboard_personal_details(websocket,details)
                 print(response)
                 if response != "Email Send Successfully":
