@@ -29,8 +29,7 @@ class EmployeeLeaveCreate(EmployeeLeaveBase):
 
 class EmployeeLeaveUpdate(BaseModel):
     leave_id: int
-    employee_id: str
-    status: Optional[LeaveStatus] = None
+    status: LeaveStatus
     reason: Optional[str] = None
 
 

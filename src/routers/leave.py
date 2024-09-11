@@ -39,8 +39,6 @@ async def apply_leave(
 ):
     # Accessing employee_id directly from the object
     employee_id = current_employee.employment_id
-    print("*****")
-    print(employee_id)
     if not employee_id:
         raise HTTPException(status_code=400, detail="Invalid employee data")
     db_leave = create_employee_leave(db, leave, employee_id)
@@ -129,8 +127,11 @@ async def update_leave(
     report_manager = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
     if employee_role.name == "admin":
+        print("admin")
         if leave.status == "approved":
+            print('uadubaud')
             db_leave = update_employee_leave(db, leave)
+            print(db_leave)
         elif leave.status == "rejected":
             if not leave.reason or not leave.reason.strip():
                 raise HTTPException(
@@ -159,6 +160,7 @@ async def update_leave(
 
     if not db_leave:
         raise HTTPException(status_code=404, detail="Leave not found")
+    print("ewew",type(db_leave))
     await send_email_leave(
         db_leave["employee_email"],
         db_leave["employee_firstname"],
@@ -166,6 +168,7 @@ async def update_leave(
         db_leave["leave"],
         db_leave["reason"],
         db_leave["status"],
+        db_leave["other_entires"],
     )
     return db_leave
 

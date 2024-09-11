@@ -50,14 +50,14 @@
                 "assigned": "Indian"
             },
             "gender": {
-                "description": "Gender of the employee",
+                "description": "Gender of the employee  [male, female, other]",
                 "datatype": "choices",
                 "required": true,
                 "choices": ["male", "female", "other"],
                 "assigned": "None"
             },
             "maritalstatus": {
-                "description": "Marital status of the employee",
+                "description": "Marital status of the employee  [single, married, divorced, widowed]",
                 "datatype": "choices",
                 "required": true,
                 "choices": ["single", "married", "divorced", "widowed"],
@@ -138,14 +138,14 @@
                 "assigned": "None"
             },
             "gender": {
-                "description": "Gender of the employee",
+                "description": "Gender of the employee  [male, female, other]",
                 "datatype": "choices",
                 "required": true,
                 "choices": ["male", "female", "other"],
                 "assigned": "None"
             },
             "maritalstatus": {
-                "description": "Marital status of the employee",
+                "description": "Marital status of the employee  [single, married, divorced, widowed]",
                 "datatype": "choices",
                 "required": true,
                 "choices": ["single", "married", "divorced", "widowed"],
@@ -216,7 +216,7 @@
                 "assigned": "None"
             },
             "employment_type": {
-                "description": "Type of employment (fulltime, parttime)",
+                "description": "Type of employment [fulltime, parttime]",
                 "datatype": "choices",
                 "required": true,
                 "choices": ["fulltime", "parttime"],
@@ -393,14 +393,14 @@
         "method": "POST",
         "payload": {
             "leave_type": {
-                "description": "Type of leave",
+                "description": "Type of leave  ['sick','personal','vacation']",
                 "datatype": "choices",
                 "required": true,
                 "choices":["sick","personal","vacation"],
                 "assigned": "None"
             },
             "duration": {
-                "description": "Duration of the leave",
+                "description": "Duration of the leave ['oneday', 'halfdays']",
                 "datatype": "choices",
                 "choices": ["oneday", "halfdays"],
                 "required": true,
@@ -449,14 +449,14 @@
         "method": "GET",
         "payload": {
             "employee_id": {
-                "description": "ID of the employee to retrieve leave records type me or employee_id",
+                "description": "Employee ID  to retrieve leave records of the employee",
                 "datatype": "regex",
                 "format": "^cds\\d{4}$",
                 "required": true,
                 "assigned": "None"
             },
             "monthnumber": {
-                "description": "Month of the leave records to retrieve (1-12)",
+                "description": "Month number of the leave records to retrieve (1-12)",
                 "datatype": "choices",  
                 "required": true,
                 "choices":["1","2","3","4","5","6","7","8","9","10","11","12"],
@@ -485,36 +485,29 @@
             }
         }
     },
-    "update leave": {
-        "project": "update leave",
+    "update leave status": {
+        "project": "update leave status",
         "project description": "Update an existing leave record by approving or cancelling.",
-        "url": "http://127.0.0.1:8000/leave/update",
+        "url": "http://127.0.0.1:8000/leave/admin/teamlead/update",
         "method": "PUT",
         "payload": {
             "leave_id": {
-                "description": "ID of the leave record to update",
+                "description": "Leave ID to update leave record",
                 "datatype": "integer",
-                "required": true,
-                "assigned": 0
-            },
-            "employee_id": {
-                "description": "ID of the employee to retrieve leave records type me or employee_id",
-                "datatype": "regex",
-                "format": "^cds\\d{4}$",
                 "required": true,
                 "assigned": "None"
             },
             "status": {
-                "description": "Status of the leave record",
-                "datatype": "string",
+                "description": "Status of the leave record ['approved', 'rejected'] ",
+                "datatype": "choices",
                 "choices": ["pending", "approved", "rejected"],
                 "required": true,
-                "assigned": "pending"
+                "assigned": "None"
             },
             "reason": {
                 "description": "Reason for updating the leave record",
                 "datatype": "string",
-                "required": false,
+                "required": true,
                 "assigned": "None"
             }
         }

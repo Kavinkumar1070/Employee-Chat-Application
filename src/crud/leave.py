@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from sqlalchemy.sql import func
 from src.core.utils import send_email_leave
-from src.models.leave import EmployeeLeave,LeaveDuration
+from src.models.leave import EmployeeLeave,LeaveDuration,LeaveStatus
 from src.models.employee import EmployeeEmploymentDetails
-from src.schemas.leave import EmployeeLeaveCreate, EmployeeLeaveUpdate, LeaveStatus
+from src.schemas.leave import EmployeeLeaveCreate, EmployeeLeaveUpdate
 
 
 def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: str):
@@ -63,10 +63,10 @@ def get_employee_leave_by_month(db: Session, employee_id: str, month: int, year:
         .filter(EmployeeEmploymentDetails.employee_id == employee_id)
         .first()
     )
-    # if not employee_data:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_404_NOT_FOUND, detail="Employee Not found"
-    #     )
+    if not employee_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Employee Not found"
+        )
     data= (
         db.query(EmployeeLeave)
         .filter(
@@ -198,42 +198,49 @@ def get_leave_by_report_manager(db: Session, report_manager_id: str):
 
 
 def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
-    employee_data = (
-        db.query(EmployeeEmploymentDetails)
+    # Query to find the leave request of the employee
+    db_leave = (
+        db.query(EmployeeLeave)
         .filter(
-            EmployeeEmploymentDetails.employee_id == leave_update.employee_id,
+            EmployeeLeave.id == leave_update.leave_id
         )
         .first()
     )
-
+    print(db_leave.leave_type)
+    employee_id=db_leave.employee_id
+    employee_data = (
+        db.query(EmployeeEmploymentDetails)
+        .filter(
+            EmployeeEmploymentDetails.id == employee_id,
+        )
+        .first()
+    )
     # If employee not found, raise an exception
     if not employee_data:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found"
         )
-
-    # Query to find the leave request of the employee
-    db_leave = (
-        db.query(EmployeeLeave)
-        .filter(
-            EmployeeLeave.id == leave_update.leave_id,
-            EmployeeLeave.employee_id == employee_data.id,
-        )
-        .first()
-    )
-
+    print(employee_data.employee_id)
+    print("value",leave_update.status)
     # If leave request found, update the details
     if db_leave:
-        if leave_update.status:
-            db_leave.status = leave_update.status
-            db_leave.reason = "Leave Granted"
-        if leave_update.reason and leave_update.status == LeaveStatus.REJECTED:
-            db_leave.reason = leave_update.reason
+        if leave_update.status == LeaveStatus.APPROVED.value:
+            db_leave.status = LeaveStatus.APPROVED
+            if leave_update.reason:
+                db_leave.reject_reason = leave_update.reason
+            else:    
+                db_leave.reject_reason = "Leave Granted"  
+        if leave_update.status == LeaveStatus.REJECTED.value:
+            db_leave.status = LeaveStatus.REJECTED
+            if leave_update.reason:
+                db_leave.reject_reason = leave_update.reason
+            else:    
+                db_leave.reject_reason = "Leave Not Granted" 
 
         db.commit()  # Commit the changes
         db.refresh(db_leave)  # Refresh the instance
     if not db_leave or db_leave.id is None:
-         raise HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="leave not found"
         )
         # Set the employee email for sending a notification
@@ -252,6 +259,7 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
         "employee_code": employee_code,
         "employee_firstname": employee_firstname,
         "employee_lastname": employee_lastname,
+        "other_entires":" "
     }
 
 
@@ -303,10 +311,11 @@ def update_employee_teamlead(
     employee_email = employee_data.employee_email
     employee_firstname = employee_data.employee.firstname
     employee_lastname = employee_data.employee.lastname
+    print(type(db_leave))
     return {
         "leave": db_leave.id,
         "reason": db_leave.reason,
-        "status": db_leave.status.value,
+        "status": db_leave.status,
         "employee_email": employee_email,
         "employee_code": employee_code,
         "employee_firstname": employee_firstname,

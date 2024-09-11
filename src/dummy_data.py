@@ -57,17 +57,7 @@ def insert_dummy_data():
         ),
         RoleFunction(
             role_id=admin_role.id,
-            function="delete personal detail",
-            jsonfile="admin_share_info.json",
-        ),
-        RoleFunction(
-            role_id=admin_role.id,
             function="update personal details",
-            jsonfile="admin_share_info.json",
-        ),
-        RoleFunction(
-            role_id=admin_role.id,
-            function="create employee details",
             jsonfile="admin_share_info.json",
         ),
         RoleFunction(
@@ -142,7 +132,7 @@ def insert_dummy_data():
         ),
         RoleFunction(
             role_id=admin_role.id,
-            function="update leave",
+            function="update leave status",
             jsonfile="admin_share_info.json",
         ),
         RoleFunction(

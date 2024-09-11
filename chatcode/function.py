@@ -118,7 +118,9 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
             user_input_data = json.loads(user_input)
             query = user_input_data.get("message")
             return await get_project_details(websocket, query, jsonfile)
-        
+        print("*****************************************************")
+        print("project_name Done :",project_name)
+        print("*****************************************************")
         return query, project_name
 
     except json.JSONDecodeError:
@@ -371,33 +373,35 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
         
         # Send available fields to the user
         available_fields = list(update_payload.keys())
-        await websocket.send_text(f"Enter the field names you want to update, separated by commas {available_fields}: ")
+        if len(available_fields) <= 2:
+            verified_fields = available_fields
+        else:   
+            await websocket.send_text("Enter the field names you want to update, separated by commas available field names are below: ")
+            await websocket.send_text(f"{available_fields} ")
+            fields_input = await websocket.receive_text()
+            fields_input = json.loads(fields_input)
+            fields_input = fields_input.get('message')
         
-        # Receive field names from the user
-        fields_input = await websocket.receive_text()
-        fields_input = json.loads(fields_input)
-        fields_input = fields_input.get('message')
-        
-        print("*****************************************************")
-        print('fields_input  :',fields_input)
-        print("*****************************************************")
-        
-        # Handle the case where the user might not input anything or input invalid data
-        if not fields_input:
-            await websocket.send_text("No fields provided. Please try again.")
-            return None
-        #if len(fields_input) != 1:
-        fields_to_update = [field.strip() for field in fields_input.split(',')]
-        #else:
-        #    fields_to_update = [fields_input.strip()]
-        
-        update_fields = update_payload.keys()
-        verified_fields = correction_update_name(fields_to_update, update_fields)
-
-        if not verified_fields:
-            await websocket.send_text("No valid fields to update. Please try again.")
-            return None
-        
+            print("*****************************************************")
+            print('fields_input  :',fields_input)
+            print("*****************************************************")
+            
+            # Handle the case where the user might not input anything or input invalid data
+            if not fields_input:
+                await websocket.send_text("No fields provided. Please try again.")
+                return None
+            #if len(fields_input) != 1:
+            fields_to_update = [field.strip() for field in fields_input.split(',')]
+            #else:
+            #    fields_to_update = [fields_input.strip()]
+            
+            update_fields = update_payload.keys()
+            verified_fields = correction_update_name(fields_to_update, update_fields)
+    
+            if not verified_fields:
+                await websocket.send_text("No valid fields to update. Please try again.")
+                return None
+            
         # Initialize updated fields with 'None'
         updated_fields = {}
         for i in verified_fields:
@@ -460,7 +464,7 @@ async def ask_user(websocket: WebSocket, pro, pay):
         if value is None or value == "None":
             des = pro['payload'][key]['description']
             #logger.info(f"Sending description to client for {key}: {des}")
-            await websocket.send_text(f"Please provide: {des}")
+            await websocket.send_text(f"Please provide {des}")
             #logger.info("Message sent to WebSocket, waiting for response...")
             user_input = await websocket.receive_text()
             user_input_data = json.loads(user_input)
