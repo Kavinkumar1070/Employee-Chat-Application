@@ -6,7 +6,7 @@ from sqlalchemy import (
     ForeignKey,
     Enum,
     Text,
-    TIMESTAMP,
+    Float,
     DateTime,
 )
 from sqlalchemy.orm import relationship
@@ -55,10 +55,10 @@ class LeaveCalendar(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     employee_id = Column(Integer, ForeignKey("employee_employment_details.id"), unique=True, index=True)
-    sick_leave = Column(Integer, default=0)
-    personal_leave = Column(Integer, default=0)
-    vacation_leave = Column(Integer, default=0)
-    unpaid_leave = Column(Integer, default=0)
+    sick_leave = Column(Float, default=0.0)  # Changed to Float
+    personal_leave = Column(Float, default=0.0)  # Changed to Float
+    vacation_leave = Column(Float, default=0.0)  # Changed to Float
+    unpaid_leave = Column(Float, default=0.0)  # Changed to Float
     created_at = Column(DateTime, default=func.now(), nullable=False)
     updated_at = Column(
         DateTime, default=func.now(), onupdate=func.now(), nullable=False

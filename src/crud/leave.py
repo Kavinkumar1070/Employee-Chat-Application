@@ -10,18 +10,23 @@ from src.models.role import Role
 from sqlalchemy.exc import IntegrityError
 from src.schemas.leave import EmployeeLeaveCreate, EmployeeLeaveUpdate,LeaveCalendarUpdate
 
-def adjust_leave_balance(db: Session, employee_id: int, employee_employment_id: str, leave_type: str):
-    # Define mappings for leave types
+def adjust_leave_balance(
+    db: Session, 
+    employee_id: int, 
+    employee_employment_id: str, 
+    leave_type: str, 
+    duration: str
+):
+    # Define mappings for leave types and their error messages
     leave_fields = {
-        "sick": ("sick_leave", "Sick leave quota is exhausted. You cannot approve the additional sick leave."),
-        "personal": ("personal_leave", "Personal leave quota is exhausted. You cannot approve the additional personal leave."),
-        "vacation": ("vacation_leave", "Vacation leave quota is exhausted. You cannot approve the additional vacation leave."),
-        "unpaid": ("unpaid_leave", "Unpaid leave quota is exhausted. You cannot approve the additional unpaid leave.")
+        "sick": ("sick_leave", "Sick leave quota is exhausted. You cannot approve additional sick leave."),
+        "personal": ("personal_leave", "Personal leave quota is exhausted. You cannot approve additional personal leave."),
+        "vacation": ("vacation_leave", "Vacation leave quota is exhausted. You cannot approve additional vacation leave."),
+        "unpaid": ("unpaid_leave", "Unpaid leave quota is exhausted. You cannot approve additional unpaid leave.")
     }
     
     # Retrieve the leave calendar entry for the given employee_id
     leave_calendar = db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_id).first()
-
     
     if not leave_calendar:
         raise HTTPException(
@@ -40,20 +45,35 @@ def adjust_leave_balance(db: Session, employee_id: int, employee_employment_id: 
     
     # Get the current leave balance for the specified leave type
     current_balance = getattr(leave_calendar, field_name)
-    # Check the leave type to apply the correct logic
-    if leave_type == "unpaid":
-        # Increase unpaid leave balance by 1
-        setattr(leave_calendar, field_name, current_balance + 1)
-    else:
-        # For other leave types, check and decrement if applicable
-        if current_balance > 0:
-            setattr(leave_calendar, field_name, current_balance - 1)
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"No available {leave_type} leave. You cannot 'apply' (or) 'approve' the {leave_type} leave for this employee_id '{employee_employment_id}'"
-            )
     
+    # Define decrement values
+    decrement_value = 1 if duration == "oneday" else 0.5  # Decrease by 1 for oneday, 0.5 for halfday
+    
+    # Check if the employee is applying for a full day leave but only has 0.5 days left
+    if current_balance == 0.5 and duration == "oneday":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"You only have {current_balance} {leave_type} leave left. You cannot apply for a full day leave."
+        )
+    
+    # Check if the leave type is unpaid (no limit)
+    if leave_type == "unpaid":
+        increment_value = 1 if duration == "oneday" else 0.5
+        setattr(leave_calendar, field_name, current_balance + increment_value)
+        db.commit()
+        db.refresh(leave_calendar)
+        return leave_calendar
+    
+    # Handle other leave types (sick, personal, vacation)
+    if current_balance >= decrement_value:
+        setattr(leave_calendar, field_name, current_balance - decrement_value)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"{error_message} Current balance: {current_balance}. You cannot apply/approve this leave."
+        )
+
+    # Commit the transaction and handle errors
     try:
         db.commit()  # Commit the changes to the database
         db.refresh(leave_calendar)  # Refresh the instance to reflect updated data
@@ -63,49 +83,63 @@ def adjust_leave_balance(db: Session, employee_id: int, employee_employment_id: 
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while updating the leave balance."
         )
-    
-    return leave_calendar
 
-def create_leave_balance(db: Session, employee_id: int,employee_employment_id:str, leave_type: str):
+    # Return the leave calendar with updated balances
+    return {
+        "employee_id": employee_employment_id,
+        "leave_type": leave_type,
+        "applied_duration": duration,
+        "remaining_balance": getattr(leave_calendar, field_name)
+    }
+
+
+def create_leave_balance(db: Session, employee_id: int, leave_type: str):
     # Define mappings for leave types
     leave_fields = {
         "sick": ("sick_leave", "Sick leave quota is exhausted. You cannot approve the additional sick leave."),
         "personal": ("personal_leave", "Personal leave quota is exhausted. You cannot approve the additional personal leave."),
         "vacation": ("vacation_leave", "Vacation leave quota is exhausted. You cannot approve the additional vacation leave."),
-        "unpaid": ("unpaid_leave", "unpaid leave quota is exhausted. You cannot approve the additional vacation leave.")
+        "unpaid": ("unpaid_leave", None)  # No quota check for unpaid leave
     }
-    
+
     # Retrieve the leave calendar entry for the given employee_id
     leave_calendar = db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_id).first()
-    
+
     if not leave_calendar:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="LeaveCalendar entry not found for the specified employee."
         )
-    
+
     if leave_type not in leave_fields:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid leave type specified. Please use 'sick', 'personal', or 'vacation'."
+            detail="Invalid leave type specified. Please use 'sick', 'personal', 'vacation', or 'unpaid'."
         )
-    
+
     # Get the field name and error message from the mappings
     field_name, error_message = leave_fields[leave_type]
-    
-    # Get the current leave balance for the specified leave type
+
+    # Handle unlimited unpaid leave case
     current_balance = getattr(leave_calendar, field_name)
-    
+
+    if current_balance >= 0 and leave_type == "unpaid":
+        # No decrement or balance check, just return the calendar
+        return leave_calendar
+
+    # Get the current leave balance for the specified leave type
+   
+
+    # For other leave types, decrement the balance and check if there is sufficient leave available
     if current_balance > 0:
-        if field_name == "unpaid":
-            pass
         setattr(leave_calendar, field_name, current_balance - 1)
     else:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"No available {leave_type} leave. You cannot 'apply'  {leave_type} Leave Please Select Other Option"
+            detail=f"No available {leave_type} leave. You cannot 'apply' {leave_type} Leave. Please select another option from '[sick', 'personal', 'vacation']."
         )
-    
+
+    # Commit the changes and handle exceptions
     try:
         db.commit()  # Commit the changes to the database
         db.refresh(leave_calendar)  # Refresh the instance to reflect updated data
@@ -115,8 +149,9 @@ def create_leave_balance(db: Session, employee_id: int,employee_employment_id:st
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while updating the leave balance."
         )
-    
+
     return leave_calendar
+
 
 
 
@@ -140,7 +175,7 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: 
             raise ValueError("Invalid leave duration")
     leave.duration = map_leave_duration(leave.duration.value)
     leave_type=leave.leave_type
-    create_leave_balance(db, employee_data.id,employee_data.employee_id,leave_type)
+    create_leave_balance(db, employee_data.id,leave_type)
     for i in range(leave.total_days):
         end_date = leave.start_date + timedelta(days=i)
         db_leave = EmployeeLeave(
@@ -336,8 +371,7 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found"
         )
-    print(employee_data.employee_id)
-    print("value",leave_update.status)
+
     # If leave request found, update the details
     if db_leave:
         if leave_update.status == LeaveStatus.APPROVED.value:
@@ -350,7 +384,8 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
             db_leave.status = LeaveStatus.REJECTED
             db_leave.reject_reason = leave_update.reason
         leave_type=normalize_string(db_leave.leave_type)
-        adjust_leave_balance(db, employee_id,employee_data.employee_id, leave_type)
+        duration = db_leave.duration.value
+        adjust_leave_balance(db, employee_id,employee_data.employee_id, leave_type,duration) 
         db.commit()  # Commit the changes
         db.refresh(db_leave)  # Refresh the instance
     if not db_leave or db_leave.id is None:
@@ -418,7 +453,8 @@ def update_employee_teamlead(
             db_leave.status = LeaveStatus.REJECTED
             db_leave.reject_reason = leave_update.reason
         leave_type=normalize_string(db_leave.leave_type)
-        adjust_leave_balance(db, employee_id,employee_data.employee_id, leave_type)
+        duration = db_leave.duration.value
+        adjust_leave_balance(db, employee_id,employee_data.employee_id, leave_type,duration)
         db.commit()  # Commit the changes
         db.refresh(db_leave)  # Refresh the instance
     if not db_leave or db_leave.id is None:
