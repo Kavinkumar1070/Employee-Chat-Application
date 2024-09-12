@@ -42,7 +42,10 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
             json_config = json.load(f)
             project_names = json_config.keys()
             for i in project_names:
-                projectinfo[i] = json_config[i]['project description']
+                if 'project description' in json_config[i]:
+                    projectinfo[i] = json_config[i]['project description']
+                else:
+                    logging.warning(f"Warning: 'project description' missing for {i}")
     except FileNotFoundError:
         print("Error: The file was not found.")
         await websocket.send_text("Error: The configuration file was not found.")
@@ -90,9 +93,8 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
         )
     except Exception as e:
         print(f"Error during API call: {e}")
-        await websocket.send_text("LLM Model Internal server error.")
-        
-        return None
+        await websocket.send_text(e)        
+        return "Internal server error"
     
     try:
         response_text = response.choices[0].message.content.strip()
@@ -119,8 +121,8 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
         return None
     except Exception as e:
         print(f"Error while processing the response: {e}")
-        await websocket.send_text("LLM Model Internal server error")
-        return None
+        await websocket.send_text(e)
+        return "Internal server error"
 
 def get_project_script(project_name: str, jsonfile: str):
     try:
@@ -193,8 +195,8 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
     
     except Exception as e:
         logger.error(f"Error during API call: {e}")
-        await websocket.send_text("Error: Failed to process the query. Please try again.")
-        return {}
+        await websocket.send_text(e)
+        return "Internal server error"
     try:
         response_text = response.choices[0].message.content.strip()
         json_start_idx = response_text.find("~~~")
@@ -220,8 +222,8 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
         
     except Exception as e:
         logger.error(f"Error while processing the response: {e}")
-        await websocket.send_text("LLM Model Internal Server Error.")
-        return {}
+        await websocket.send_text(e)
+        return "Internal server error"
 
 def validate(payload_detail, response_config):
     payload_details = payload_detail['payload']

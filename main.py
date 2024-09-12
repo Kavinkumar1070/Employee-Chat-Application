@@ -194,10 +194,16 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Main logic
                 jsonfile = choose_json(role)
                 query, project_name = await get_project_details(websocket, user_message, jsonfile)
+                #if query == "Internal server error":
+                    # await websocket.send_text("navigate")  # Redirect to the new page
+                    # break
                 project_details = get_project_script(project_name, jsonfile)
                 payload_details = split_payload_fields(project_details)
                 
                 filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile)
+                # if filled_cleaned == "Internal server error":
+                #     await websocket.send_text("navigate")  # Redirect to the new page
+                #     break
                 validate_payload = validate(project_details, filled_cleaned)
                 
                 # Handling PUT requests
