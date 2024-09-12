@@ -15,7 +15,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 load_dotenv()
-groq_api = os.getenv('GROQ_API_KEY1')
+groq_api1 = os.getenv('GROQ_API_KEY1')
+groq_api2 = os.getenv('GROQ_API_KEY2')
+groq_api3 = os.getenv('GROQ_API_KEY3')
 
 def choose_json(role):
     json_file = ['admin','employee','teamlead','onboard']                                                 
@@ -60,7 +62,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
         await websocket.send_text("Error: Failed to read the configuration file.")
         return None
 
-    client = Groq(api_key=groq_api)
+    client = Groq(api_key=groq_api1)
     try:
         response = client.chat.completions.create(
             model='mixtral-8x7b-32768',
@@ -164,7 +166,7 @@ def split_payload_fields(project_detail: dict):
 
 
 async def fill_payload_values(websocket: WebSocket, query: str, payload_details: dict, jsonfile: str) -> Dict[str, Any]:
-    client = Groq(api_key=groq_api)
+    client = Groq(api_key=groq_api2)
 
     try:
         response = client.chat.completions.create(
@@ -412,7 +414,7 @@ import logging
 
 def nlp_response(answer, payload): 
     try:
-        client = Groq(api_key=groq_api)
+        client = Groq(api_key=groq_api3)
         response = client.chat.completions.create(
             model='mixtral-8x7b-32768',
             messages=[

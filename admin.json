@@ -437,9 +437,9 @@
                 "assigned": "None"
             },
             "duration": {
-                "description": "Duration of the leave ['oneday', 'halfdays']",
+                "description": "Duration of the leave ['oneday', 'halfday']",
                 "datatype": "choices",
-                "choices": ["oneday", "halfdays"],
+                "choices": ["oneday", "halfday"],
                 "required": true,
                 "assigned": "None"
             },
