@@ -160,19 +160,16 @@ async def database_operation(websocket: WebSocket, details: dict):
 
     except httpx.HTTPStatusError as e:
         error_message = e.response.text
-        print('**************')
         error_message = json.loads(error_message)
         await websocket.send_text(error_message['detail'])
 
     except httpx.RequestError as e:
         error_message = f"Request error occurred: {str(e)}"
         await websocket.send_text(error_message)
-        return error_message
 
     except Exception as e:
         error_message = f"An unexpected error occurred: {str(e)}"
         await websocket.send_text(error_message)
-        return error_message
 
 
 

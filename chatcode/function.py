@@ -91,6 +91,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
     except Exception as e:
         print(f"Error during API call: {e}")
         await websocket.send_text("LLM Model Internal server error.")
+        
         return None
     
     try:
@@ -292,89 +293,46 @@ def validate(payload_detail, response_config):
     print("*****************************************************************************************************")
     return final_response
 
-# def correction_update_name(names, update_fields):
-#     try:
-#         client = Groq(api_key="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")
-
-#         # Convert dict_keys to list for easier manipulation
-#         update_payload_list = list(update_fields)
-
-#         response = client.chat.completions.create(
-#             model='mixtral-8x7b-32768',
-#             messages=[
-#                 {
-#                     "role": "system",
-#                     "content": f""""You are a spelling correction expert. You have a list of valid names: {update_payload_list}.
-#                         The user has provided the following names to check: {names}.
-#                         Correct the names in the payload based on the valid names list. If a name in the payload matches a name in the list, return it as is.
-#                         If a name does not match any name in the list, do not return it.
-#                         Output only the selected values in the list like this ["employee id","details"].
-#                         No need of any explanations
-#                         Response Format: Return list response in the following format, enclosed with ~~~ before and after the response.
-#                     """
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": f"Analyze the following list of names: {names} and fields: {update_payload_list}."
-#                 }
-#             ]
-#         )
-
-#         response_text = response.choices[0].message.content.strip()
-#         print(response_text)
-#         json_start_idx = response_text.find("~~~") + 3
-#         json_end_idx = response_text.rfind("~~~")
-#         result = response_text[json_start_idx:json_end_idx].strip()
-#         json_string = re.sub(r'\\_', '_', result)
-#         print("*****************************************************")
-#         print("update model list convert")
-#         print(json_string)
-#         print("*****************************************************")
-#         # Try to parse the result to JSON, handle any parsing errors
-#         try:
-#             response = json.loads(json_string)
-#         except json.JSONDecodeError as e:
-#             print(f"Error decoding JSON response: {e}")
-#             return []  # Return an empty list in case of parsing failure
-#         return response
-
-#     except Exception as e:
-#         print(f"Error occurred in correction_update_name: {e}") 
-#         return []  # Return an empty list in case of any unexpected failure
-
 async def update_process_with_user_input(websocket: WebSocket, project_details: dict, data: dict):
     try:
         update_payload = data['payload']
         # Send available fields to the user
         available_fields = list(update_payload.keys())
         if len(available_fields) <= 2:
+            print('less than 2')
             verified_fields = available_fields
         else:   
-            await websocket.send_text("Enter the field names you want to update, separated by commas available field names are below: ")
+            await websocket.send_text("Enter 'All' if fields needs to be updated (or)")
+            await websocket.send_text("Enter the field names you want to update, 'separated by commas'")
             await websocket.send_text(f"{available_fields} ")
             fields_input = await websocket.receive_text()
             fields_input = json.loads(fields_input)
-            fields_input = fields_input.get('message')
-            
+            fields_input = fields_input.get('message')    
             # Handle the case where the user might not input anything or input invalid data
             if not fields_input:
                 await websocket.send_text("No fields provided. Please try again.")
                 return None
-            fields_to_update = [field.strip() for field in fields_input.split(',')]
             
-            update_fields = update_payload.keys()
-            verified_fields = fields_to_update
-            #verified_fields = correction_update_name(fields_to_update, update_fields)
-    
-            if not verified_fields:
-                await websocket.send_text("LLM Model Internal server Error.")
-                return None
-            
+            if  fields_input.lower() == 'all':
+                print('all')
+                print(available_fields)
+                verified_fields = available_fields
+            else:
+                print('selected columns')
+                fields_to_update = [field.strip() for field in fields_input.split(',')]
+                
+                #update_fields = update_payload.keys()
+                verified_fields = fields_to_update
+                #or when use model
+                #verified_fields = correction_update_name(fields_to_update, update_fields)
+        
+        if not verified_fields:
+            await websocket.send_text("No Verified Fields check update_process_with_user_input.")
+                
         # Initialize updated fields with 'None'
         updated_fields = {}
         for i in verified_fields:
             updated_fields[i] = 'None'
-        
         
         updated = {'project': project_details['project'],
                 'url': project_details['url'],

@@ -179,7 +179,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 data = await websocket.receive_text()
                 data_json = json.loads(data)
                 print('________________________________________________________________________________________')
-                print("data_json", data_json)
+                print("data json :", data_json)
                 print('________________________________________________________________________________________')
 
                 token = data_json.get("token")

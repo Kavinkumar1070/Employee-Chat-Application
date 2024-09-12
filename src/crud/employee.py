@@ -142,7 +142,7 @@ def update_employee_employment_details(
             .first()
         ) 
         role=get_current_employee_roles(reporting_manager.id,db)
-        if not role.name == "teamlead":
+        if not role.name == "teamlead" and not role.name == "admin":
                 raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Reporting_manager is not associated with role",

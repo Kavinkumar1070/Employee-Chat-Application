@@ -60,21 +60,6 @@ async def read_employee_route(
         raise HTTPException(status_code=404, detail="Employee not found")
 
 
-@router.get(
-    "/employees/{employee_id}",
-    dependencies=[Depends(roles_required( "admin"))],
-)
-async def read_employee_route(
-    employee_id: str = Path(...),db: Session = Depends(get_db), current_employee=Depends(get_current_employee)
-):
-    current_employee_id = current_employee.employment_id
-    employee_role = get_current_employee_roles(current_employee.id, db)
-    if employee_role.name == "admin":
-        db_employee = get_employee(db,employee_id)
-        return db_employee
-    raise HTTPException(status_code=404, detail="Employee not found")
-
-
 
 @router.put(
     "/employees/{employee_id}",
@@ -99,14 +84,6 @@ async def update_employee_data(
     
     return updated_employee
 
-# @router.delete(
-#     "/personal/{employee_id}", dependencies=[Depends(roles_required("admin"))]
-# )
-# async def delete_employee_route(employee_id: str, db: Session = Depends(get_db)):
-#     db_employee = delete_employee(db, employee_id)
-#     if db_employee is None:
-#         raise HTTPException(status_code=404, detail="Employee not found")
-#     return {"details": "employee deleted successfully"}
 
 
 @router.delete(
@@ -149,26 +126,28 @@ async def read_employee(
 
     if employee_role.name == "admin":
         db_employee = get_all_employee_employment_details(db, employee_id)
-    if db_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
+    
 
     # Prepare the response with employee details
-    employee_details = {
-        "employee_email": db_employee.employee_email,
-        "job_position": db_employee.job_position,
-        "department": db_employee.department,
-        "start_date": db_employee.start_date,
-        "employment_type": db_employee.employment_type,
-        "reporting_manager": db_employee.reporting_manager,
-        "work_location": db_employee.work_location,
-        "basic_salary": db_employee.basic_salary,
-        "is_active": db_employee.is_active,
-        "releave_date": str(db_employee.releave_date),
-        "employee_data":db_employee.employee.employment_id,
-        "employee_name":db_employee.employee.firstname
-    }
+        employee_details = {
+            "employee_email": db_employee.employee_email,
+            "job_position": db_employee.job_position,
+            "department": db_employee.department,
+            "start_date": db_employee.start_date,
+            "employment_type": db_employee.employment_type,
+            "reporting_manager": db_employee.reporting_manager,
+            "work_location": db_employee.work_location,
+            "basic_salary": db_employee.basic_salary,
+            "is_active": db_employee.is_active,
+            "releave_date": str(db_employee.releave_date),
+            "employee_data":db_employee.employee.employment_id,
+            "employee_name":db_employee.employee.firstname
+        }
 
-    return employee_details
+        return employee_details
+
+    if db_employee is None:
+        raise HTTPException(status_code=404, detail="Employee not found")
 
 
 @router.put("/employees/update/admin", dependencies=[Depends(roles_required("admin"))])
