@@ -529,6 +529,7 @@ def get_calender_tl(db:Session,report_manager:str, employee_id:str):
 def get_calender_admin(db:Session, employee_id:str):
     employee_data=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id).first()
     data=db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_data.id).first()
+    print(data.employee_id)
     return {
         "sick_leave":data.sick_leave,
         "personal_leave":data.personal_leave,
@@ -536,10 +537,13 @@ def get_calender_admin(db:Session, employee_id:str):
     }
 
 
-def update_leave_calendar(db: Session, employee_id: int, leave_update: LeaveCalendarUpdate):
-    leave_calendar = db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_id).first()
+def update_leave_calendar(db: Session,  leave_update: LeaveCalendarUpdate):
+    employee_data = db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == leave_update.employee_id).first()
+    leave_calendar = db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_data.id).first()
     if leave_calendar:
         for key, value in leave_update.dict(exclude_unset=True).items():
+            if key == 'employee_id':
+                continue
             setattr(leave_calendar, key, value)
         db.commit()
         db.refresh(leave_calendar)

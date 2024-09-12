@@ -242,16 +242,16 @@ def delete_leave(
     return {"leave deleted successfully"}
 
 
-@router.put("/update_leave/{employee_id}",dependencies=[Depends(roles_required("admin"))])
-async def update_leave(employee_id: int, leave_update: LeaveCalendarUpdate, db: Session = Depends(get_db)):
+@router.put("/update/leave/calender/",dependencies=[Depends(roles_required("admin"))])
+async def update_leave( leave_update: LeaveCalendarUpdate, db: Session = Depends(get_db)):
     # Update the leave calendar entry
-    return update_leave_calendar(db, employee_id, leave_update)
+    return update_leave_calendar(db, leave_update)
 
-@router.post("/admin/calender", dependencies=[Depends(roles_required("admin"))])
+@router.post("/calender", dependencies=[Depends(roles_required("admin"))])
 async def create_leave_calendar(db: Session = Depends(get_db)):
     return leave_calender(db)
 
 
-@router.get("/calender", dependencies=[Depends(roles_required("admin","employee","teamlead"))])
+@router.get("/calender/{employee_id}", dependencies=[Depends(roles_required("admin"))])
 async def get_leave_calendar(employee_id:str ,db: Session = Depends(get_db)):
     return get_calender_admin(db,employee_id)

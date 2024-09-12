@@ -319,16 +319,14 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
                 verified_fields = available_fields
             else:
                 print('selected columns')
-                fields_to_update = [field.strip() for field in fields_input.split(',')]
-                
-                #update_fields = update_payload.keys()
-                verified_fields = fields_to_update
-                #or when use model
-                #verified_fields = correction_update_name(fields_to_update, update_fields)
-        
+                fields_to_update = [field.strip().replace("'", "").replace("[", "").replace("]", "") for field in fields_input.split(',')]
+                verified_fields = [field for field in fields_to_update if field and field in available_fields]
+    
         if not verified_fields:
             await websocket.send_text("No Verified Fields check update_process_with_user_input.")
-                
+        
+        print('$$$$$$$$$$')
+        print(verified_fields)
         # Initialize updated fields with 'None'
         updated_fields = {}
         for i in verified_fields:
@@ -342,6 +340,8 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
         # print('New updated fields:', updated)
         # print("*****************************************************")
         response = await ask_user(websocket, project_details, updated)
+        print('$$$$$$$$$$')
+        print(response)
         return response
 
     except Exception as e:

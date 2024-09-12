@@ -261,6 +261,24 @@
                 "datatype": "string",
                 "required": true,
                 "assigned": "None"
+            },
+            "sick_leave": {
+                "description": "number of sick leave",
+                "datatype": "integer",
+                "required": true,
+                "assigned": "None"
+            },
+            "personal_leave": {
+                "description": "number of personal leave",
+                "datatype": "integer",
+                "required": true,
+                "assigned": "None"
+            },
+            "vacation_leave": {
+                "description": "number of vacation leave",
+                "datatype": "integer",
+                "required": true,
+                "assigned": "None"
             }
         }
     },
@@ -293,6 +311,24 @@
             "new_name": {
                 "description": "New role name",
                 "datatype": "string",
+                "required": true,
+                "assigned": "None"
+            },
+            "sick_leave": {
+                "description": "number of sick leave",
+                "datatype": "integer",
+                "required": true,
+                "assigned": "None"
+            },
+            "personal_leave": {
+                "description": "number of personal leave",
+                "datatype": "integer",
+                "required": true,
+                "assigned": "None"
+            },
+            "vacation_leave": {
+                "description": "number of vacation leave",
+                "datatype": "integer",
                 "required": true,
                 "assigned": "None"
             }
@@ -511,6 +547,61 @@
                 "required": true,
                 "assigned": "None"
             }
+        }
+    },
+    "create leave calender": {
+        "project": "create leave calender",
+        "project description": "create a new leave calender for employees",
+        "url": "http://127.0.0.1:8000/admin/calender",
+        "method": "POST",
+        "payload": {}
+    },
+    "get leave calender": {
+        "project": "get leave calender",
+        "project description": "get a leave calender for employees",
+        "url": "http://127.0.0.1:8000/admin/calender/{employee_id}",
+        "method": "GET",
+        "payload": {"employee_id": {
+                "description": "Employee ID to retrieve or get employment records",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "assigned": "None"
+            }
+        }
+    },
+    "update leave calender": {
+        "project": "update leave calender",
+        "project description": "update a leave calender for employee",
+        "url": "http://127.0.0.1:8000/admin/update/leave/calender/",
+        "method": "PUT",
+        "payload": {
+            "employee_id": {
+                "description": "Employee ID to retrieve or get employment records",
+                "datatype": "regex",
+                "format": "^cds\\d{4}$",
+                "required": true,
+                "assigned": "None"
+            },
+            "sick_leave": {
+                "description": "number of sick leave",
+                "datatype": "integer",
+                "required": true,
+                "assigned": "None"
+            },
+            "personal_leave": {
+                "description": "number of personal leave",
+                "datatype": "integer",
+                "required": true,
+                "assigned": "None"
+            },
+            "vacation_leave": {
+                "description": "number of vacation leave",
+                "datatype": "integer",
+                "required": true,
+                "assigned": "None"
+            }
+            
         }
     }
     

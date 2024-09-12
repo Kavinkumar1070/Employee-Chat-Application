@@ -54,6 +54,7 @@ class EmployeeLeaveResponse(BaseModel):
 
 
 class LeaveCalendarUpdate(BaseModel):
+    employee_id: str
     sick_leave: Optional[int] = None
     personal_leave: Optional[int] = None
     vacation_leave: Optional[int] = None
