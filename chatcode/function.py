@@ -232,6 +232,7 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
         await websocket.send_text(e)
         return "Internal server error"
 
+
 def validate(payload_detail, response_config):
     payload_details = payload_detail['payload']
     validated_payload = {}

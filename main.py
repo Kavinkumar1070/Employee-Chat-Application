@@ -223,13 +223,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 answer['bearer_token'] = token
                 
                 # Database operation
-                result = await database_operation(websocket, answer)
+                result,payload = await database_operation(websocket, answer)
                 
                 if not result:
                     await websocket.send_text("Thanks for using. Need anything, feel free to ask!")
                 else:
                     # Processing the result
-                    model_output = nlp_response(result)
+                    model_output = nlp_response(result,payload)
                     await websocket.send_text(model_output + " Thanks for using. Need anything, feel free to ask!")
             
             except json.JSONDecodeError:

@@ -115,7 +115,6 @@ async def database_operation(websocket: WebSocket, details: dict):
     query_params = details.get('query_params', {})
     method = details.get('method', 'GET').upper()
     timeout_seconds = 30
-
     bearer_token = details.get('bearer_token')
 
     if not bearer_token:
@@ -156,6 +155,7 @@ async def database_operation(websocket: WebSocket, details: dict):
                 html_table = generate_html_table(response_data)
                 await websocket.send_text(f"Request successful. Data:<br>{html_table}")
             else:
+                
                 return response_data,payload
 
     except httpx.HTTPStatusError as e:
