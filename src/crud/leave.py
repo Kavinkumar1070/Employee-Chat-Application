@@ -514,6 +514,18 @@ def get_calender(db:Session, employee_id:int):
         "vacation_leave":data.vacation_leave,
     }
 
+def get_calender_tl(db:Session,report_manager:str, employee_id:str):
+    employee_data=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id,
+                                                             EmployeeEmploymentDetails.reporting_manager == report_manager).first()
+    if not employee_data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail="Employee not Found or not Authenticate to View Details")
+    data=db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_data.id).first()
+    return {
+        "sick_leave":data.sick_leave,
+        "personal_leave":data.personal_leave,
+        "vacation_leave":data.vacation_leave,
+    }
+
 def get_calender_admin(db:Session, employee_id:str):
     employee_data=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id).first()
     data=db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_data.id).first()

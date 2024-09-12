@@ -254,5 +254,4 @@ async def create_leave_calendar(db: Session = Depends(get_db)):
 
 @router.get("/calender", dependencies=[Depends(roles_required("admin","employee","teamlead"))])
 async def get_leave_calendar(employee_id:str ,db: Session = Depends(get_db)):
-
     return get_calender_admin(db,employee_id)

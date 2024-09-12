@@ -209,3 +209,5 @@ def delete_employee_employment_details(db: Session, employee_id: str):
         employee_employment.is_active = False
         db.commit()
     return employee_employment
+
+

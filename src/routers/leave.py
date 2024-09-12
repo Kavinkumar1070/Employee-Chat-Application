@@ -26,6 +26,7 @@ from src.crud.leave import (
     get_employee_leave_by_month_tl,
     leave_calender,
     get_calender,
+    get_calender_tl,
     update_leave_calendar
 )
 
@@ -132,11 +133,8 @@ async def update_leave(
     report_manager = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
     if employee_role.name == "admin":
-        print("admin")
         if leave.status == "approved":
-            print('uadubaud')
             db_leave = update_employee_leave(db, leave)
-            print(db_leave)
         elif leave.status == "rejected":
             if not leave.reason or not leave.reason.strip():
                 raise HTTPException(
@@ -198,5 +196,10 @@ def delete_leave(
 async def get_leave_calendar(db: Session = Depends(get_db),current_employee=Depends(get_current_employee)):
     employee_id=current_employee.id
     return get_calender(db,employee_id)
+
+@router.get("/teamlead/calender/{employee_id}", dependencies=[Depends(roles_required("teamlead"))])
+async def get_leave_calendar_tl(employee_id: str = Path(...),db: Session = Depends(get_db),current_employee=Depends(get_current_employee)):
+    report_manager=current_employee.employment_id
+    return get_calender_tl(db,report_manager,employee_id)
 
 

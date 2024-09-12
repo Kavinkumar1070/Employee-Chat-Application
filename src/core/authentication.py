@@ -7,8 +7,8 @@ import os
 from dotenv import load_dotenv
 
 from src.core.database import get_db
-from src.core.utils import verify_password
-from src.schemas.authentication import TokenData
+from src.core.utils import verify_password,hash_password
+from src.schemas.authentication import TokenData,ChangePassword
 from src.models.personal import EmployeeOnboarding
 from src.models.role import Role, RoleFunction
 from src.models.association import employee_role
@@ -215,6 +215,33 @@ def login_for_access_token(
         "file": role_file,
     }
 
+def change_password(db:Session,hash_password_new:str,employee_id:int):
+    print("sdsd",employee_id)
+    print("asdf",hash_password_new)
+    employee=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.id == employee_id).first()
+    print(employee.id)
+    if not employee:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail= "Employee not Found")
+    employee.password = hash_password_new
+    db.add(employee)
+    db.commit()
+    return {"details":"Password Changed Successfully"}
+
+
+
+@router.put("/change-password", dependencies=[Depends(roles_required("employee","teamlead","admin"))])
+def change_password_with_old(data:ChangePassword,db:Session=Depends(get_db),current_employee=Depends(get_current_employee)):
+    employee_id=current_employee.id
+    employee=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.id == employee_id).first()
+    verify=verify_password(data.current_password,employee.password)
+    if not verify:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Current Password is Wrong ")
+    if data.new_password != data.confirm_password:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="New Password  and Confirm Password is Mismatch")
+    hash_new_password=hash_password(data.new_password)
+    return change_password(db,hash_new_password,employee_id)
+
+    # change_password
 
 @router.get("/admin-endpoint", dependencies=[Depends(roles_required("admin"))])
 def read_employee_me(
