@@ -7,10 +7,15 @@ from fastapi import WebSocket
 import groq
 from groq import Groq
 from fastapi import WebSocket
+import os 
+from dotenv import load_dotenv
 
 # Setup logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+load_dotenv()
+groq_api = os.getenv('GROQ_API_KEY1')
 
 def choose_json(role):
     json_file = ['admin','employee','teamlead','onboard']                                                 
@@ -55,7 +60,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
         await websocket.send_text("Error: Failed to read the configuration file.")
         return None
 
-    client = Groq(api_key="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")
+    client = Groq(api_key=groq_api)
     try:
         response = client.chat.completions.create(
             model='mixtral-8x7b-32768',
@@ -159,7 +164,7 @@ def split_payload_fields(project_detail: dict):
 
 
 async def fill_payload_values(websocket: WebSocket, query: str, payload_details: dict, jsonfile: str) -> Dict[str, Any]:
-    client = Groq(api_key="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")
+    client = Groq(api_key=groq_api)
 
     try:
         response = client.chat.completions.create(
@@ -323,12 +328,13 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
                 print('selected columns')
                 fields_to_update = [field.strip().replace("'", "").replace("[", "").replace("]", "") for field in fields_input.split(',')]
                 verified_fields = [field for field in fields_to_update if field and field in available_fields]
+                # update_fields = update_payload.keys()
+                # verified_fields = correction_update_name(fields_to_update, update_fields)
+                # verified_fields = json.loads(verified_fields)
     
         if not verified_fields:
             await websocket.send_text("No Verified Fields check update_process_with_user_input.")
-        
-        print('$$$$$$$$$$')
-        print(verified_fields)
+
         # Initialize updated fields with 'None'
         updated_fields = {}
         for i in verified_fields:
@@ -337,12 +343,13 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
         updated = {'project': project_details['project'],
                 'url': project_details['url'],
                 'method': project_details['method'],
-                'payload': updated_fields}       
+                'payload': updated_fields} 
+                
         # print("*****************************************************")
         # print('New updated fields:', updated)
         # print("*****************************************************")
+        
         response = await ask_user(websocket, project_details, updated)
-        print('$$$$$$$$$$')
         print(response)
         return response
 
@@ -401,26 +408,42 @@ async def ask_user(websocket: WebSocket, pro, pay):
                 pay['payload'][key] = abc[key]
     return pay
 
-def nlp_response(answer):       
-    client = Groq(api_key="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")
-    response = client.chat.completions.create(
-        model='mixtral-8x7b-32768',
-        messages=[
-            {
-                "role": "system",
-                "content": """
-                You are an AI assistant responsible for explaining technical SQL operation results in simple and user-friendly terms. 
-                The user has performed a CRUD operation (Create, Read, Update, Delete) using an API that interacts with a database. 
-                Your goal is to provide clear, concise summaries that explain what happened during the operation.
-                
-                Please avoid technical jargon and ensure that your response is easy to understand for someone without technical knowledge.
-                """
-            },
-            {
-                "role": "user",
-                "content": f"The API response is: {answer}. Please summarize the result in a user-friendly way."
-            }
-        ]
-    )
-    response_text = response.choices[0].message.content.strip()
-    return response_text
+import logging
+
+def nlp_response(answer, payload): 
+    try:
+        client = Groq(api_key=groq_api)
+        response = client.chat.completions.create(
+            model='mixtral-8x7b-32768',
+            messages=[
+                {
+                    "role": "system",
+                    "content": """
+                    You are an AI assistant responsible for explaining technical SQL operation results in simple and user-friendly terms. 
+                    The user has performed a CRUD operation (Create, Read, Update, Delete) using an API that interacts with a database.
+                    
+                    Provide a concise, clear summary of the operation result in **under 40 words**. Include the relevant payload values.
+                    Avoid technical jargon and ensure the explanation is easily understandable by non-technical users.
+                    """
+                },
+                {
+                    "role": "user",
+                    "content": f"The API response is: {answer}. The payload is: {payload}. Please summarize the result in a user-friendly way."
+                }
+            ]
+        )
+    except Exception as e:
+        logging.error(f"Error during API call: {e}")
+        return "Internal server error"
+
+    try:
+        response_text = response.choices[0].message.content.strip()
+        return response_text
+    except (AttributeError, IndexError, KeyError) as e:
+        logging.error(f"Error extracting response from the API: {e}")
+        return "Error: Failed to retrieve a valid response from the model."
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
+        return "Internal server error."
+
+

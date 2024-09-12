@@ -107,6 +107,10 @@
                     } else {
                         chatBox.innerHTML += `<div class="message-content">${otherContent}</div>`;
                     }
+                }
+                // If the server sends "navigate", redirect the user
+                if (message === "navigate") {
+                    window.location.href = "/templates/complete.html";  // Update this URL as needed
                 } else {
                     // Handle other types of messages
                     addMessageChat(message, 'bot');

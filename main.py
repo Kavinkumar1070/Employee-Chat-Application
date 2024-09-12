@@ -194,16 +194,16 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Main logic
                 jsonfile = choose_json(role)
                 query, project_name = await get_project_details(websocket, user_message, jsonfile)
-                #if query == "Internal server error":
-                    # await websocket.send_text("navigate")  # Redirect to the new page
-                    # break
+                if query == "Internal server error":
+                    await websocket.send_text("navigate")  # Redirect to the new page
+                    break
                 project_details = get_project_script(project_name, jsonfile)
                 payload_details = split_payload_fields(project_details)
                 
                 filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile)
-                # if filled_cleaned == "Internal server error":
-                #     await websocket.send_text("navigate")  # Redirect to the new page
-                #     break
+                if filled_cleaned == "Internal server error":
+                    await websocket.send_text("navigate")  # Redirect to the new page
+                    break
                 validate_payload = validate(project_details, filled_cleaned)
                 
                 # Handling PUT requests
@@ -222,13 +222,16 @@ async def websocket_endpoint(websocket: WebSocket):
                 answer['bearer_token'] = token
                 
                 # Database operation
-                result = await database_operation(websocket, answer)
+                result,payload = await database_operation(websocket, answer)
                 
                 if not result:
                     await websocket.send_text("Thanks for using. Need anything, feel free to ask!")
                 else:
                     # Processing the result
-                    model_output = nlp_response(result)
+                    model_output = nlp_response(result,payload)
+                    if model_output == "Internal server error":
+                        await websocket.send_text("navigate")  # Redirect to the new page
+                        break
                     await websocket.send_text(model_output + " Thanks for using. Need anything, feel free to ask!")
             
             except json.JSONDecodeError:

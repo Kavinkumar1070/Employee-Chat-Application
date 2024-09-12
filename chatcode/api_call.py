@@ -156,7 +156,7 @@ async def database_operation(websocket: WebSocket, details: dict):
                 html_table = generate_html_table(response_data)
                 await websocket.send_text(f"Request successful. Data:<br>{html_table}")
             else:
-                return response_data
+                return response_data,payload
 
     except httpx.HTTPStatusError as e:
         error_message = e.response.text
