@@ -36,9 +36,28 @@ def insert_dummy_data():
     Base.metadata.create_all(bind=engine)
 
     # Insert roles
-    admin_role = Role(name="admin")
-    teamlead_role = Role(name="teamlead")
-    employee_role = Role(name="employee")
+        # Dummy data for roles
+    admin_role = Role(
+        name="admin",
+        sick_leave=10,
+        personal_leave=5,
+        vacation_leave=15
+    )
+
+    teamlead_role = Role(
+        name="teamlead",
+        sick_leave=8,
+        personal_leave=4,
+        vacation_leave=12
+    )
+
+    employee_role = Role(
+        name="employee",
+        sick_leave=6,
+        personal_leave=3,
+        vacation_leave=10
+    )
+
 
     session.add_all([admin_role, teamlead_role, employee_role])
     session.commit()

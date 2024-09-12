@@ -10,6 +10,9 @@ class Role(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), unique=True, index=True)
+    sick_leave = Column(Integer, default=0)
+    personal_leave = Column(Integer, default=0)
+    vacation_leave = Column(Integer, default=0)
     employees = relationship(
         "EmployeeOnboarding", secondary=employee_role, back_populates="roles"
     )

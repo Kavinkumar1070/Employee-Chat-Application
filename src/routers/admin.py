@@ -6,6 +6,7 @@ from src.core.utils import normalize_string,hash_password
 from src.models.personal import EmployeeOnboarding
 from src.core.authentication import get_current_employee, get_current_employee_roles
 from src.schemas.personal import  EmployeeUpdate
+from src.schemas.leave import  LeaveCalendarUpdate
 from src.crud.personal import (
     get_employee,
     update_employee,
@@ -29,6 +30,9 @@ from src.crud.leave import (
     get_leave_by_employee_id,
     get_employee_leave_by_month,
     get_leave_by_id,
+    leave_calender,
+    update_leave_calendar,
+    get_calender_admin
 )
 
 
@@ -257,3 +261,19 @@ def delete_leave(
     if not success:
         raise HTTPException(status_code=404, detail="Leave not found")
     return {"leave deleted successfully"}
+
+
+@router.put("/update_leave/{employee_id}",dependencies=[Depends(roles_required("admin"))])
+async def update_leave(employee_id: int, leave_update: LeaveCalendarUpdate, db: Session = Depends(get_db)):
+    # Update the leave calendar entry
+    return update_leave_calendar(db, employee_id, leave_update)
+
+@router.post("/admin/calender", dependencies=[Depends(roles_required("admin"))])
+async def create_leave_calendar(db: Session = Depends(get_db)):
+    return leave_calender(db)
+
+
+@router.get("/calender", dependencies=[Depends(roles_required("admin","employee","teamlead"))])
+async def get_leave_calendar(employee_id:str ,db: Session = Depends(get_db)):
+
+    return get_calender_admin(db,employee_id)

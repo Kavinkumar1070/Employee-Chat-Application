@@ -8,8 +8,8 @@ from src.crud.role import *
 from src.schemas.role import RoleFunctionCreate
 
 from src.schemas.role import (
-    Role,
-    UpdateRoleNameRequest,
+    UpdateRole,
+    RoleCreate,
     EmployeeRole,
 )
 
@@ -19,8 +19,8 @@ router = APIRouter(
 
 
 @router.post("", dependencies=[Depends(roles_required("admin"))])
-async def create_role(name: Role, db: Session = Depends(get_db)):
-    name = normalize_string(name.name)
+async def create_role(name: RoleCreate, db: Session = Depends(get_db)):
+    name.name = normalize_string(name.name)
     if create(db, name):
         return f"{name} Role Created Successfully"
     return {"message": f"{name} Role is Already Exists"}
@@ -37,11 +37,10 @@ async def delete_role(role_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/", dependencies=[Depends(roles_required("admin"))])
-async def update_role(request: UpdateRoleNameRequest, db: Session = Depends(get_db)):
+async def update_role(request: UpdateRole, db: Session = Depends(get_db)):
     exists_role = get_single(db, request.role_id)
     if exists_role:
-        new_name = normalize_string(request.new_name)
-        update(db, exists_role.id, new_name)
+        update(db,request)
         raise HTTPException(status_code=status.HTTP_200_OK, detail="Role updated")
     else:
         raise HTTPException(
@@ -50,7 +49,7 @@ async def update_role(request: UpdateRoleNameRequest, db: Session = Depends(get_
 
 
 @router.get("/", dependencies=[Depends(roles_required("admin"))])
-async def get_role( db: Session = Depends(get_db)):
+async def get_roles( db: Session = Depends(get_db)):
     role = get(db)
     return role
 

@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from src.core.database import get_db, engine
+from apscheduler.schedulers.background import BackgroundScheduler
+from src.core.database import get_db, engine,SessionLocal
 from src import models
 from src.routers import personal, employee, role,leave,admin
 from src.core.authentication import router as auth_router, authenticate_employee, create_access_token
@@ -32,6 +33,68 @@ app.include_router(role.router)
 app.include_router(leave.router)
 app.include_router(admin.router)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
+
+
+
+
+def update_yearly_leave_balances(db: Session):
+    employees = db.query(models.EmployeeOnboarding).all()
+
+    for employee in employees:
+        # Get the role of the employee and associated leave quotas
+        employment_details = db.query(models.EmployeeEmploymentDetails).filter(
+            models.EmployeeEmploymentDetails.employee_id == employee.employment_id
+        ).first()
+
+        if not employment_details or not employment_details.role_id:
+            continue
+
+        role = db.query(models.Role).filter(models.Role.id == employment_details.role_id).first()
+        if not role:
+            continue
+
+        # Get the employee's leave calendar
+        leave_calendar = db.query(models.LeaveCalendar).filter(
+            models.LeaveCalendar.employee_id == employee.employment_id
+        ).first()
+
+        if not leave_calendar:
+            continue
+
+        # Update leave balances based on the role's leave quotas
+        leave_calendar.sick_leave = role.sick_leave
+        leave_calendar.personal_leave = role.personal_leave
+        leave_calendar.vacation_leave = role.vacation_leave
+
+        try:
+            db.commit()  # Commit the updated leave balances
+            db.refresh(leave_calendar)
+        except Exception as e:
+            db.rollback()  # Roll back in case of error
+            logging.error(f"Error updating leave for employee {employee.employment_id}: {str(e)}")
+
+# Scheduler to run the task every year
+def start_scheduler():
+    scheduler = BackgroundScheduler()
+
+    # Schedule the task to run once a year (January 1st)
+    scheduler.add_job(
+        update_yearly_leave_balances,
+        trigger='cron',
+        year='*',
+        month='1',
+        day='1',
+        args=[SessionLocal()]  # Pass a fresh DB session each time
+    )
+    
+    scheduler.start()
+
+# FastAPI startup event
+@app.on_event("startup")
+async def on_startup():
+    # Start the scheduler in the background
+    start_scheduler()
+
 
 @app.get("/")
 def get():

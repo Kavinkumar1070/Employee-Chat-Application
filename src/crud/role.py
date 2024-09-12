@@ -6,21 +6,23 @@ from sqlalchemy import insert
 
 from src.models.role import Role, RoleFunction
 from src.schemas.role import EmployeeRole
+from src.core.utils import normalize_string
 from src.models.personal import EmployeeOnboarding
 from src.models.association import employee_role
-from src.schemas.role import RoleFunctionCreate, RoleFunctionUpdate
+from src.schemas.role import RoleFunctionCreate, RoleFunctionUpdate,RoleCreate,UpdateRole
 
 
-def create(db: Session, name: str):
-    role_check = db.query(Role).filter(Role.name == name).first()
-    if role_check:
-        return False
-    else:
-        role = Role(name=name)
-        db.add(role)
-        db.commit()
-        db.refresh(role)
-        return role
+def create(db: Session, role: RoleCreate):
+    db_role = Role(
+        name=role.name,
+        sick_leave=role.sick_leave,
+        personal_leave=role.personal_leave,
+        vacation_leave=role.vacation_leave,
+    )
+    db.add(db_role)
+    db.commit()
+    db.refresh(db_role)
+    return db_role
 
 
 def get_role(db: Session, role_name: str):
@@ -35,17 +37,23 @@ def delete(db: Session, db_role: int):
     return {"message": "Role deleted successfully"}
 
 
-def update(db: Session, role_id: int, new_name: str):
-    role = db.query(Role).filter(Role.id == role_id).first()
+def update(db: Session, update_data: UpdateRole):
+    role = db.query(Role).filter(Role.id == update_data.role_id).first()
     try:
         if role:
-            role.name = new_name
+            # Loop through the update_data dict and update fields dynamically
+            for key, value in update_data.dict(exclude_unset=True).items():
+                if key == "new_name":
+                    setattr(role, "name", normalize_string(value))
+                else:
+                    setattr(role, key, value)
+            
             db.commit()
             db.refresh(role)
         return role
     except IntegrityError as e:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="role name is already exists"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Role name already exists"
         )
 
 

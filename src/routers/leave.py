@@ -5,10 +5,12 @@ from src.core.utils import send_email_leave
 from src.core.database import get_db
 from src.core.authentication import roles_required
 from src.models.personal import EmployeeOnboarding
+from src.models.leave import LeaveCalendar
 from src.core.authentication import get_current_employee, get_current_employee_roles
 from src.schemas.leave import (
     EmployeeLeaveCreate,
     EmployeeLeaveUpdate,
+    LeaveCalendarUpdate
 )
 from src.crud.leave import (
     create_employee_leave,
@@ -22,6 +24,9 @@ from src.crud.leave import (
     get_leave_by_report_manager,
     update_employee_teamlead,
     get_employee_leave_by_month_tl,
+    leave_calender,
+    get_calender,
+    update_leave_calendar
 )
 
 router = APIRouter(
@@ -160,7 +165,6 @@ async def update_leave(
 
     if not db_leave:
         raise HTTPException(status_code=404, detail="Leave not found")
-    print("ewew",type(db_leave))
     await send_email_leave(
         db_leave["employee_email"],
         db_leave["employee_firstname"],
@@ -186,3 +190,13 @@ def delete_leave(
     if not success:
         raise HTTPException(status_code=404, detail="Leave not found")
     return {"leave deleted successfully"}
+
+
+
+
+@router.get("/calender", dependencies=[Depends(roles_required("employee","teamlead"))])
+async def get_leave_calendar(db: Session = Depends(get_db),current_employee=Depends(get_current_employee)):
+    employee_id=current_employee.id
+    return get_calender(db,employee_id)
+
+

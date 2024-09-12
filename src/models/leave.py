@@ -48,3 +48,20 @@ class EmployeeLeave(Base):
     )
 
     employee = relationship("EmployeeEmploymentDetails", back_populates="leaves")
+
+
+class LeaveCalendar(Base):
+    __tablename__ = "leavecalendar"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    employee_id = Column(Integer, ForeignKey("employee_employment_details.id"), unique=True, index=True)
+    sick_leave = Column(Integer, default=0)
+    personal_leave = Column(Integer, default=0)
+    vacation_leave = Column(Integer, default=0)
+    unpaid_leave = Column(Integer, default=0)
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False
+    )
+    
+    employee = relationship("EmployeeEmploymentDetails", back_populates="leave_calendar")

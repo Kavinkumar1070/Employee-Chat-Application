@@ -49,3 +49,11 @@ class EmployeeLeaveResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+
+
+class LeaveCalendarUpdate(BaseModel):
+    sick_leave: Optional[int] = None
+    personal_leave: Optional[int] = None
+    vacation_leave: Optional[int] = None
