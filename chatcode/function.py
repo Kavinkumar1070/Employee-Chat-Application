@@ -163,7 +163,30 @@ def split_payload_fields(project_detail: dict):
     except TypeError:
         print("Error: The project detail provided is not a dictionary.")
         return "Error: Invalid project detail format."
+    
+def verify_values_from_query(query, payload, config):
+    """
+    Verifies that the values filled in the payload are directly captured from the user query or assigned from the config.
+    """
+    # Tokenize the user query for words and possible values
+    query_tokens = re.findall(r'\b\w+\b', query.lower())
 
+    # Verify each field in the payload
+    verified_payload = {}
+    for field, value in payload.items():
+        # Ensure the value is a string before applying .lower()
+        if isinstance(value, str) and value.lower() in query_tokens:
+            # If the value is found in the query, accept it
+            verified_payload[field] = value
+        elif value == config.get(field, "None"):
+            # If the value matches the assigned value from the config, accept it
+            verified_payload[field] = value
+        else:
+            # Otherwise, assume the model made an assumption, set it to None and log the issue
+            #print(f"Field '{field}' contains assumed value '{value}'. Resetting to None.")
+            verified_payload[field] = "None"
+
+    return verified_payload
 
 async def fill_payload_values(websocket: WebSocket, query: str, payload_details: dict, jsonfile: str) -> Dict[str, Any]:
     client = Groq(api_key=groq_api2)
@@ -216,11 +239,14 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
             # Try to parse the JSON response
             result = json.loads(sanitized_response)
             response_config = result.get('payload', {})
+            verified_payload = verify_values_from_query(query, response_config, payload_details)
+
             print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
             print("Fill payload Done")
-            print(result)
+            print(verified_payload)
             print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-            return response_config
+            
+            return verified_payload
         
         except json.JSONDecodeError:
             logger.error("Error: Failed to decode JSON from the response.")

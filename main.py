@@ -195,16 +195,14 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Main logic
                 jsonfile = choose_json(role)
                 query, project_name = await get_project_details(websocket, user_message, jsonfile)
-                #if query == "Internal server error":
-                    # await websocket.send_text("navigate")  # Redirect to the new page
-                    # break
+                if query == "Internal server error":
+                    await websocket.send_text("Server Error")  # Redirect to the new page
                 project_details = get_project_script(project_name, jsonfile)
                 payload_details = split_payload_fields(project_details)
                 
                 filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile)
-                # if filled_cleaned == "Internal server error":
-                #     await websocket.send_text("navigate")  # Redirect to the new page
-                #     break
+                if filled_cleaned == "Internal server error":
+                    await websocket.send_text("Server Error")  # Redirect to the new page
                 validate_payload = validate(project_details, filled_cleaned)
                 
                 # Handling PUT requests
@@ -225,8 +223,10 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Database operation
                 result,payload = await database_operation(websocket, answer)
                 
-                if not result:
+                if not result and not payload:
                     await websocket.send_text("Thanks for using. Need anything, feel free to ask!")
+                if result == "Backend Error":
+                    await websocket.send_text("Backend Error")  # Redirect to the new page
                 else:
                     # Processing the result
                     model_output = nlp_response(result,payload)
@@ -234,11 +234,9 @@ async def websocket_endpoint(websocket: WebSocket):
             
             except json.JSONDecodeError:
                 await websocket.send_text("Invalid input format. Please send a valid JSON.")
-            except KeyError as e:
-                await websocket.send_text(f"Missing required field: {str(e)}")
             except Exception as e:
-                # Catch-all for unexpected errors
                 await websocket.send_text(f"An error occurred: {str(e)}")
+                await websocket.send_text("Backend Error")  # Redirect to the new page
 
     except WebSocketDisconnect:
         logger.info("WebSocket disconnected")

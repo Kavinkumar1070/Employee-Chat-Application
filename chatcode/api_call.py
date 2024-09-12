@@ -115,6 +115,7 @@ async def database_operation(websocket: WebSocket, details: dict):
     query_params = details.get('query_params', {})
     method = details.get('method', 'GET').upper()
     timeout_seconds = 30
+
     bearer_token = details.get('bearer_token')
 
     if not bearer_token:
@@ -166,10 +167,12 @@ async def database_operation(websocket: WebSocket, details: dict):
     except httpx.RequestError as e:
         error_message = f"Request error occurred: {str(e)}"
         await websocket.send_text(error_message)
+        return "Backend Error"
 
     except Exception as e:
         error_message = f"An unexpected error occurred: {str(e)}"
         await websocket.send_text(error_message)
+        return "Backend Error"
 
 
 
