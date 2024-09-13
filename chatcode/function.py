@@ -138,6 +138,7 @@ def get_project_script(project_name: str, jsonfile: str):
             project_script = json_config.get(project_name)
             print("+++++++++++++++++++++++++++++++++++++++++++++++++++++")
             print("project_detail Done")
+            print(project_script)
             print("+++++++++++++++++++++++++++++++++++++++++++++++++++++")
             return project_script
     
@@ -153,6 +154,7 @@ def split_payload_fields(project_detail: dict):
         payload_detail = project_detail['payload']
         print("*****************************************************")
         print("payload_detail Done")
+        print(payload_detail)
         print("*****************************************************")
         return payload_detail
 
@@ -163,7 +165,8 @@ def split_payload_fields(project_detail: dict):
     except TypeError:
         print("Error: The project detail provided is not a dictionary.")
         return "Error: Invalid project detail format."
-    
+
+
 def verify_values_from_query(query, payload, config):
     """
     Verifies that the values filled in the payload are directly captured from the user query or assigned from the config.
@@ -188,9 +191,9 @@ def verify_values_from_query(query, payload, config):
 
     return verified_payload
 
+
 async def fill_payload_values(websocket: WebSocket, query: str, payload_details: dict, jsonfile: str) -> Dict[str, Any]:
     client = Groq(api_key=groq_api2)
-
     try:
         response = client.chat.completions.create(
         model='mixtral-8x7b-32768',
@@ -245,7 +248,6 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
             print("Fill payload Done")
             print(verified_payload)
             print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-            
             return verified_payload
         
         except json.JSONDecodeError:
@@ -257,13 +259,13 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
         logger.error(f"Error while processing the response: {e}")
         await websocket.send_text(e)
         return "Internal server error"
-
+    
 
 def validate(payload_detail, response_config):
     payload_details = payload_detail['payload']
     validated_payload = {}
+    
     for key, values in payload_details.items():
-
         if key in response_config.keys():
             value = response_config.get(key)
             required = values.get('required', False)
@@ -276,27 +278,47 @@ def validate(payload_detail, response_config):
             
             # Check datatype and format
             datatype = values['datatype']
+            
             if datatype == 'regex':
                 pattern = values['format']
                 if not re.match(pattern, value):
                     validated_payload[key] = None
                     continue
+            
             elif datatype == 'date':
-                date_format = values['format']
-                try:
-                    datetime.strptime(value, date_format)
-                except ValueError:
+                formats = values.get('formats', [])
+                if not formats:
+                    formats = [
+            '%Y-%m-%d',       # 2024-09-13
+            '%Y/%m/%d',       # 2024/09/13           
+            '%Y.%m.%d',       # 2024.09.13
+            '%Y %b %d',       # 2024 Sep 13]
+                    ]   
+                value = value.strip()
+                valid_date = False
+                for fmt in formats:
+                    try:
+                        datetime.strptime(value, fmt)
+                        valid_date = True
+                        break
+                    except ValueError:
+                        continue
+                
+                if not valid_date:
                     validated_payload[key] = None
                     continue
+            
             elif datatype == 'choices':
                 choices = values['choices']
                 if value not in choices:
                     validated_payload[key] = None
                     continue
+            
             elif datatype == 'string' and value != 'None':
                 if not isinstance(value, str):
                     validated_payload[key] = None
                     continue
+            
             elif datatype == 'integer':
                 try:
                     # Try to cast the value to an integer
@@ -304,6 +326,7 @@ def validate(payload_detail, response_config):
                 except ValueError:
                     validated_payload[key] = None
                     continue
+            
             elif datatype == 'mobile':
                 try:
                     # Check if the value is an integer and has 10 digits
@@ -314,20 +337,24 @@ def validate(payload_detail, response_config):
                 except ValueError:
                     validated_payload[key] = None
                     continue
+            
             # If all checks pass, keep the value
             validated_payload[key] = value
-        
+    
     final_response = {
         'project': payload_detail['project'],
         'url': payload_detail['url'],
         'method': payload_detail['method'],
         'payload': validated_payload
     }
+    
     print("*****************************************************************************************************")
     print("Validation Done")
     print(final_response)
     print("*****************************************************************************************************")
+    
     return final_response
+
 
 async def update_process_with_user_input(websocket: WebSocket, project_details: dict, data: dict):
     try:
@@ -337,10 +364,14 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
         if len(available_fields) <= 2:
             print('less than 2')
             verified_fields = available_fields
-        else:   
+        else:
+            available_field=[]
+            for key,value in project_details['payload'].items():
+                if  value['required'] == False:
+                    available_field.append(key)   
             await websocket.send_text("Enter 'All' if fields needs to be updated (or)")
             await websocket.send_text("Enter the field names you want to update, 'separated by commas'")
-            await websocket.send_text(f"{available_fields} ")
+            await websocket.send_text(f"{available_field} ")
             fields_input = await websocket.receive_text()
             fields_input = json.loads(fields_input)
             fields_input = fields_input.get('message')    
@@ -357,9 +388,17 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
                 print('selected columns')
                 fields_to_update = [field.strip().replace("'", "").replace("[", "").replace("]", "") for field in fields_input.split(',')]
                 verified_fields = [field for field in fields_to_update if field and field in available_fields]
-                # update_fields = update_payload.keys()
-                # verified_fields = correction_update_name(fields_to_update, update_fields)
-                # verified_fields = json.loads(verified_fields)
+                
+
+                for key,value in project_details['payload'].items():
+                    if  value['required'] == True:
+                        print(key)
+                        if key not in verified_fields:
+                            verified_fields.append(key)
+                        else:
+                            print("all true fields present")
+                print(verified_fields)
+                
     
         if not verified_fields:
             await websocket.send_text("No Verified Fields check update_process_with_user_input.")

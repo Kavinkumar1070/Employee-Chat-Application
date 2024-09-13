@@ -26,15 +26,37 @@ def validate_input(field, value, datatype):
         return isinstance(value, str) and len(value.strip()) > 0
 
     elif datatype == "date":
-        try:
-            # Strip any leading/trailing spaces
-            value = value.strip()
-            # Validate the date format
-            datetime.datetime.strptime(value, '%Y-%m-%d')
-            return True
-        except ValueError:
-            logger.warning(f"Date validation failed for value: '{value}'")
-            return False
+        formats = [
+            '%Y-%m-%d',       # 2024-09-13
+            #'%d-%m-%Y',       # 13-09-2024
+            #'%m-%d-%Y',       # 09-13-2024
+            
+            #'%m/%d/%Y',       # 09/13/2024
+            #'%d/%m/%Y',       # 13/09/2024
+            '%Y/%m/%d',       # 2024/09/13
+            
+            '%Y.%m.%d',       # 2024.09.13
+            #'%d.%m.%Y',       # 13.09.2024
+            
+            #'%b %d, %Y',      # Sep 13, 2024
+            #'%d %b %Y',       # 13 Sep 2024
+            '%Y %b %d',       # 2024 Sep 13
+            
+            #'%d %B %Y',       # 13 September 2024
+            #'%d %B',          # 13 September (day and month)
+            #'%B %d, %Y',      # September 13, 2024
+            #'%b %d, %Y',      # Sep 13, 2024
+            
+        ]
+        value = value.strip()
+        for fmt in formats:
+            try:
+                datetime.datetime.strptime(value, fmt)
+                return True
+            except ValueError:
+                continue
+        logger.warning(f"Date validation failed for value: '{value}'")
+        return False
 
     elif datatype == "integer":
         return value.isdigit()
@@ -67,7 +89,7 @@ async def collect_user_input(websocket: WebSocket, jsonfile, validate_input):
                 options = "['Single', 'Married', 'Divorced', 'Widowed']"
                 message = f"Please provide {field.capitalize()} {options}: "
             elif props['datatype'] == 'date':
-                options = "in YYYY-MM-DD format"  
+                options = "must be in year-month-day format ex: YYYY-MM-DD"  
                 message = f"Please provide {field.capitalize()} {options}: "  
             else:
                 message = f"Please provide {field.capitalize()}: "

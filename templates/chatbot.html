@@ -47,6 +47,159 @@
                 <i class="fa fa-paper-plane" style="font-size: 1.5em;"></i>
             </button>
         </div>
+        <script>
+            const chatBox = document.getElementById('chat-box');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const initialMessage = document.getElementById('initial');
+            let employeeId = null;
+            let role = null;
+
+            const token = localStorage.getItem('token');
+            console.log(token);
+
+            if (token) {
+                fetchProfileInfo(token);
+            } else {
+                document.getElementById('welcome-message').innerText = "Welcome!";
+                enableInput(); // Enable input if no token is found (for testing or guest mode)
+            }
+
+            async function fetchProfileInfo(token) {
+                try {
+                    const response = await fetch('/profile', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch profile info');
+                    }
+
+                    const profile = await response.json();
+                    employeeId = profile.Employee_ID;
+                    role = profile.Role;
+
+                    setTimeout(() => {
+                        (profile.Functions || []).forEach((data) => {
+                            const list = document.getElementById("lists");
+                            const listItem = document.createElement("li");
+                            listItem.innerHTML = data;
+                            list.appendChild(listItem);
+                        });
+                    }, 1000);
+                    document.getElementById('welcome-message').innerText = `Welcome, Your Role is: ${profile.Role} Your Employee ID is: ${employeeId}.`;
+                    enableInput(); // Enable the input field and send button after fetching profile info
+
+                } catch (error) {
+                    document.getElementById('welcome-message').innerText = "Welcome!";
+                    console.error(error);
+                    enableInput(); // Enable input even if fetching profile fails
+                }
+            }
+
+            function enableInput() {
+                userInput.disabled = false;
+                sendButton.disabled = false;
+            }
+
+            const websocket = new WebSocket("ws://127.0.0.1:8000/ws/chat");
+
+            websocket.onopen = () => {
+                console.log("WebSocket connection established.");
+            };
+
+            websocket.onmessage = (event) => {
+                const message = event.data;
+            
+                // Check if the message starts with <!DOCTYPE html> indicating HTML content
+                if (message.startsWith("<!DOCTYPE html>")) {
+                    // Create a temporary element to safely insert the HTML content
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = message;
+            
+                    // Extract the table from the temporary element
+                    const table = tempDiv.querySelector('table');
+                    const otherContent = tempDiv.innerHTML;
+            
+                    // Append table or other content with specific styling
+                    if (table) {
+                        chatBox.innerHTML += `<div class="table-wrapper">${table.outerHTML}</div>`;
+                    } else {
+                        chatBox.innerHTML += `<div class="message-content">${otherContent}</div>`;
+                    }
+                }
+                // If the server sends "Server Error" or "Backend Error", redirect the user
+                if (message === "navigate") {
+                    window.location.href = "/templates/complete.html";  // Update this URL as needed
+                } else {
+                    // Handle other types of messages
+                    addMessageChat(message, 'bot');
+                }
+            };
+
+            function sendMessage() {
+                const message = userInput.value;
+                if (message.trim() === "") return;
+
+                if (initialMessage) {
+                    initialMessage.style.display = 'none';
+                }
+
+                addMessageToChat(message, 'user');
+
+                const payload = {
+                    message: message,
+                    employee_id: employeeId,
+                    role: role,
+                    token: token
+                };
+                console.log('payload', payload);
+                websocket.send(JSON.stringify(payload));
+
+                userInput.value = "";
+            }
+
+            function addMessageToChat(message, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', sender);
+                messageElement.classList.add('regular-message'); // Apply a specific class for regular messages
+                messageElement.innerHTML = message; // Use innerHTML to render HTML content
+                chatBox.appendChild(messageElement);
+            
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+            
+            function addMessageChat(message, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', sender);
+                messageElement.classList.add('message-content'); // Apply a specific class for all message types
+                messageElement.innerHTML = message; // Use innerHTML to render HTML content
+                        
+                // Check if the message contains a table
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = message;
+                const table = tempDiv.querySelector('table');
+            
+                if (table) {
+                    // Add a specific class for tables to apply unique styles
+                    messageElement.classList.add('table-message');
+                    messageElement.style.width ="100%"
+
+                }
+            
+                chatBox.appendChild(messageElement);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+            userInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        </script>
     </div>
     <script src="scripts.js"></script>
 </body>

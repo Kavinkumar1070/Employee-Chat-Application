@@ -531,11 +531,16 @@ def leave_calender(db: Session):
 
 def get_calender(db:Session, employee_id:int):
     data=db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_id).first()
+    if not data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Leave calendar Not found"
+        )
     return {
         "sick_leave":data.sick_leave,
         "personal_leave":data.personal_leave,
         "vacation_leave":data.vacation_leave,
     }
+    
 
 def get_calender_tl(db:Session,report_manager:str, employee_id:str):
     employee_data=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id,
@@ -554,8 +559,11 @@ def get_calender_tl(db:Session,report_manager:str, employee_id:str):
 
 def get_calender_admin(db:Session, employee_id:str):
     employee_data=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id).first()
+    if not employee_data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Employee not found")
     data=db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_data.id).first()
-    print(data.employee_id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Leave not found in calender")
     return {
         "sick_leave":data.sick_leave,
         "personal_leave":data.personal_leave,

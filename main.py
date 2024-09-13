@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from apscheduler.schedulers.background import BackgroundScheduler
 from src.core.database import get_db, engine,SessionLocal
 from src import models
-from src.routers import personal, employee, role,leave,admin
+from src.routers import personal, employee, role,leave,admin,general
 from src.core.authentication import router as auth_router, authenticate_employee, create_access_token
 from pathlib import Path
 from fastapi.responses import HTMLResponse
@@ -32,6 +32,7 @@ app.include_router(employee.router)
 app.include_router(role.router)
 app.include_router(leave.router)
 app.include_router(admin.router)
+app.include_router(general.router)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 
 
@@ -196,15 +197,18 @@ async def websocket_endpoint(websocket: WebSocket):
                 jsonfile = choose_json(role)
                 query, project_name = await get_project_details(websocket, user_message, jsonfile)
                 if query == "Internal server error":
-                    await websocket.send_text("Server Error")  # Redirect to the new page
+                    await websocket.send_text("navigate")  # Redirect to the new page
                 project_details = get_project_script(project_name, jsonfile)
                 payload_details = split_payload_fields(project_details)
+                if payload_details != {}:
+                    filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile)
+                    if filled_cleaned == "Internal server error":
+                        await websocket.send_text("navigate")  # Redirect to the new page
+                else:
+                    filled_cleaned = payload_details
+                print('start')        
                 
-                filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile)
-                if filled_cleaned == "Internal server error":
-                    await websocket.send_text("Server Error")  # Redirect to the new page
-                validate_payload = validate(project_details, filled_cleaned)
-                
+                validate_payload = validate(project_details, filled_cleaned)    
                 # Handling PUT requests
                 if validate_payload['method'] == 'PUT':
                     answer = await update_process(websocket, project_details, validate_payload)
@@ -219,6 +223,8 @@ async def websocket_endpoint(websocket: WebSocket):
                     print("---------------------------------------------------------------------------------------------------------------------------")
                 
                 answer['bearer_token'] = token
+
+                    
                 
                 # Database operation
                 result,payload = await database_operation(websocket, answer)
@@ -228,10 +234,10 @@ async def websocket_endpoint(websocket: WebSocket):
                 # if result == "Backend Error":
                 #     await websocket.send_text("Backend Error")  # Redirect to the new page
                 else:
-                    # Processing the result
                     model_output = nlp_response(result,payload)
                     await websocket.send_text(model_output + " Thanks for using. Need anything, feel free to ask!")
-            
+                    continue
+                                                    
             except json.JSONDecodeError:
                 await websocket.send_text("Invalid input format. Please send a valid JSON.")
             except Exception as e:
@@ -241,6 +247,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         logger.info("WebSocket disconnected")
     except Exception as e:
+        print('++++++')
         logger.error(f"Unexpected error in WebSocket connection: {str(e)}")
     finally:
         await websocket.close()

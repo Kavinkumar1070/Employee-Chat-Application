@@ -18,7 +18,7 @@
                 "assigned": "None"
             },
             "dateofbirth": {
-                "description": "Date of birth of the employee in YYYY-MM-DD format",
+                "description": "Date of birth of the employee in year month day format Ex:YYYY-MM-DD",
                 "datatype": "date",
                 "format": "%Y-%m-%d",
                 "required": true,
@@ -96,58 +96,58 @@
             "firstname": {
                 "description": "First name of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "lastname": {
                 "description": "Last name of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "dateofbirth": {
                 "description": "Date of birth of the employee in YYYY-MM-DD format",
                 "datatype": "date",
                 "format": "%Y-%m-%d",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "contactnumber": {
                 "description": "Contact number of the employee",
                 "datatype": "mobile",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "emailaddress": {
                 "description": "Email address of the employee",
                 "datatype": "regex",
                 "format": "^[a-z0-9]+@[a-z0-9]+\\.com$",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "address": {
                 "description": "Residential address of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "nationality": {
                 "description": "Nationality of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "gender": {
                 "description": "Gender of the employee  [male, female, other]",
                 "datatype": "choices",
-                "required": true,
+                "required": false,
                 "choices": ["male", "female", "other"],
                 "assigned": "None"
             },
             "maritalstatus": {
                 "description": "Marital status of the employee  [single, married, divorced, widowed]",
                 "datatype": "choices",
-                "required": true,
+                "required": false,
                 "choices": ["single", "married", "divorced", "widowed"],
                 "assigned": "None"
             }
@@ -190,7 +190,7 @@
         "method": "PUT",
         "payload": {
             "employment_id": {
-                "description": "ID of the employee",
+                "description": "Employee ID for update employement detail",
                 "datatype": "regex",
                 "format": "^cds\\d{4}$",
                 "required": true,
@@ -199,26 +199,26 @@
             "job_position": {
                 "description": "Job position of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "department": {
                 "description": "Department of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "start_date": {
                 "description": "Start date of the employee in YYYY-MM-DD format",
                 "datatype": "date",
                 "format": "%Y-%m-%d",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "employment_type": {
                 "description": "Type of employment [fulltime, parttime]",
                 "datatype": "choices",
-                "required": true,
+                "required": false,
                 "choices": ["fulltime", "parttime"],
                 "assigned": "None"
             },
@@ -226,26 +226,26 @@
                 "description": "Reporting manager of the employee",
                 "datatype": "regex",
                 "format": "^cds\\d{4}$",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "work_location": {
                 "description": "Work location of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "employee_email": {
                 "description": "Email address of the employee",
                 "datatype": "regex",
                 "format": "^[a-z0-9]+@[a-z0-9]+\\.com$",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "basic_salary": {
                 "description": "Basic salary of the employee",
                 "datatype": "integer",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             }
         }
@@ -311,25 +311,25 @@
             "new_name": {
                 "description": "New role name",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "sick_leave": {
                 "description": "number of sick leave",
                 "datatype": "integer",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "personal_leave": {
                 "description": "number of personal leave",
                 "datatype": "integer",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "vacation_leave": {
                 "description": "number of vacation leave",
                 "datatype": "integer",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             }
             
@@ -538,13 +538,13 @@
                 "description": "Status of the leave record ['approved', 'rejected'] ",
                 "datatype": "choices",
                 "choices": ["pending", "approved", "rejected"],
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "reason": {
                 "description": "Reason for updating the leave record",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             }
         }
@@ -586,19 +586,19 @@
             "sick_leave": {
                 "description": "number of sick leave",
                 "datatype": "integer",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "personal_leave": {
                 "description": "number of personal leave",
                 "datatype": "integer",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "vacation_leave": {
                 "description": "number of vacation leave",
                 "datatype": "integer",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             }
             
@@ -619,13 +619,13 @@
             "new_password": {
                 "description": "new email password",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "confirm_password": {
                 "description": "confirm new email password",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             }
             

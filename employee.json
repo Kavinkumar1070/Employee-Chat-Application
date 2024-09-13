@@ -14,52 +14,52 @@
             "lastname": {
                 "description": "Last name of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "dateofbirth": {
                 "description": "Date of birth of the employee in YYYY-MM-DD format",
                 "datatype": "date",
                 "format": "%Y-%m-%d",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "contactnumber": {
                 "description": "Contact number of the employee",
                 "datatype": "mobile",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "emailaddress": {
                 "description": "Email address of the employee",
                 "datatype": "regex",
                 "format": "^[a-z0-9]+@[a-z0-9]+\\.com$",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "address": {
                 "description": "Residential address of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "nationality": {
                 "description": "Nationality of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "gender": {
                 "description": "Gender of the employee  [male, female, other]",
                 "datatype": "choices",
-                "required": true,
+                "required": false,
                 "choices": ["male", "female", "other"],
                 "assigned": "None"
             },
             "maritalstatus": {
                 "description": "Marital status of the employee  [single, married, divorced, widowed]",
                 "datatype": "choices",
-                "required": true,
+                "required": false,
                 "choices": ["single", "married", "divorced", "widowed"],
                 "assigned": "None"
             }
@@ -185,13 +185,13 @@
             "new_password": {
                 "description": "new email password",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "confirm_password": {
                 "description": "confirm new email password",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             }
             

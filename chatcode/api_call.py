@@ -8,6 +8,7 @@ from fastapi import WebSocket
 from typing import Dict
 import logging
 import json
+from chatcode.function import *
 
 logger = logging.getLogger(__name__)
 
@@ -125,8 +126,6 @@ async def database_operation(websocket: WebSocket, details: dict):
     try:
         print(url_template)
         url = url_template.format(**payload)
-        
-        print(url)
     except KeyError as e:
         missing_key = str(e).strip("'")
         await websocket.send_text(f"Missing value for placeholder: {missing_key}.")
@@ -146,15 +145,28 @@ async def database_operation(websocket: WebSocket, details: dict):
         return f"Unsupported HTTP method: {method}"
 
     try:
+        
         async with httpx.AsyncClient(timeout=timeout_seconds) as client:
             response = await method_dispatch[method](client)
-            response.raise_for_status()
-
+            print('__________')
+            if response.status_code == 404 :
+                error_message = response.text
+                print(f"Error: {error_message}")
+                error_message = json.loads(error_message)
+                await websocket.send_text(error_message['detail'])
+                return "Error","Detail"
+            if response.status_code >= 400:
+            # Capture and log the full response to understand the issue
+                error_message = response.text
+                print(f"Error: {error_message}")
+                return "payload", "error"  
+            print('__________')
             response_data = response.json()
             print(response_data)
             if method == 'GET':
                 html_table = generate_html_table(response_data)
                 await websocket.send_text(f"Request successful. Data:<br>{html_table}")
+                return "Error","Detail"
             else:
                 
                 return response_data,payload
@@ -163,16 +175,17 @@ async def database_operation(websocket: WebSocket, details: dict):
         error_message = e.response.text
         error_message = json.loads(error_message)
         await websocket.send_text(error_message['detail'])
+        return "Error","Detail"
 
     except httpx.RequestError as e:
         error_message = f"Request error occurred: {str(e)}"
         await websocket.send_text(error_message)
-        return "Backend Error"
+        return "Backend","Error"
 
     except Exception as e:
         error_message = f"An unexpected error occurred: {str(e)}"
         await websocket.send_text(error_message)
-        return "Backend Error"
+        return "Backend","Error"
 
 
 
