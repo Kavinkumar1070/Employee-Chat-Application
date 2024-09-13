@@ -1,133 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login and Register</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        
-        .container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            text-align: center;
-        }
-        
-        h2 {
-            margin-bottom: 20px;
-        }
-        
-        input[type="email"],
-        input[type="password"] {
-            width: calc(100% - 20px); /* Adjust for padding and border */
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        
-        .buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px; /* Added margin-top for spacing */
-        }
-        
-        .buttons button {
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            flex: 1; /* Ensure buttons take equal space */
-            margin: 0 5px; /* Adjust for space between buttons */
-        }
-        
-        .login-btn {
-            background-color: #4CAF50;
-            color: white;
-        }
-        
-        .register-btn {
-            background-color: #008CBA;
-            color: white;
-        }
-        
-        #message {
-            color: red;
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="/templates/onboardstyle.css" />
 </head>
+
 <body>
-
-<div class="container">
-    <h2>Login</h2>
-    <form>
-        <input type="email" id="email" name="email" placeholder="Email" required>
-        <input type="password" id="password" name="password" placeholder="Password" required>
-        <div class="buttons">
-            <button onclick="register()" type="button" class="register-btn">Register</button>
-            <button onclick="login()" type="button" class="login-btn">Login</button>
-            
+  <section>
+    <div class="login-box">
+      <img src="user.png" class="avatar" alt="Avatar">
+      <h1>Login Here</h1>
+      <form>
+        <div class="input-box">
+          <i class="fa fa-envelope icon"></i> <!-- Icon -->
+          <input type="email" id="email" required>
+          <label>Email</label>
         </div>
-        <div id="message"></div> <!-- Error message element -->
-        <script>
-            async function login() {
-                const username = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                console.log(username)
-                if (!username || !password) {
-                    document.getElementById('message').innerText = 'Please enter both username and password.';
-                    return;
-                }
-            
-                try {
-                    const response = await fetch('/auth/token', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams({
-                            username: username,
-                            password: password
-                        })
-                    });
-            
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`Login failed: ${response.status} - ${errorText}`);
-                    }
-            
-                    const data = await response.json();
-                    const token = data.access_token;
-                    const role = data.role
-            
-                    // Store the token in local storage
-                    localStorage.setItem('token', token);
-            
-                    window.location.href = "/templates/chatbot.html";
-            
-                } catch (error) {
-                    document.getElementById('message').innerText = error.message;
-                }
-            }
+        <div class="input-box">
+          <i class="fa fa-lock icon"></i> <!-- Icon -->
+          <input type="password" id="password" required>
+          <label>Password</label>
+        </div>
+        <button type="button" onclick="login()">Login</button>
+        <button type="button" onclick="register()">Sign Up</button>
+      </form>
+      <div id="message"></div>
+    </div>
+  </section>
 
-            function register() {
-                window.location.href = "/templates/onboard.html";
-            }
-        </script>
-    </form>
-</div>
+  <script>
+    async function login() {
+      const username = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
 
+      if (!username || !password) {
+        document.getElementById('message').innerText = 'Please enter both email and password.';
+        return;
+      }
+
+      try {
+        const response = await fetch('/auth/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            username: username,
+            password: password
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Login failed: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+        const token = data.access_token;
+
+        // Store the token in local storage
+        localStorage.setItem('token', token);
+
+        // Redirect to the chatbot page
+        window.location.href = "/templates/chatbot.html";
+
+      } catch (error) {
+        document.getElementById('message').innerText = error.message;
+      }
+    }
+
+    function register() {
+      window.location.href = "/templates/onboard.html";
+    }
+  </script>
 </body>
+
 </html>

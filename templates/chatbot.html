@@ -3,181 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot UI</title>
-    <link rel="stylesheet" href="../templates/newstyle.css">
-    
+    <title>AI Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <link rel="stylesheet" href="newstyle.css">
+    <style>        
+        .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 400px; /* Adjust height as needed */
+        overflow-y: auto;
+        border-radius: 12px; /* Rounded corners */
+        border: 1px solid #ddd; /* Light border */
+        padding: 15px; /* Increased padding for better spacing */
+        background: linear-gradient(145deg, #ffffff, #f9f9f9); /* Subtle gradient background */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+        font-family: 'Roboto', sans-serif; /* Ensure consistent font */
+        color: #333; /* Text color for readability */
+    }</style>
 </head>
 <body>
-    <div>
-        <div class="headerbox">
-            <p id="welcome-message" class="para" style="width: 790px;">Loading...</p>
-        </div>
-        <div class="chat-container" style="width: 800px;">
+    <div class="container">
+        <h1 class="title"><span id="welcome-message" class="highlight"></span></h1>
+        <h2 class="subtitle">How can I help you today?</h2>
+   
+        <!-- 
+        
+        <div class="notice">
+            <p>Humans review some saved chats to improve  AI. To stop this for future chats.It is very useful use the chatbot to make work easier. 
+            <a href="https://medium.com/wednesday-is-speaking/the-ultimate-guide-to-understanding-chatbot-architecture-and-how-they-work-2d00a3d91d61#:~:text=It%20involves%20a%20sophisticated%20interplay,delivering%20intelligent%20and%20engaging%20conversations.">How it works</a></p>
+        </div> -->
+        
+
+        <div class="chat-container">
             <div class="chat-box" id="chat-box">
-                <div id="initial">
-                    <p>Hello, I am Jarvis, an Employee Chatbot. Please ask a query related to the topics below:</p>
-                    <p>Enter quit to break the conversation.</p>
-                    <ul id="lists"></ul>
-                </div>
-            </div>
-            <div class="input-box">
-                <input type="text" id="user-input" placeholder="Type a message..." disabled>
-                <button id="send-button" onclick="sendMessage()" disabled>Send</button>
+                <div class="card-container" id="lists"></div>
             </div>
         </div>
-        <script>
-            const chatBox = document.getElementById('chat-box');
-            const userInput = document.getElementById('user-input');
-            const sendButton = document.getElementById('send-button');
-            const initialMessage = document.getElementById('initial');
-            let employeeId = null;
-            let role = null;
-
-            const token = localStorage.getItem('token');
-            console.log(token);
-
-            if (token) {
-                fetchProfileInfo(token);
-            } else {
-                document.getElementById('welcome-message').innerText = "Welcome!";
-                enableInput(); // Enable input if no token is found (for testing or guest mode)
-            }
-
-            async function fetchProfileInfo(token) {
-                try {
-                    const response = await fetch('/profile', {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch profile info');
-                    }
-
-                    const profile = await response.json();
-                    employeeId = profile.Employee_ID;
-                    role = profile.Role;
-
-                    setTimeout(() => {
-                        (profile.Functions || []).forEach((data) => {
-                            const list = document.getElementById("lists");
-                            const listItem = document.createElement("li");
-                            listItem.innerHTML = data;
-                            list.appendChild(listItem);
-                        });
-                    }, 1000);
-                    document.getElementById('welcome-message').innerText = `Welcome, Your Role is: ${profile.Role} Your Employee ID is: ${employeeId}.`;
-                    enableInput(); // Enable the input field and send button after fetching profile info
-
-                } catch (error) {
-                    document.getElementById('welcome-message').innerText = "Welcome!";
-                    console.error(error);
-                    enableInput(); // Enable input even if fetching profile fails
-                }
-            }
-
-            function enableInput() {
-                userInput.disabled = false;
-                sendButton.disabled = false;
-            }
-
-            const websocket = new WebSocket("ws://127.0.0.1:8000/ws/chat");
-
-            websocket.onopen = () => {
-                console.log("WebSocket connection established.");
-            };
-
-            websocket.onmessage = (event) => {
-                const message = event.data;
-            
-                // Check if the message starts with <!DOCTYPE html> indicating HTML content
-                if (message.startsWith("<!DOCTYPE html>")) {
-                    // Create a temporary element to safely insert the HTML content
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = message;
-            
-                    // Extract the table from the temporary element
-                    const table = tempDiv.querySelector('table');
-                    const otherContent = tempDiv.innerHTML;
-            
-                    // Append table or other content with specific styling
-                    if (table) {
-                        chatBox.innerHTML += `<div class="table-wrapper">${table.outerHTML}</div>`;
-                    } else {
-                        chatBox.innerHTML += `<div class="message-content">${otherContent}</div>`;
-                    }
-                }
-                // If the server sends "Server Error" or "Backend Error", redirect the user
-                if (message === "Server Error" || message === "Backend Error") {
-                    window.location.href = "/templates/complete.html";  // Update this URL as needed
-                } else {
-                    // Handle other types of messages
-                    addMessageChat(message, 'bot');
-                }
-            };
-
-            function sendMessage() {
-                const message = userInput.value;
-                if (message.trim() === "") return;
-
-                if (initialMessage) {
-                    initialMessage.style.display = 'none';
-                }
-
-                addMessageToChat(message, 'user');
-
-                const payload = {
-                    message: message,
-                    employee_id: employeeId,
-                    role: role,
-                    token: token
-                };
-                console.log('payload', payload);
-                websocket.send(JSON.stringify(payload));
-
-                userInput.value = "";
-            }
-
-            function addMessageToChat(message, sender) {
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message', sender);
-                messageElement.classList.add('regular-message'); // Apply a specific class for regular messages
-                messageElement.innerHTML = message; // Use innerHTML to render HTML content
-                chatBox.appendChild(messageElement);
-            
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-            
-            function addMessageChat(message, sender) {
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message', sender);
-                messageElement.classList.add('message-content'); // Apply a specific class for all message types
-                messageElement.innerHTML = message; // Use innerHTML to render HTML content
-                        
-                // Check if the message contains a table
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = message;
-                const table = tempDiv.querySelector('table');
-            
-                if (table) {
-                    // Add a specific class for tables to apply unique styles
-                    messageElement.classList.add('table-message');
-                    messageElement.style.width ="100%"
-
-                }
-            
-                chatBox.appendChild(messageElement);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-
-            userInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-        </script>
+        <div class="input-box">
+            <input type="text" id="user-input" placeholder="Type a message..." disabled>
+            <button id="send-button" onclick="sendMessage()" disabled>
+                <i class="fa fa-paper-plane" style="font-size: 1.5em;"></i>
+            </button>
+        </div>
     </div>
+    <script src="scripts.js"></script>
 </body>
 </html>

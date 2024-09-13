@@ -99,7 +99,7 @@ async def on_startup():
 
 @app.get("/")
 def get():
-    file_path = Path(__file__).resolve().parent / "templates" / "index.html"
+    file_path = Path(__file__).resolve().parent / "templates" / "front_page.html"
     if not file_path.exists():
         return HTMLResponse("File not found", status_code=404)
     return HTMLResponse(file_path.read_text())
@@ -223,10 +223,10 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Database operation
                 result,payload = await database_operation(websocket, answer)
                 
-                if not result and not payload:
+                if not  result and payload:
                     await websocket.send_text("Thanks for using. Need anything, feel free to ask!")
-                if result == "Backend Error":
-                    await websocket.send_text("Backend Error")  # Redirect to the new page
+                # if result == "Backend Error":
+                #     await websocket.send_text("Backend Error")  # Redirect to the new page
                 else:
                     # Processing the result
                     model_output = nlp_response(result,payload)
@@ -236,7 +236,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 await websocket.send_text("Invalid input format. Please send a valid JSON.")
             except Exception as e:
                 await websocket.send_text(f"An error occurred: {str(e)}")
-                await websocket.send_text("Backend Error")  # Redirect to the new page
+                # await websocket.send_text("Backend Error")  # Redirect to the new page
 
     except WebSocketDisconnect:
         logger.info("WebSocket disconnected")

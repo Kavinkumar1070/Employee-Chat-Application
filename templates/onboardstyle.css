@@ -1,81 +1,158 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to right, #8e9eab, #eef2f3); /* Gradient background */
+  font-family: sans-serif;
+  color: #2c3e50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
-.chat-container {
-    width: 400px;
-    height: 600px;
-    background-color: #ffffff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+.login-box {
+  width: 350px;
+  padding: 40px;
+  background: rgba(0, 0, 0, 0.1); /* Transparent background */
+  backdrop-filter: blur(10px); /* Background blur effect */
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
+  border: 5px solid rgba(7, 7, 7, 0.18);
+  position: relative;
+  transition: all 0.3s ease;
 }
 
-.para {
-    flex: 1;
-    width: 390px;
-    padding: 5px;
-    background-color: #007bff;
-    font-size: x-large;
-    color: #fff;
-    text-align: center;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+.login-box:hover {
+  transform: scale(2.0); /* Scale effect on hover */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
 }
 
-.chat-box {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+.avatar {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: -50px;
+  left: calc(50% - 50px);
+  border-radius: 50%;
+  border: 4px solid rgba(12, 12, 12, 0.5); /* Slightly transparent border */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
-.message {
-    margin-bottom: 15px;
+h1 {
+  text-align: center;
+  margin-top: 50px;
+  font-size: 24px;
+  color: #fff; /* Light font color for better contrast */
 }
 
-.message.user {
-    align-self: flex-end;
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px;
-    border-radius: 15px 15px 0 15px;
+.login-box .input-box {
+  position: relative;
+  margin-bottom: 30px;
 }
 
-.message.bot {
-    align-self: flex-start;
-    background-color: #e2e2e2;
-    color: #000;
-    padding: 10px;
-    border-radius: 15px 15px 15px 0;
+.login-box .input-box input {
+  width: 100%;
+  padding: 10px 0 10px 40px;
+  font-size: 16px;
+  color: #000000;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+  outline: none;
+  transition: 0.3s ease;
 }
 
-.input-box {
-    display: flex;
-    border-top: 1px solid #e2e2e2;
+.login-box .input-box input:focus {
+  border-bottom: 2px solid #007bff; /* Change color on focus */
 }
 
-input[type="text"] {
-    flex: 1;
-    padding: 15px;
-    border: none;
-    outline: none;
+.login-box .input-box label {
+  position: absolute;
+  top: 10px;
+  left: 40px;
+  pointer-events: none;
+  transition: 0.5s;
+  color: rgba(255, 255, 255, 0.6);
 }
 
-button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 0 20px;
-    cursor: pointer;
+.login-box .input-box input:focus ~ label,
+.login-box .input-box input:valid ~ label {
+  top: -20px;
+  left: 40px;
+  color: #007bff;
+  font-size: 12px;
 }
+
+.login-box .input-box .icon {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  font-size: 18px;
+  color: rgba(29, 28, 28, 0.6); /* Adjust color to semi-transparent white */
+}
+
+.login-box .remember-forget {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 20px;
+  color: rgba(255, 255, 255, 0.8); /* Slight transparency */
+}
+
+.login-box button {
+  width: 100%;
+  height: 40px;
+  background: rgba(0, 123, 255, 0.8); /* Semi-transparent button */
+  color: #fff;
+  border: none;
+  outline: none;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  margin-bottom: 10px;
+  transition: 0.5s ease;
+}
+
+.login-box button:hover {
+  background: rgba(0, 123, 255, 1); /* Solid color on hover */
+  transform: translateY(-2px);
+}
+
+.register-link p {
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.register-link a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
+#message {
+  color: #d9534f; /* A more refined red color */
+  text-align: center;
+  margin-top: 15px;
+  font-size: 1rem; /* Adjust font size for readability */
+  font-weight: bold; /* Make the message stand out more */
+  padding: 10px; /* Add some padding around the text */ /* Match border color with the text */
+  border-radius: 5px; /* Rounded corners for a softer look */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+
+/* Remove autofill background color for Chrome, Safari, and Firefox */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active  {
+  transition: background-color 5000s;
+  
+}
+
+
