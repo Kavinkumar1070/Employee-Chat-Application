@@ -1,7 +1,8 @@
 body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(to right, #8e9eab, #eef2f3); /* Gradient background */
+  /*background: linear-gradient(to right, #8e9eab, #eef2f3);  Gradient background */
+  background-color: #fff;
   font-family: sans-serif;
   color: #2c3e50;
   display: flex;
@@ -11,20 +12,20 @@ body {
 }
 
 .login-box {
-  width: 350px;
+  width: 390px;
   padding: 40px;
-  background: rgba(0, 0, 0, 0.1); /* Transparent background */
-  backdrop-filter: blur(10px); /* Background blur effect */
+  background: rgba(252, 247, 247, 0.1); /* Transparent background */
+  backdrop-filter: blur(100%); /* Background blur effect */
   border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
-  border: 5px solid rgba(7, 7, 7, 0.18);
+  box-shadow: 10px 15px 32px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
+  border: 5px solid rgba(255, 253, 253, 0.18);
   position: relative;
   transition: all 0.3s ease;
 }
 
 .login-box:hover {
-  transform: scale(2.0); /* Scale effect on hover */
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
+  transform: scale(1.1); /* Scale effect on hover */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
 }
 
 .avatar {
@@ -40,9 +41,10 @@ body {
 
 h1 {
   text-align: center;
-  margin-top: 50px;
+  margin-top: 30px;
+  margin-bottom: 50px;
   font-size: 24px;
-  color: #fff; /* Light font color for better contrast */
+  color: #2e2d2d; /* Light font color for better contrast */
 }
 
 .login-box .input-box {
@@ -59,20 +61,28 @@ h1 {
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.6);
   outline: none;
-  transition: 0.3s ease;
+  transition: border-bottom 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Hover effect */
+.login-box .input-box input:hover {
+  border-bottom: 1px solid #ffffff;
+   /* Change to a solid white on hover */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+
+/* Focus effect for input */
 .login-box .input-box input:focus {
-  border-bottom: 2px solid #007bff; /* Change color on focus */
+  border-bottom: 2px solid #007bff; /* Green border on focus */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Increase shadow on focus */
 }
-
 .login-box .input-box label {
   position: absolute;
-  top: 10px;
-  left: 40px;
+  top: -30%;
+  left: 50px;
   pointer-events: none;
   transition: 0.5s;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(8, 8, 8, 0.6);
 }
 
 .login-box .input-box input:focus ~ label,
@@ -80,13 +90,13 @@ h1 {
   top: -20px;
   left: 40px;
   color: #007bff;
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .login-box .input-box .icon {
   position: absolute;
   top: 10px;
-  left: 0;
+  left:14px;
   font-size: 18px;
   color: rgba(29, 28, 28, 0.6); /* Adjust color to semi-transparent white */
 }
@@ -110,13 +120,13 @@ h1 {
   border-radius: 20px;
   cursor: pointer;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  margin-bottom: 10px;
+  margin-bottom: 25px;
   transition: 0.5s ease;
 }
 
 .login-box button:hover {
   background: rgba(0, 123, 255, 1); /* Solid color on hover */
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .register-link p {
@@ -140,7 +150,7 @@ h1 {
   margin-top: 15px;
   font-size: 1rem; /* Adjust font size for readability */
   font-weight: bold; /* Make the message stand out more */
-  padding: 10px; /* Add some padding around the text */ /* Match border color with the text */
+  padding: 20px; /* Add some padding around the text */ /* Match border color with the text */
   border-radius: 5px; /* Rounded corners for a softer look */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }

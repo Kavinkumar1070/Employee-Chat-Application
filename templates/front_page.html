@@ -3,118 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--=============== REMIXICONS ===============-->
+    <title>Document</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="/templates/assets/css/styles.css">
-
-    <title>Welcome</title>
-</head>
-<style>
-/* Video covers the whole background */
-/* Video container positioned below the navbar */
-.video-bg {
-    position: relative; /* Ensure it follows normal flow of the page */
-    width: 99%; /* Set the width of the video */ /* Optional: limit the maximum width */
-    height: 99vh; /* Maintain aspect ratio */
-    margin: 10px auto; /* Center horizontally */
-    display: block; /* Ensure block-level layout */
-    object-fit: cover; /* Cover the container while maintaining aspect ratio */
-    z-index: -1; /* Ensure it stays in the background */
-}
-
-/* Ensure the content starts below the video */
-h1{
-    color: black
-}
-.content-container {
-    position: relative;
-    text-align: center;
-    color: black;
-    z-index: 1;
-    padding-top: 20px; /* Adjust as needed for spacing */
-    margin-top: 20px; /* Adjust as needed for spacing */
-}
-
-/* Larger heading for desktop and scaling down for smaller devices */
-.content-container {
-    position: absolute; /* Use absolute positioning */
-    top: 50%; /* Move container down 50% of viewport height */
-    left: 50%; /* Move container right 50% of viewport width */
-    transform: translate(-50%, -50%); /* Adjust for the container’s width and height */
-    text-align: center;
-    color: white;
-    z-index: 1;
-}
-
-/* Transparent background button */
-.btn-catch-bot {
-    background-color: transparent;
-    color: rgb(226, 224, 224);
-    padding: 15px 30px;
-    border: 2px solid rgb(247, 247, 247);
-    border-radius: 25px;
-    font-size: 18px;
-    cursor: pointer;
-
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-/* Button hover effect with color change */
-.btn-catch-bot:hover {
-    background-color: white;
-    color: #0f0f0f;
-    border-color: #ff5f57;
-}
-
-/* Icon margin adjustment */
-.btn-catch-bot i {
-    margin-right: 10px;
-}
-
-/* MEDIA QUERIES for Responsive Design */
-@media screen and (max-width: 768px) {
-    .content-container h1 {
-        font-size: 32px; /* Scale down the header size */
+        <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>.video-bg {
+        position: relative; /* Ensure it follows normal flow of the page */
+        width: 99%; /* Set the width of the video */ /* Optional: limit the maximum width */
+        height: 99vh; /* Maintain aspect ratio */
+        margin: 10px auto; /* Center horizontally */
+        display: block; /* Ensure block-level layout */
+        object-fit: cover; /* Cover the container while maintaining aspect ratio */
+        z-index: -1; /* Ensure it stays in the background */
     }
-
-    .btn-catch-bot {
-        font-size: 16px;
-        padding: 12px 25px; /* Adjust button padding for smaller screens */
+    
+    /* Ensure the content starts below the video */
+    h1{
+        color: black
     }
-
-    .video-bg {
-        object-fit: cover; /* Ensure video scales properly */
-        width: 100%;
-        height: 100vh; /* Allow video height to adjust for smaller screens */
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .content-container h1 {
-        font-size: 24px; /* Further scale down header for mobile devices */
-    }
-
-    .btn-catch-bot {
-        font-size: 14px;
-        padding: 10px 20px; /* Reduce button size for mobile screens */
-    }
-
     .content-container {
-        padding: 10px; /* Reduce overall padding */
+        position: relative;
+        text-align: center;
+        color: black;
+        z-index: 1;
+        padding-top: 20px; /* Adjust as needed for spacing */
+        margin-top: 20px; /* Adjust as needed for spacing */
     }
-}
-
-</style>
+    
+    /* Larger heading for desktop and scaling down for smaller devices */
+    .content-container {
+        position: absolute; /* Use absolute positioning */
+        top: 50%; /* Move container down 50% of viewport height */
+        left: 50%; /* Move container right 50% of viewport width */
+        transform: translate(-50%, -50%); /* Adjust for the container’s width and height */
+        text-align: center;
+        color: white;
+        z-index: 1;
+    }
+    
+    /* Transparent background button */
+    .btn-catch-bot {
+        background-color: transparent;
+        color: rgb(226, 224, 224);
+        padding: 15px 30px;
+        border: 2px solid rgb(247, 247, 247);
+        border-radius: 25px;
+        font-size: 18px;
+        cursor: pointer;
+    
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    
+    /* Button hover effect with color change */
+    .btn-catch-bot:hover {
+        background-color: white;
+        color: #0f0f0f;
+        border-color: #ff5f57;
+    }
+    
+    /* Icon margin adjustment */
+    .btn-catch-bot i {
+        margin-right: 10px;
+    }
+    
+    /* MEDIA QUERIES for Responsive Design */
+    @media screen and (max-width: 768px) {
+        .content-container h1 {
+            font-size: 32px; /* Scale down the header size */
+        }
+    
+        .btn-catch-bot {
+            font-size: 16px;
+            padding: 12px 25px; /* Adjust button padding for smaller screens */
+        }
+    
+        .video-bg {
+            object-fit: cover; /* Ensure video scales properly */
+            width: 100%;
+            height: 100vh; /* Allow video height to adjust for smaller screens */
+        }
+    }
+    
+    @media screen and (max-width: 480px) {
+        .content-container h1 {
+            font-size: 24px; /* Further scale down header for mobile devices */
+        }
+    
+        .btn-catch-bot {
+            font-size: 14px;
+            padding: 10px 20px; /* Reduce button size for mobile screens */
+        }
+    
+        .content-container {
+            padding: 10px; /* Reduce overall padding */
+        }
+    }
+    
+    </style>
+</head>
 <body>
-    <!--=============== HEADER ===============-->
     <header class="header">
         <nav class="nav container">
             <div class="nav__data">
-                <a href="#" class="nav__logo">
-                    <i class="ri-code-s-slash-line"></i> Chatbot
+                <a href="/templates/chatbot.html" class="nav__logo">
+                    <i class="ri-code-s-slash-line"></i> CodeBot
                 </a>
 
                 <div class="nav__toggle" id="nav-toggle">
@@ -127,10 +120,7 @@ h1{
             <div class="nav__menu" id="nav-menu">
                 <ul class="nav__list">
                     <li>
-                        <a href="#" class="nav__link">Home</a>
-                    </li>
-                    <li>
-                        <a href="/templates/chatbot.html" class="nav__link">Jet_Chatbot</a>
+                        <a href="/templates/front_page.html" class="nav__link">Home</a>
                     </li>
 
                     <!--=============== DROPDOWN 1 ===============-->
@@ -206,11 +196,80 @@ h1{
                             </div>
                         </div>
                     </li>
-                    <li>
-                        <a href="/templates/index.html" class="nav__link">Login</a>
-                    </li>
 
                     <!--=============== DROPDOWN 2 ===============-->
+                    <li class="dropdown__item">
+                        <div class="nav__link dropdown__button">
+                            Resources <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                        </div>
+
+                        <div class="dropdown__container">
+                            <div class="dropdown__content">
+                                <div class="dropdown__group">
+                                    <div class="dropdown__icon">
+                                        <i class="ri-code-line"></i>
+                                    </div>
+
+                                    <span class="dropdown__title">Web templates</span>
+
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="#" class="dropdown__link">Free templates</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Premium templates</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="dropdown__group">
+                                    <div class="dropdown__icon">
+                                        <i class="ri-pen-nib-line"></i>
+                                    </div>
+
+                                    <span class="dropdown__title">Designs</span>
+
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="#" class="dropdown__link">Web designs</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">App designs</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Component design</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="dropdown__group">
+                                    <div class="dropdown__icon">
+                                        <i class="ri-apps-2-line"></i>
+                                    </div>
+
+                                    <span class="dropdown__title">Others</span>
+
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="#" class="dropdown__link">Recent blogs</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Tutorial videos</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Webinar</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <a href="/templates/login.html" class="nav__link">Login</a>
+                    </li>
+
+                    <!--=============== DROPDOWN 3 ===============-->
                     <li class="dropdown__item">                        
                         <div class="nav__link dropdown__button">
                             Company <i class="ri-arrow-down-s-line dropdown__arrow"></i>
@@ -227,13 +286,13 @@ h1{
 
                                     <ul class="dropdown__list">
                                         <li>
-                                            <a href="https://www.conversedatasolutions.com/about-us" class="dropdown__link">About us</a>
+                                            <a href="https://www.conversedatasolutions.com/" class="dropdown__link">About us</a>
                                         </li>
                                         <li>
-                                            <a href="https://www.conversedatasolutions.com/contact-us" class="dropdown__link">Support</a>
+                                            <a href="https://www.conversedatasolutions.com/" class="dropdown__link">Support</a>
                                         </li>
                                         <li>
-                                            <a href="https://www.conversedatasolutions.com/contact-us" class="dropdown__link">Contact us</a>
+                                            <a href="https://www.conversedatasolutions.com/" class="dropdown__link">Contact us</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -261,8 +320,6 @@ h1{
             </div>
         </nav>
     </header>
-
-    <!--=============== VIDEO BACKGROUND ===============-->
     <video class="video-bg" autoplay muted loop>
         <source src="/templates/forentpage.mp4" type="video/mp4">
         Your browser does not support the video tag.
@@ -276,7 +333,7 @@ h1{
             <i class="ri-robot-line"></i> Catch with Bot
         </button>
     </div>
-
+    <script src="/static/js/main.js"></script>
     <script>
         function navigateToPage() {
             // Navigate to another page (adjust the URL as needed)

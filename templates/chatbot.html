@@ -3,39 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Interface</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-    <link rel="stylesheet" href="newstyle.css">
-    <style>        
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/templates/newstyle.css">
+    <style>
         .chat-container {
-        display: flex;
-        flex-direction: column;
-        height: 400px; /* Adjust height as needed */
-        overflow-y: auto;
-        border-radius: 12px; /* Rounded corners */
-        border: 1px solid #ddd; /* Light border */
-        padding: 15px; /* Increased padding for better spacing */
-        background: linear-gradient(145deg, #ffffff, #f9f9f9); /* Subtle gradient background */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-        font-family: 'Roboto', sans-serif; /* Ensure consistent font */
-        color: #333; /* Text color for readability */
-    }</style>
+            display: flex;
+            flex-direction: column;
+            height: 400px; /* Adjust height as needed */
+            overflow-y: auto;
+            border-radius: 12px; /* Rounded corners */
+            border: 1px solid #ddd; /* Light border */
+            padding: 15px; /* Increased padding for better spacing */
+            background: linear-gradient(145deg, #ffffff, #f9f9f9); /* Subtle gradient background */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+            font-family: 'Roboto', sans-serif; /* Ensure consistent font */
+            color: #333; /* Text color for readability */
+        }</style>
+    
 </head>
 <body>
-    <div class="container">
+    <header class="header">
+        <nav class="nav container">
+            <div class="nav__data">
+                <a href="/templates/chatbot.html" class="nav__logo">
+                    <i class="ri-code-s-slash-line"></i> CodeBot
+                </a>
+                
+                <div class="nav__toggle" id="nav-toggle">
+                    <i class="ri-menu-line nav__toggle-menu"></i>
+                    <i class="ri-close-line nav__toggle-close"></i>
+                </div>
+            </div>
+
+            <!--=============== NAV MENU ===============-->
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li>
+                        <a href="/templates/front_page.html" class="nav__link">Home</a>
+                    </li>
+
+                    <!--=============== DROPDOWN 1 ===============-->
+                    <li class="dropdown__item">                      
+                        <div class="nav__link dropdown__button">
+                            Discover <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                        </div>
+
+                        <div class="dropdown__container">
+                            <div class="dropdown__content">
+                                <div class="dropdown__group">
+                                    <div class="dropdown__icon">
+                                        <i class="ri-flashlight-line"></i>
+                                    </div>
+
+                                    <span class="dropdown__title">Most viewed courses</span>
+
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="#" class="dropdown__link">HTML for beginners</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Advanced CSS</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">JavaScript OOP</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="dropdown__group">
+                                    <div class="dropdown__icon">
+                                        <i class="ri-heart-3-line"></i>
+                                    </div>
+
+                                    <span class="dropdown__title">Popular courses</span>
+
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="#" class="dropdown__link">Development with Flutter</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Web development with React</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Backend development expert</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="dropdown__group">
+                                    <div class="dropdown__icon">
+                                        <i class="ri-book-mark-line"></i>
+                                    </div>
+
+                                    <span class="dropdown__title">Careers</span>
+
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="#" class="dropdown__link">Web development</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Applications development</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">UI/UX design</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">ML</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <!--=============== DROPDOWN 2 ===============-->
+                    <li class="dropdown__item">
+                        <div class="nav__link dropdown__button">
+                            Resources <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                        </div>
+
+                        <div class="dropdown__container">
+                            <div class="dropdown__content">
+                                <div class="dropdown__group">
+                                    <div class="dropdown__icon">
+                                        <i class="ri-code-line"></i>
+                                    </div>
+
+                                    <span class="dropdown__title">Web templates</span>
+
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="#" class="dropdown__link">Free templates</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Premium templates</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="dropdown__group">
+                                    <div class="dropdown__icon">
+                                        <i class="ri-pen-nib-line"></i>
+                                    </div>
+
+                                    <span class="dropdown__title">Designs</span>
+
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="#" class="dropdown__link">Web designs</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">App designs</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Component design</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="dropdown__group">
+                                    <div class="dropdown__icon">
+                                        <i class="ri-apps-2-line"></i>
+                                    </div>
+
+                                    <span class="dropdown__title">Others</span>
+
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="#" class="dropdown__link">Recent blogs</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Tutorial videos</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Webinar</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <a href="/templates/login.html" class="nav__link">Login</a>
+                    </li>
+
+                    <!--=============== DROPDOWN 3 ===============-->
+                    <li class="dropdown__item">                        
+                        <div class="nav__link dropdown__button">
+                            Company <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                        </div>
+
+                        <div class="dropdown__container">
+                            <div class="dropdown__content">
+                                <div class="dropdown__group">
+                                    <div class="dropdown__icon">
+                                        <i class="ri-community-line"></i>
+                                    </div>
+
+                                    <span class="dropdown__title">About us</span>
+
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="https://www.conversedatasolutions.com/" class="dropdown__link">About us</a>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.conversedatasolutions.com/" class="dropdown__link">Support</a>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.conversedatasolutions.com/" class="dropdown__link">Contact us</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="dropdown__group">
+                                    <div class="dropdown__icon">
+                                        <i class="ri-shield-line"></i>
+                                    </div>
+
+                                    <span class="dropdown__title">Safety and quality</span>
+
+                                    <ul class="dropdown__list">
+                                        <li>
+                                            <a href="#" class="dropdown__link">Cookie settings</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown__link">Privacy Policy</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div class="acontainer">
         <h1 class="title"><span id="welcome-message" class="highlight"></span></h1>
         <h2 class="subtitle">How can I help you today?</h2>
-   
-        <!-- 
-        
-        <div class="notice">
-            <p>Humans review some saved chats to improve  AI. To stop this for future chats.It is very useful use the chatbot to make work easier. 
-            <a href="https://medium.com/wednesday-is-speaking/the-ultimate-guide-to-understanding-chatbot-architecture-and-how-they-work-2d00a3d91d61#:~:text=It%20involves%20a%20sophisticated%20interplay,delivering%20intelligent%20and%20engaging%20conversations.">How it works</a></p>
-        </div> -->
-        
-
         <div class="chat-container">
             <div class="chat-box" id="chat-box">
                 <div class="card-container" id="lists"></div>
@@ -47,160 +258,9 @@
                 <i class="fa fa-paper-plane" style="font-size: 1.5em;"></i>
             </button>
         </div>
-        <script>
-            const chatBox = document.getElementById('chat-box');
-            const userInput = document.getElementById('user-input');
-            const sendButton = document.getElementById('send-button');
-            const initialMessage = document.getElementById('initial');
-            let employeeId = null;
-            let role = null;
-
-            const token = localStorage.getItem('token');
-            console.log(token);
-
-            if (token) {
-                fetchProfileInfo(token);
-            } else {
-                document.getElementById('welcome-message').innerText = "Welcome!";
-                enableInput(); // Enable input if no token is found (for testing or guest mode)
-            }
-
-            async function fetchProfileInfo(token) {
-                try {
-                    const response = await fetch('/profile', {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch profile info');
-                    }
-
-                    const profile = await response.json();
-                    employeeId = profile.Employee_ID;
-                    role = profile.Role;
-
-                    setTimeout(() => {
-                        (profile.Functions || []).forEach((data) => {
-                            const list = document.getElementById("lists");
-                            const listItem = document.createElement("li");
-                            listItem.innerHTML = data;
-                            list.appendChild(listItem);
-                        });
-                    }, 1000);
-                    document.getElementById('welcome-message').innerText = `Welcome, Your Role is: ${profile.Role} Your Employee ID is: ${employeeId}.`;
-                    enableInput(); // Enable the input field and send button after fetching profile info
-
-                } catch (error) {
-                    document.getElementById('welcome-message').innerText = "Welcome!";
-                    console.error(error);
-                    enableInput(); // Enable input even if fetching profile fails
-                }
-            }
-
-            function enableInput() {
-                userInput.disabled = false;
-                sendButton.disabled = false;
-            }
-
-            const websocket = new WebSocket("ws://127.0.0.1:8000/ws/chat");
-
-            websocket.onopen = () => {
-                console.log("WebSocket connection established.");
-            };
-
-            websocket.onmessage = (event) => {
-                const message = event.data;
-            
-                // Check if the message starts with <!DOCTYPE html> indicating HTML content
-                if (message.startsWith("<!DOCTYPE html>")) {
-                    // Create a temporary element to safely insert the HTML content
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = message;
-            
-                    // Extract the table from the temporary element
-                    const table = tempDiv.querySelector('table');
-                    const otherContent = tempDiv.innerHTML;
-            
-                    // Append table or other content with specific styling
-                    if (table) {
-                        chatBox.innerHTML += `<div class="table-wrapper">${table.outerHTML}</div>`;
-                    } else {
-                        chatBox.innerHTML += `<div class="message-content">${otherContent}</div>`;
-                    }
-                }
-                // If the server sends "Server Error" or "Backend Error", redirect the user
-                if (message === "navigate") {
-                    window.location.href = "/templates/complete.html";  // Update this URL as needed
-                } else {
-                    // Handle other types of messages
-                    addMessageChat(message, 'bot');
-                }
-            };
-
-            function sendMessage() {
-                const message = userInput.value;
-                if (message.trim() === "") return;
-
-                if (initialMessage) {
-                    initialMessage.style.display = 'none';
-                }
-
-                addMessageToChat(message, 'user');
-
-                const payload = {
-                    message: message,
-                    employee_id: employeeId,
-                    role: role,
-                    token: token
-                };
-                console.log('payload', payload);
-                websocket.send(JSON.stringify(payload));
-
-                userInput.value = "";
-            }
-
-            function addMessageToChat(message, sender) {
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message', sender);
-                messageElement.classList.add('regular-message'); // Apply a specific class for regular messages
-                messageElement.innerHTML = message; // Use innerHTML to render HTML content
-                chatBox.appendChild(messageElement);
-            
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-            
-            function addMessageChat(message, sender) {
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message', sender);
-                messageElement.classList.add('message-content'); // Apply a specific class for all message types
-                messageElement.innerHTML = message; // Use innerHTML to render HTML content
-                        
-                // Check if the message contains a table
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = message;
-                const table = tempDiv.querySelector('table');
-            
-                if (table) {
-                    // Add a specific class for tables to apply unique styles
-                    messageElement.classList.add('table-message');
-                    messageElement.style.width ="100%"
-
-                }
-            
-                chatBox.appendChild(messageElement);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-
-            userInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-        </script>
     </div>
-    <script src="scripts.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/templates/scripts.js">
+    </script>
 </body>
 </html>

@@ -26,7 +26,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app.mount("/templates", StaticFiles(directory=Path(__file__).resolve().parent / "templates"), name="templates")
 
-
+app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(personal.router)
 app.include_router(employee.router)
 app.include_router(role.router)

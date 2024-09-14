@@ -15,14 +15,23 @@
     height: 100vh;
   }
   
-  .container {
+  .acontainer {
     text-align: center;
-    background-color: #f5f5f5;
+    background-color: #e0e0e0; /* Changed to a lighter background for better contrast */
     max-width: 800px;
-    width: 100%;
+    width: 90%; /* Adjusted to provide better responsiveness */
     padding: 20px;
-    margin: auto;
-  }
+    margin: 20px auto; /* Added margin for spacing around the container */
+    border-radius: 12px; /* Rounded corners for a softer look */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: box-shadow 0.3s ease, transform 0.3s ease; /* Smooth transition effects */
+}
+
+.acontainer:hover {
+    box-shadow: 10px 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    transform: translateY(-5px); /* Slight lift effect on hover */
+}
+
   
   .title {
     font-size: 36px;
@@ -118,20 +127,23 @@
     flex-direction: column;
 }
 
-.message {
-    margin-bottom: 15px;
-}
 
 /* Common styles for messages */
 .message {
-    padding: 10px;
-    border-radius: 10px;
+    padding: 15px;
+    border-radius: 12px;
     font-size: 16px;
-    margin: 5px 0;
+    margin: 10px 0;
     max-width: 80%;
     word-wrap: break-word;
     animation: fadeIn 0.5s ease-in-out;
+    position: relative;
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Base shadow */
 }
+
 @keyframes rotate {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -144,10 +156,10 @@
   align-self: flex-end; /* Align user messages to the right */
   border: 1px solid #1b9d5f; /* Darker green border for contrast */
   border-radius: 10px; /* Rounded corners for consistency */
-  padding: 10px 20px; /* Add padding to the top, right, and bottom; less on the left for the icon */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  padding: 15px 25px; /* Add padding to the top, right, and bottom; less on the left for the icon */
+  box-shadow: 10px 7px 2px #02020226; /* Subtle shadow for depth */
   max-width: 80%; /* Limit width for better readability */
-  margin: 5px 0; /* Spacing between messages */
+  margin: 10px 0; /* Spacing between messages */
   word-wrap: break-word; /* Handle long words or URLs */
   position: relative; /* For positioning pseudo-elements */
   font-family: 'Roboto', sans-serif; /* Consistent font */
@@ -167,17 +179,7 @@
   color: #ffffff; /* Icon color */
 }
 
-.message.user::after {
-  content: '';
-  position: absolute;
-  right: -15px; /* Move further right */
-  top: 50%;
-  transform: translateY(-50%);
-  border: 10px solid transparent;
-  border-right-color: #2acf66; /* Triangle arrow effect */
-  border-left: none; /* Hide the right border */
-  border-width: 10px 10px 10px 0; /* Adjust for triangle shape */
-}
+
 
 
 /* Bot message styles */
@@ -188,7 +190,7 @@
   align-self: flex-start; /* Align bot messages to the left */
   border-radius: 12px; /* Rounded corners for a modern look */
   padding: 15px 40px 15px 50px; /* Extra space on the left for the icon */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Deeper shadow for added depth */
+  box-shadow: -10px 8px 1px rgba(0, 0, 0, 0.15); /* Deeper shadow for added depth */
   max-width: 80%; /* Limit width for better readability */
   margin: 5px 0; /* Spacing between messages */
   word-wrap: break-word; /* Handle long words or URLs */
@@ -208,17 +210,7 @@
   
 }
 
-.message.bot::after {
-  content: '';
-  position: absolute;
-  left: -15px; /* Move further left */
-  top: 50%;
-  transform: translateY(-50%) rotate(180deg); /* Rotate the arrow */
-  border: 10px solid transparent;
-  border-right-color: #ddd; /* Triangle arrow effect */
-  border-left: none; /* Hide the left border */
-  border-width: 10px 10px 10px 0; /* Adjust for triangle shape */
-}
+
 
 
 /* Add the speech bubble effect for bot messages */
@@ -288,7 +280,7 @@ button i {
 }
 
 .table-wrapper th {
-    background-color: #e2dfdf;
+    background-color: #080808;
 }
 
 .regular-message {
