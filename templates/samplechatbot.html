@@ -14,6 +14,7 @@
         .chat-container {
             display: flex;
             flex-direction: column;
+            margin-top: 20px;
             height: 400px; /* Adjust height as needed */
             overflow-y: auto;
             border-radius: 12px; /* Rounded corners */
@@ -245,22 +246,23 @@
         </nav>
     </header>
     <div class="acontainer">
-        <h1 class="title"><span id="welcome-message" class="highlight"></span></h1>
+        <h1 class="title"><span id="welcome-message" class="highlight">Welcome</span></h1>
         <h2 class="subtitle">How can I help you today?</h2>
+        <div class="card-container" id="lists"></div>
         <div class="chat-container">
-            <div class="chat-box" id="chat-box">
-                <div class="card-container" id="lists"></div>
-            </div>
+        <div class="chat-box" id="chat-box">
         </div>
         <div class="input-box">
-            <input type="text" id="user-input" placeholder="Type a message..." disabled>
-            <button id="send-button" onclick="sendMessage()" disabled>
+            <input type="text" id="user-input" placeholder="Type a message...">
+            <button id="send-button" onclick="sendMessage()">
                 <i class="fa fa-paper-plane" style="font-size: 1.5em;"></i>
             </button>
         </div>
     </div>
+
+
+    </div>
+<script src="/templates/chatbot.js"></script>
     <script src="/static/js/main.js"></script>
-    <script src="/templates/scripts.js">
-    </script>
 </body>
 </html>
