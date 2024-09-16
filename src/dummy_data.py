@@ -222,37 +222,37 @@ def insert_dummy_data():
 
     employee_functions = [
     RoleFunction(
-        role_id=teamlead_role.id,
+        role_id=employee_role.id,
         function='update personal detail',
         jsonfile="employee.json",
     ),
     RoleFunction(
-        role_id=teamlead_role.id,
+        role_id=employee_role.id,
         function='Read employee detail',
         jsonfile="employee.json",
     ),
     RoleFunction(
-        role_id=teamlead_role.id,
+        role_id=employee_role.id,
         function='Apply Leave Request',
         jsonfile="employee.json",
     ),
     RoleFunction(
-        role_id=teamlead_role.id,
+        role_id=employee_role.id,
         function='get pending leaves',
         jsonfile="employee.json",
     ),
     RoleFunction(
-        role_id=teamlead_role.id,
+        role_id=employee_role.id,
         function='get leave history',
         jsonfile="employee.json",
     ),
     RoleFunction(
-        role_id=teamlead_role.id,
+        role_id=employee_role.id,
         function='delete leave record',
         jsonfile="employee.json",
     ),
     RoleFunction(
-        role_id=teamlead_role.id,
+        role_id=employee_role.id,
         function='get leave calender',
         jsonfile="employee.json",
     )
