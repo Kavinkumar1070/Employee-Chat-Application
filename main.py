@@ -26,7 +26,6 @@ models.Base.metadata.create_all(bind=engine)
 
 app.mount("/templates", StaticFiles(directory=Path(__file__).resolve().parent / "templates"), name="templates")
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(personal.router)
 app.include_router(employee.router)
 app.include_router(role.router)
@@ -152,13 +151,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 if response != "Email Send Successfully":
                     await websocket.send_text(response)
                     await websocket.send_text("You will be Navigated to Login Screen")  # Redirect to the new page
-                    await asyncio.sleep(7)  # Add a 3-second delay
+                    await asyncio.sleep(3)  # Add a 3-second delay
                     await websocket.send_text("navigate")
                     break
                 else:
                     await websocket.send_text("Your details have been saved successfully. Check your personal mail for Username and Password.")
                     await websocket.send_text("You will be Navigated to Login Screen")  # Redirect to the new page
-                    await asyncio.sleep(7)  # Add a 3-second delay
+                    await asyncio.sleep(3)  # Add a 3-second delay
                     await websocket.send_text("navigate")
                     break
             else:

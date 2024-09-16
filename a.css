@@ -4,22 +4,8 @@ body {
     margin: 0;
     height: 100vh;
     display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
 }
 
-#initial p{
-    color:#3C3D37;
-    font-size:20px;
-}
-
-#role {
-    font-size:20px; 
-}
-
-#employee-id {
-    font-size:20px; 
-}
 .container {
     display: flex;
     width: 100%;
@@ -27,20 +13,19 @@ body {
 }
 
 .sidebar {
-    width: 300px; /* Fixed width for sidebar */
-    background-color: #697565; /* Dark gray for the sidebar */
+    width: 300px; /* Adjusted sidebar width */
+    background-color: #343a40; /* Dark gray for the sidebar */
     color: #ffffff;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    overflow-y:auto;
 }
 
 .sidebar h2 {
     margin: 0;
-    color:#212726 ;
+    color: #ffffff;
 }
 
 #profile-info p {
@@ -56,24 +41,21 @@ body {
 
 .sidebar ul li {
     margin-bottom: 10px;
-    font-size:18px;
     color: #e9ecef; /* Light gray text */
 }
 
 .main-content {
-    width: 60%; /* Fixed width to 70% */
+    flex: 1;
     display: flex;
     flex-direction: column;
-    height: 100%; /* Full height to make sure input is always at the bottom */
-    margin: 0 auto; /* Center horizontally */
 }
 
 .headerbox {
-    background-color: #f7f7f8; /* Blue for the header */
-    color: #3C3D37;
-    font-size: 30px;
+    padding: 15px;
+    background-color: #007bff; /* Blue for the header */
+    color: #ffffff;
+    font-size: 18px;
     text-align: center;
-    font-weight:bold;
     border-bottom: 1px solid #e5e5ea;
 }
 
@@ -81,8 +63,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-color: #f7f7f8; /* White background for chat area */
-    overflow: hidden; /* Ensure that input box is at the bottom */
+    background-color: #ffffff; /* White background for chat area */
 }
 
 .chat-box {
@@ -91,40 +72,36 @@ body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    text-align: center;
 }
 
 .message {
     margin-bottom: 12px;
-    max-width: 100%;
+    max-width: 80%;
     padding: 10px;
     border-radius: 15px;
-    font-size: 20px;
+    font-size: 14px;
     line-height: 1.4;
 }
 
 .message.user {
     align-self: flex-end;
-    background-color: #697565; /* Blue for user messages */
+    background-color: #007bff; /* Blue for user messages */
     color: #ffffff;
-    margin-bottom:30px;
     border-radius: 15px 15px 0 15px;
 }
 
 .message.bot {
     align-self: flex-start;
-    background-color: #ECDFCC; /* Light gray for bot messages */
-    color: #181C14;
+    background-color: #e9ecef; /* Light gray for bot messages */
+    color: #000000;
     border-radius: 15px 15px 15px 0;
-    width:auto;
 }
 
 .input-box {
     display: flex;
-    align-items: center; /* Center align items vertically */
-    background-color: #f7f7f8;
-    padding: 20px;
-    position: relative;
+    border-top: 1px solid #e5e5ea;
+    padding: 10px;
+    background-color: #f1f1f1; /* Light gray for input area */
 }
 
 input[type="text"] {
@@ -132,24 +109,22 @@ input[type="text"] {
     padding: 10px;
     border: 1px solid #e5e5ea;
     border-radius: 20px;
-    background-color:#EEEEEE;
-    color:#3C3D37;
     outline: none;
-    font-size: 18px;
-    margin-right: 10px; /* Space between input and button */
+    font-size: 14px;
 }
 
 button {
-    background-color: #3C3D37; /* Blue for the button */
+    background-color: #007bff; /* Blue for the button */
     color: #ffffff;
     border: none;
-    padding: 10px 15px; /* Adjusted padding */
+    padding: 0 15px;
+    margin-left: 10px;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #697565; /* Darker blue for hover effect */
+    background-color: #0056b3; /* Darker blue for hover effect */
 }

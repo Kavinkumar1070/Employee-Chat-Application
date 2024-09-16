@@ -23,11 +23,11 @@ async def onboard_personal_details(websocket: WebSocket, details: dict):
     try:
         # Initialize HTTP client with timeout
         async with httpx.AsyncClient(timeout=timeout_seconds) as client:
-
-            response = await client.post(url, json=payload)
+            response = await client.post(url, json=payload)            
             response.raise_for_status()             
             response_data = response.json()
-            response_data = response_data.get('detail')
+            response_data = response_data.get('detail')            
+        
             return response_data
  
     except httpx.HTTPStatusError as e:
@@ -66,16 +66,50 @@ def generate_html_table(data):
             if key not in headers:
                 headers.append(key)
     
-    # Start building the HTML for the table with styles for horizontal scrolling
+    # Start building the HTML for the table with modern styles and black borders
     table = '''
     <!DOCTYPE html>
     <html>
     <head>
         <style>
-            table { width: 100%; }
-            th, td { border: 1px solid black; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
-            .table-wrapper { width: 100%; overflow-x: auto; }
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f9;
+                margin: 0;
+                padding: 0;
+                color: #333;
+            }
+            .table-wrapper {
+                width: 100%;
+                overflow-x: auto;
+                margin: 20px 0;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                margin: auto;
+                border: 2px solid black;  /* Black border around the table */
+                border-radius: 8px;
+            }
+            th, td {
+                padding: 12px 15px;
+                text-align: left;
+                border: 1px solid black;  /* Black border around cells */
+                white-space: nowrap;
+            }
+            th {
+                background-color: #3C3D37;
+                color: #fff;
+                text-transform: uppercase;
+                border-bottom: 3px solid #000;  /* Thick bottom border for header */
+            }
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            td {
+                transition: background-color 0.3s ease;
+            }
         </style>
     </head>
     <body>
@@ -83,7 +117,7 @@ def generate_html_table(data):
             <table>
                 <thead>
                     <tr>'''
-    
+
     # Create table headers
     for header in headers:
         table += f'<th>{header}</th>'
@@ -109,6 +143,9 @@ def generate_html_table(data):
     '''
     
     return table
+
+
+
 
 async def database_operation(websocket: WebSocket, details: dict):
     url_template = details.get('url')
@@ -165,7 +202,7 @@ async def database_operation(websocket: WebSocket, details: dict):
             print(response_data)
             if method == 'GET':
                 html_table = generate_html_table(response_data)
-                await websocket.send_text(f"Request successful. Data:<br>{html_table}")
+                await websocket.send_text(f"{html_table}")
                 return "Error","Detail"
             else:
                 
