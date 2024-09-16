@@ -1,5 +1,5 @@
 body {
-  margin: 0;
+  margin-top: 30px;
   padding: 0;
   /*background: linear-gradient(to right, #8e9eab, #eef2f3);  Gradient background */
   background-color: #fff;
@@ -78,17 +78,25 @@ h1 {
 }
 .login-box .input-box label {
   position: absolute;
-  top: -30%;
-  left: 50px;
+  top:-24px;
+  left: 10px;
+  font-weight:bold;
   pointer-events: none;
+  font-size: 18px;
   transition: 0.5s;
   color: rgba(8, 8, 8, 0.6);
+}
+::placeholder {
+  color: rgb(26, 25, 25);
+  font-size: 15px;
+  font-weight:bold;
+  opacity: 0.2; /* Firefox */
 }
 
 .login-box .input-box input:focus ~ label,
 .login-box .input-box input:valid ~ label {
-  top: -20px;
-  left: 40px;
+  top: -30px;
+  left: 0;
   color: #007bff;
   font-size: 15px;
 }
