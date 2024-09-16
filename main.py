@@ -100,7 +100,7 @@ async def on_startup():
 
 @app.get("/")
 def get():
-    file_path = Path(__file__).resolve().parent / "templates" / "front_page.html"
+    file_path = Path(__file__).resolve().parent / "templates" / "index.html"
     if not file_path.exists():
         return HTMLResponse("File not found", status_code=404)
     return HTMLResponse(file_path.read_text())
@@ -229,10 +229,20 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Database operation
                 result,payload = await database_operation(websocket, answer)
                 
-                if not  result and payload:
+                print('result :',result)
+                print('payload :',payload)
+                
+                if result =="payload"  and payload == "error" :
+                    await websocket.send_text("Facing internal issue.try again!")
+                    continue
+                if result =="Error"  and payload == "Detail" :
                     await websocket.send_text("Thanks for using. Need anything, feel free to ask!")
-                # if result == "Backend Error":
-                #     await websocket.send_text("Backend Error")  # Redirect to the new page
+                    continue
+                if result == "Backend" and payload == "Error":
+                    await websocket.send_text("Backend Server Error")
+                    await asyncio.sleep(3)
+                    await websocket.send_text("navigate")  # Redirect to the new page
+                    continue
                 else:
                     model_output = nlp_response(result,payload)
                     await websocket.send_text(model_output + " Thanks for using. Need anything, feel free to ask!")
@@ -242,7 +252,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 await websocket.send_text("Invalid input format. Please send a valid JSON.")
             except Exception as e:
                 await websocket.send_text(f"An error occurred: {str(e)}")
-                # await websocket.send_text("Backend Error")  # Redirect to the new page
 
     except WebSocketDisconnect:
         logger.info("WebSocket disconnected")

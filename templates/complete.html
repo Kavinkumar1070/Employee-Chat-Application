@@ -41,20 +41,17 @@
     </style>
     <script>
         window.onload = function() {
-            // Check if the page was reloaded
-            if (performance.navigation.type === 1) {
-                // Redirect to the onboard page after a reload
-                window.location.href = "/templates/chatbot.html";
-            }
+            // Redirect to the onboard page after refresh
+            window.location.href = "/templates/chatbot.html";
         };
     </script>
-    
 </head>
 <body>
 
 <div class="container">
-    <h2>Sorry Internal Issue!</h2>
-    <p>Server or Backend error, try again after some time.</p>
+    <h2>Sorry!</h2>
+    <p>Internal server error, try again after some time.</p>
 </div>
+
 </body>
 </html>
