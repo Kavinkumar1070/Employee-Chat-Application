@@ -101,7 +101,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
     except Exception as e:
         print(f"Error during API call: {e}")
         await websocket.send_text(e)        
-        return "Internal server error"
+        return "Internal", "server error"
     
     try:
         response_text = response.choices[0].message.content.strip()
@@ -121,6 +121,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
         print("project_name :",project_name)
         print("*****************************************************")
         return query, project_name
+        
 
     except json.JSONDecodeError:
         print("Error: Failed to decode JSON from the response.")
@@ -129,7 +130,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
     except Exception as e:
         print(f"Error while processing the response: {e}")
         await websocket.send_text(e)
-        return "Internal server error"
+        return "Internal", "server error"
 
 def get_project_script(project_name: str, jsonfile: str):
     try:

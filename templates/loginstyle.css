@@ -74,7 +74,7 @@ h1 {
   transition: border-bottom 0.3s ease, box-shadow 0.3s ease;
 }
 #registerText:hover {
-  color: red !important; /* Ensure hover style is applied */
+  color: #697565 !important; /* Ensure hover style is applied */
 }
 
 /* Focus effect for input */
