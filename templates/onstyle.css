@@ -21,6 +21,12 @@ body {
 #initial p{
     color:#3C3D37;
     font-size:25px;
+    
+}
+
+#initial ul li a{
+    text-decoration: none;
+    color:#697565;
 }
 
 #initial ul li{

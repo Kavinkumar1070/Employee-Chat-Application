@@ -35,6 +35,7 @@
             </div>
         </div>
     </div>
+    
     <script>
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
@@ -127,7 +128,7 @@
             }
             // If the server sends "Server Error" or "Backend Error", redirect the user
             if (message === "navigate") {
-                window.location.href = "/templates/complete.html";  // Update this URL as needed
+                window.location.href = "../templates/complete.html";  // Update this URL as needed
             } else {
                 // Handle other types of messages
                 addMessageChat(message, 'bot');

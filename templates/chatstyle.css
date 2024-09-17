@@ -28,7 +28,7 @@ body {
 
 .sidebar {
     width: 300px; /* Fixed width for sidebar */
-    background-color: #697565; /* Dark gray for the sidebar */
+    background-color: #3C3D37; /* Dark gray for the sidebar */
     color: #ffffff;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -39,8 +39,8 @@ body {
 }
 
 .sidebar h2 {
-    margin: 0;
-    color:#212726 ;
+    margin-bottom: 0px;
+    color:#ECDFCC ;
 }
 
 #profile-info p {
@@ -153,3 +153,7 @@ button {
 button:hover {
     background-color: #697565; /* Darker blue for hover effect */
 }
+
+
+
+

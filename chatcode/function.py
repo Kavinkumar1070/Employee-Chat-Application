@@ -229,6 +229,7 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
     except Exception as e:
         logger.error(f"Error during API call: {e}")
         await websocket.send_text(e)
+        print('222222222222222222222')
         return "Internal server error"
     try:
         response_text = response.choices[0].message.content.strip()

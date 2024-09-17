@@ -18,7 +18,7 @@ form{
 .login-box {
   width: 390px;
   padding: 40px;
-  background: rgba(252, 247, 247, 0.1); /* Transparent background */
+  background: whitesmoke; /* Transparent background */
   backdrop-filter: blur(100%); /* Background blur effect */
   border-radius: 15px;
   box-shadow: 10px 15px 32px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
@@ -54,39 +54,34 @@ h1 {
 .login-box .input-box {
   position: relative;
   margin-bottom: 30px;
-  border:2px solid black;
-  border-radius:20px 
-
+  border-bottom: 1px solid #ffffff;
+  /* Change to a solid white on hover */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
 }
 
 .login-box .input-box input {
   width: 90%;
-  padding-left:60px;
-  padding: 10px 0 10px 40px;
+  padding-left:0px;
+  padding: 10px 0 10px 60px;
   font-size: 16px;
   height:25px;
   color: #000000;
+  
   background: none;
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.6);
   outline: none;
   transition: border-bottom 0.3s ease, box-shadow 0.3s ease;
 }
-
-/* Hover effect */
-.login-box .input-box input:hover {
-  padding-left:60px;
-
-  border-bottom: 1px solid #ffffff;
-   /* Change to a solid white on hover */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+#registerText:hover {
+  color: red !important; /* Ensure hover style is applied */
 }
 
 /* Focus effect for input */
 .login-box .input-box input:focus {
-  padding-left:60px;
-  border-bottom: 2px solid #007bff; /* Green border on focus */
+  border-bottom: 2px solid #697565; /* Green border on focus */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Increase shadow on focus */
+  padding: 10px 0 10px 60px;
 }
 .login-box .input-box label {
   position: absolute;
@@ -136,7 +131,7 @@ h1 {
   width: 60%;
   margin-left:20%;
   height: 40px;
-  background: rgba(0, 123, 255, 0.8); /* Semi-transparent button */
+  background: #3C3D37; /* Semi-transparent button */
   color: #fff;
   border: none;
   outline: none;
@@ -149,7 +144,7 @@ h1 {
 }
 
 .login-box button:hover {
-  background: rgba(0, 123, 255, 1); /* Solid color on hover */
+  background: #697565; /* Solid color on hover */
   transform: translateY(-1px);
 }
 
@@ -185,7 +180,7 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active  {
-  transition: background-color 5000s;
+  transition: background-color red;
   
 }
 

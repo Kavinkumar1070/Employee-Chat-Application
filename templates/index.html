@@ -26,7 +26,10 @@
         <input type="password" id="password" placeholder="Enter your Password" required>
       </div>
       <button type="button" onclick="login()">Login</button>
-      <p style="text-align:center;"> Don't have account? <b onclick="register()">Register</b></p>
+      <p style="text-align:center;"> 
+        Don't have an account? 
+        <b onclick="register()" style="color:#181C14; cursor: pointer;" id="registerText">Register now</b>
+      </p>
     </form>
     <div id="message"></div>
   </div>
@@ -56,7 +59,7 @@
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Login failed: ${response.status} - ${errorText}`);
+        throw new Error(`Incorrect email or password`);
       }
 
       const data = await response.json();
