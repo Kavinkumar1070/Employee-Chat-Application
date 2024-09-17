@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot UI</title>
+    <title>Chatbot UI with API and Models</title>
     <link rel="stylesheet" href="../templates/chatstyle.css">
 </head>
 <body>
@@ -17,6 +17,7 @@
             <h2>Available Operation</h2>
             <ul id="lists"></ul>
         </div>
+
         <div class="main-content">
             <div class="headerbox">
                 <p id="welcome-message" class="para">Loading...</p>
@@ -34,8 +35,29 @@
                 </div>
             </div>
         </div>
+
+        <!-- API Key and Model Fields -->
+        <div class="top-right-container">
+            <div class="dropdown" id="apikey-dropdown">
+                <div class="default" onclick="toggleDropdown('apikey')">API Key 1</div>
+                <ul id="apikey-list" class="dropdown-content">
+                    <li onclick="selectOption('apikey', 'API Key 1')">API Key 1</li>
+                    <li onclick="selectOption('apikey', 'API Key 2')">API Key 2</li>
+                    <li onclick="selectOption('apikey', 'API Key 3')">API Key 3</li>
+                </ul>
+            </div>
+
+            <div class="dropdown" id="models-dropdown">
+                <div class="default" onclick="toggleDropdown('models')">Model A</div>
+                <ul id="models-list" class="dropdown-content">
+                    <li onclick="selectOption('models', 'Model A')">Model A</li>
+                    <li onclick="selectOption('models', 'Model B')">Model B</li>
+                    <li onclick="selectOption('models', 'Model C')">Model C</li>
+                </ul>
+            </div>
+        </div>
     </div>
-    
+
     <script>
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
@@ -193,6 +215,25 @@
                 sendMessage();
             }
         });
+
+         function toggleDropdown(field) {
+            const dropdown = document.getElementById(field + '-list');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function selectOption(field, value) {
+            const defaultElement = document.querySelector('#' + field + '-dropdown .default');
+            defaultElement.innerText = value;
+            toggleDropdown(field);
+        }
+
+        // Close dropdown if clicked outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.default')) {
+                const dropdowns = document.querySelectorAll('.dropdown-content');
+                dropdowns.forEach(dropdown => dropdown.style.display = 'none');
+            }
+        }
     </script>
 </body>
 </html>
