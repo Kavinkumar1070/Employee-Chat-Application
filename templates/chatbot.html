@@ -8,14 +8,34 @@
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <h2>Profile</h2>
-            <div id="profile-info">
-                <p id="role">Role: Loading...</p>
-                <p id="employee-id">Employee ID: Loading...</p>
-            </div>
+        <div class="sidebar">            
             <h2>Available Operation</h2>
             <ul id="lists"></ul>
+        </div>
+    <div style="width:100%;">
+        <div class="top-right-container">
+            <div id="profile-info">
+                <p id="employee-id">Employee ID: Loading...</p>
+            </div>
+            <div class="ff">
+                <div class="dropdown" id="apikey-dropdown">
+                    <div class="default" onclick="toggleDropdown('apikey')">API Key 1</div>
+                    <ul id="apikey-list" class="dropdown-content">
+                        <li onclick="selectOption('apikey', 'API Key 1')">API Key 1</li>
+                        <li onclick="selectOption('apikey', 'API Key 2')">API Key 2</li>
+                        <li onclick="selectOption('apikey', 'API Key 3')">API Key 3</li>
+                    </ul>
+                </div>
+
+                <div class="dropdown" id="models-dropdown">
+                    <div class="default" onclick="toggleDropdown('models')">Model A</div>
+                    <ul id="models-list" class="dropdown-content">
+                        <li onclick="selectOption('models', 'Model A')">Model A</li>
+                        <li onclick="selectOption('models', 'Model B')">Model B</li>
+                        <li onclick="selectOption('models', 'Model C')">Model C</li>
+                    </ul>
+                </div>
+            </div> 
         </div>
 
         <div class="main-content">
@@ -25,7 +45,7 @@
             <div class="chat-container">
                 <div class="chat-box" id="chat-box">
                     <div id="initial">
-                        <p>Hello, I am Jarvis, an Employee Chatbot. Please ask a query related to the topics below:</p>
+                        <p>Hello,Please ask a query related to the topics mentioned in available operations:</p>
                         <p>Enter 'quit' to end the session.</p>
                     </div>
                 </div>
@@ -35,26 +55,9 @@
                 </div>
             </div>
         </div>
-
+        
         <!-- API Key and Model Fields -->
-        <div class="top-right-container">
-            <div class="dropdown" id="apikey-dropdown">
-                <div class="default" onclick="toggleDropdown('apikey')">API Key 1</div>
-                <ul id="apikey-list" class="dropdown-content">
-                    <li onclick="selectOption('apikey', 'API Key 1')">API Key 1</li>
-                    <li onclick="selectOption('apikey', 'API Key 2')">API Key 2</li>
-                    <li onclick="selectOption('apikey', 'API Key 3')">API Key 3</li>
-                </ul>
-            </div>
-
-            <div class="dropdown" id="models-dropdown">
-                <div class="default" onclick="toggleDropdown('models')">Model A</div>
-                <ul id="models-list" class="dropdown-content">
-                    <li onclick="selectOption('models', 'Model A')">Model A</li>
-                    <li onclick="selectOption('models', 'Model B')">Model B</li>
-                    <li onclick="selectOption('models', 'Model C')">Model C</li>
-                </ul>
-            </div>
+        
         </div>
     </div>
 
@@ -93,9 +96,7 @@
 
                 const profile = await response.json();
                 employeeId = profile.Employee_ID;
-                role = profile.Role;
 
-                roleElement.innerText = `Role: ${profile.Role}`;
                 employeeIdElement.innerText = `Employee ID: ${employeeId}`;
 
                 setTimeout(() => {
@@ -156,28 +157,38 @@
                 addMessageChat(message, 'bot');
             }
         };
-
         function sendMessage() {
             const message = userInput.value;
             if (message.trim() === "") return;
-
+        
             if (initialMessage) {
                 initialMessage.style.display = 'none';
             }
-
+        
+            // Get the selected API Key and Model
+            const selectedApiKey = document.querySelector('#apikey-dropdown .default').innerText;
+            console.log(selectedApiKey)
+            const selectedModel = document.querySelector('#models-dropdown .default').innerText;
+        
             addMessageToChat(message, 'user');
-
+        
+            // Create the payload with the selected API Key and Model
             const payload = {
                 message: message,
                 employee_id: employeeId,
                 role: role,
-                token: token
+                token: token,
+                apikey: selectedApiKey,  // Add the API Key to the payload
+                model: selectedModel      // Add the Model to the payload
             };
             console.log('payload', payload);
+            
+            // Send the payload via WebSocket
             websocket.send(JSON.stringify(payload));
-
+        
             userInput.value = "";
         }
+        
 
         function addMessageToChat(message, sender) {
             const messageElement = document.createElement('div');

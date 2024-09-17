@@ -6,6 +6,8 @@ body {
     display: flex;
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+
 }
 
 #initial p{
@@ -32,11 +34,10 @@ body {
     width: 300px; /* Fixed width for sidebar */
     background-color: #3C3D37; /* Dark gray for the sidebar */
     color: #ffffff;
-    padding: 20px;
+    padding-left:20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     overflow-y:auto;
 }
 
@@ -47,7 +48,7 @@ body {
 
 #profile-info p {
     margin: 10px 0;
-    color: #e9ecef; /* Light gray text */
+    color: black; /* Light gray text */
 }
 
 .sidebar ul {
@@ -66,8 +67,9 @@ body {
     width: 60%; /* Fixed width to 60% */
     display: flex;
     flex-direction: column;
-    height: 100%; /* Full height to make sure input is always at the bottom */
-    margin: 50px auto; /* Center horizontally */
+    height: 90%; /* Full height to make sure input is always at the bottom */
+    margin: 10px auto; /* Center horizontally */
+    
 }
 
 .headerbox {
@@ -76,7 +78,7 @@ body {
     font-size: 30px;
     text-align: center;
     font-weight:bold;
-    border-bottom: 1px solid #e5e5ea;
+    margin-top:-10px;
 }
 
 .chat-container {
@@ -89,7 +91,6 @@ body {
 
 .chat-box {
     flex: 1;
-    padding: 15px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -156,18 +157,25 @@ button:hover {
     background-color: #697565;
 }
 
-/* Styling for the dropdowns in the top-right corner */
 .top-right-container {
-    position: absolute;
-    top: 5px;
-    right: 20px;
+    top: 0px;
+    left: 22.7%;
     display: flex;
     flex-direction: row;
     gap: 10px;
     z-index: 100;
-    
+    justify-content: space-between;
+    width: 98%;
+    padding: 10px; /* Optional: Add some padding if needed */
+    border-bottom: 2px solid #e5e5ea; /* Light gray bottom border */
 }
 
+
+
+.ff{
+    display:flex;
+    flex-direction:row;
+}
 .dropdown {
     position: relative;
     width: auto; /* Fixed width for the dropdowns */
