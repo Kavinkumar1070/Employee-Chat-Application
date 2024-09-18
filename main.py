@@ -192,6 +192,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Check for 'quit' message
                 if user_message.lower() == 'quit':
                     await websocket.send_text("Goodbye, Thanks for using our app!")
+                    await asyncio.sleep(3)
+                    await websocket.send_text("quit")
                     break
                 
                 # Main logic
@@ -202,13 +204,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 print(query)
                 print(project_name)
                 if query == "Internal" and project_name =="server error":
-                    await websocket.send_text("navigate")  # Redirect to the new page
+                    await websocket.send_text("navigateerror")  # Redirect to the new page
                 project_details = get_project_script(project_name, jsonfile)
                 payload_details = split_payload_fields(project_details)
                 if payload_details != {}:
                     filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile,apikey,model)
                     if filled_cleaned == "Internal server error":
-                        await websocket.send_text("navigate")  # Redirect to the new page
+                        await websocket.send_text("navigateerror")  # Redirect to the new page
                 else:
                     filled_cleaned = payload_details
                 print('start')        
@@ -246,7 +248,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 if result == "Backend" and payload == "Error":
                     await websocket.send_text("Backend Server Error")
                     await asyncio.sleep(3)
-                    await websocket.send_text("navigate")  # Redirect to the new page
+                    await websocket.send_text("navigateerror")  # Redirect to the new page
                     continue
                 else:
                     model_output = nlp_response(result,payload,apikey,model)

@@ -6,7 +6,7 @@
     <title>Chatbot UI with API and Models</title>
     <link rel="stylesheet" href="../templates/chatstyle.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-
+ 
 </head>
 <body>
     <div class="container">
@@ -24,25 +24,27 @@
                     <div id="profile-info" >
                         <p id="employee-id">Employee ID: Loading...</p>
                     </div>
-                 </div>
+                </div>
                 <div class="ff">
                     <div class="dropdown" id="apikey-dropdown">
-                        <div class="default" onclick="toggleDropdown('apikey')">API Key 1</div>
+                        <div class="default" onclick="toggleDropdown('apikey')">GROQ_API_KEY1</div>
                         <ul id="apikey-list" class="dropdown-content">
-                            <li onclick="selectOption('apikey', 'API Key 1')">API Key 1</li>
-                            <li onclick="selectOption('apikey', 'API Key 2')">API Key 2</li>
-                            <li onclick="selectOption('apikey', 'API Key 3')">API Key 3</li>
+                        <li onclick="selectOption('apikey', 'GROQ_API_KEY1')">GROQ_API_KEY1</li>
+                        <li onclick="selectOption('apikey', 'GROQ_API_KEY2')">GROQ_API_KEY2</li>
+                        <li onclick="selectOption('apikey', 'GROQ_API_KEY3')">GROQ_API_KEY3</li>
+                        <li onclick="selectOption('apikey', 'GROQ_API_KEY4')">GROQ_API_KEY4</li>
                         </ul>
                     </div>
                     <div class="dropdown" id="models-dropdown">
-                        <div class="default" onclick="toggleDropdown('models')">Model A</div>
+                        <div class="default" onclick="toggleDropdown('models')">Mistral</div>
                         <ul id="models-list" class="dropdown-content">
-                            <li onclick="selectOption('models', 'Model A')">Model A</li>
-                            <li onclick="selectOption('models', 'Model B')">Model B</li>
-                            <li onclick="selectOption('models', 'Model C')">Model C</li>
+                        <li onclick="selectOption('models', 'mixtral-8x7b-32768')">Mistral</li>
+                        <li onclick="selectOption('models', 'llama3-70b-8192')">LLAMA70b</li>
+                        <li onclick="selectOption('models', 'llama3-8b-8192')">LLAMA8b</li>
+                        <li onclick="selectOption('models', 'gemma2-9b-it')">Gemma</li>
                         </ul>
                     </div>
-                </div> 
+                </div>
             </div>
             <div class="main-content">
                 <div class="headerbox">
@@ -60,13 +62,13 @@
                         <button id="send-button" onclick="sendMessage()" disabled>Send</button>
                     </div>
                 </div>
-            
+           
             </div>
-        
+       
         </div>
-    
+   
     </div>
-
+ 
     <script>
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
@@ -76,17 +78,17 @@
         const initialMessage = document.getElementById('initial');
         let employeeId = null;
         let role = null;
-
+ 
         const token = localStorage.getItem('token');
         console.log(token);
-
+ 
         if (token) {
             fetchProfileInfo(token);
         } else {
             document.getElementById('welcome-message').innerText = "Refresh Bot!";
             enableInput(); // Enable input if no token is found (for testing or guest mode)
         }
-
+ 
         async function fetchProfileInfo(token) {
             try {
                 const response = await fetch('/profile', {
@@ -95,17 +97,17 @@
                         'Authorization': `Bearer ${token}`
                     }
                 });
-
+ 
                 if (!response.ok) {
                     throw new Error('Failed to fetch profile info');
                 }
-
+ 
                 const profile = await response.json();
                 employeeId = profile.Employee_ID;
                 role = profile.Role;
-
+ 
                 employeeIdElement.innerText = `Employee ID: ${employeeId}`;
-
+ 
                 setTimeout(() => {
                     (profile.Functions || []).forEach((data) => {
                         const list = document.getElementById("lists");
@@ -114,41 +116,41 @@
                         list.appendChild(listItem);
                     });
                 }, 1000);
-
+ 
                 document.getElementById('welcome-message').innerText = `Welcome to Employee Chat Application!`;
                 enableInput(); // Enable the input field and send button after fetching profile info
-
+ 
             } catch (error) {
                 document.getElementById('welcome-message').innerText = "Welcome!";
                 console.error(error);
                 enableInput(); // Enable input even if fetching profile fails
             }
         }
-
+ 
         function enableInput() {
             userInput.disabled = false;
             sendButton.disabled = false;
         }
-
+ 
         const websocket = new WebSocket("ws://127.0.0.1:8000/ws/chat");
-
+ 
         websocket.onopen = () => {
             console.log("WebSocket connection established.");
         };
-
+ 
         websocket.onmessage = (event) => {
             const message = event.data;
-
+ 
             // Check if the message starts with <!DOCTYPE html> indicating HTML content
             if (message.startsWith("<!DOCTYPE html>")) {
                 // Create a temporary element to safely insert the HTML content
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = message;
-
+ 
                 // Extract the table from the temporary element
                 const table = tempDiv.querySelector('table');
                 const otherContent = tempDiv.innerHTML;
-
+ 
                 // Append table or other content with specific styling
                 if (table) {
                     chatBox.innerHTML += `<div class="table-wrapper">${table.outerHTML}</div>`;
@@ -157,9 +159,11 @@
                 }
             }
             // If the server sends "Server Error" or "Backend Error", redirect the user
-            if (message === "navigate") {
+            if (message === "navigateerror") {
                 window.location.href = "../templates/complete.html";  // Update this URL as needed
-            } else {
+            } if (message === "quit") {
+                window.location.href ='/templates/index.html';  // Update this URL as needed
+            }else {
                 // Handle other types of messages
                 addMessageChat(message, 'bot');
             }
@@ -167,18 +171,18 @@
         function sendMessage() {
             const message = userInput.value;
             if (message.trim() === "") return;
-        
+       
             if (initialMessage) {
                 initialMessage.style.display = 'none';
             }
-        
+       
             // Get the selected API Key and Model
             const selectedApiKey = document.querySelector('#apikey-dropdown .default').innerText;
             console.log(selectedApiKey)
             const selectedModel = document.querySelector('#models-dropdown .default').innerText;
-        
+       
             addMessageToChat(message, 'user');
-        
+       
             // Create the payload with the selected API Key and Model
             const payload = {
                 message: message,
@@ -189,51 +193,50 @@
                 model: selectedModel      // Add the Model to the payload
             };
             console.log('payload', payload);
-            
+           
             // Send the payload via WebSocket
             websocket.send(JSON.stringify(payload));
-        
+       
             userInput.value = "";
         }
-        
-
+       
+ 
         function addMessageToChat(message, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', sender);
             messageElement.classList.add('regular-message'); // Apply a specific class for regular messages
             messageElement.innerHTML = message; // Use innerHTML to render HTML content
             chatBox.appendChild(messageElement);
-
+ 
             chatBox.scrollTop = chatBox.scrollHeight;
         }
-
+ 
         function addMessageChat(message, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', sender);
             messageElement.classList.add('message-content'); // Apply a specific class for all message types
             messageElement.innerHTML = message; // Use innerHTML to render HTML content
-
+ 
             // Check if the message contains a table
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = message;
             const table = tempDiv.querySelector('table');
-
+ 
             if (table) {
                 // Add a specific class for tables to apply unique styles
                 messageElement.classList.add('table-message');
-                messageElement.style.width = "100%";
             }
-
+ 
             chatBox.appendChild(messageElement);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
-
+ 
         userInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 sendMessage();
             }
         });
-
+ 
         function toggleDropdown(field) {
             const dropdowns = document.querySelectorAll('.dropdown-content');
             dropdowns.forEach(dropdown => {
@@ -241,19 +244,19 @@
                     dropdown.style.display = 'none';
                 }
             });
-            
+           
             const dropdown = document.getElementById(field + '-list');
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         }
-
+ 
         function selectOption(field, value) {
             const defaultElement = document.querySelector('#' + field + '-dropdown .default');
             defaultElement.innerText = value;
             toggleDropdown(field);
         }
-
-
-        
+ 
+ 
+       
         //afdsfd
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
@@ -261,9 +264,9 @@
             sidebar.classList.toggle('sidebar-hidden');
             toggleBtn.classList.toggle('sidebar-open');
         }
-
+ 
         document.getElementById('toggleBtn').addEventListener('click', toggleSidebar);
-
+ 
         // Close dropdown if clicked outside
         window.onclick = function(event) {
             if (!event.target.matches('.default')) {

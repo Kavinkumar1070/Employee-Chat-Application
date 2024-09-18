@@ -96,12 +96,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str,ap
                 }
             ]
         )
-    except Exception as e:
-        print(f"Error during API call: {e}")
-        await websocket.send_text(e)        
-        return "Internal", "server error"
-    
-    try:
+
         response_text = response.choices[0].message.content.strip()
         json_start_idx = response_text.find("~~~")
         json_end_idx = response_text.rfind("~~~") + 1

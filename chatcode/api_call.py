@@ -74,13 +74,13 @@ def generate_html_table(data):
         <style>
             body {
                 font-family: Arial, sans-serif;
-                background-color: #f4f4f9;
+                background-color: #f7f7f8;
                 margin: 0;
                 padding: 0;
                 color: #333;
             }
             .table-wrapper {
-                width: 100%;
+                width: 925px;
                 overflow-x: auto;
                 margin: 20px 0;
             }
