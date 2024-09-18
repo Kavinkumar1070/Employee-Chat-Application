@@ -102,6 +102,7 @@
 
                 const profile = await response.json();
                 employeeId = profile.Employee_ID;
+                role = profile.Role;
 
                 employeeIdElement.innerText = `Employee ID: ${employeeId}`;
 

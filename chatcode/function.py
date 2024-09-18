@@ -15,9 +15,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 load_dotenv()
-groq_api1 = os.getenv('GROQ_API_KEY1')
-groq_api2 = os.getenv('GROQ_API_KEY2')
-groq_api3 = os.getenv('GROQ_API_KEY3')
+
 
 def choose_json(role):
     json_file = ['admin','employee','teamlead','onboard']                                                 
@@ -42,7 +40,7 @@ def sanitize_json_string(response_text: str) -> str:
             return "{}"
     return "{}"
 
-async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
+async def get_project_details(websocket: WebSocket, query: str, jsonfile: str,apikey,model):
     projectinfo = {}
     try:
         with open(jsonfile, 'r') as f:
@@ -62,10 +60,10 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
         await websocket.send_text("Error: Failed to read the configuration file.")
         return None
 
-    client = Groq(api_key=groq_api1)
+    client = Groq(api_key=os.getenv(apikey))
     try:
         response = client.chat.completions.create(
-            model='mixtral-8x7b-32768',
+            model=os.getenv(model),
             messages=[
                 {
             "role": "system",
@@ -116,7 +114,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str):
             user_input = await websocket.receive_text()
             user_input_data = json.loads(user_input)
             query = user_input_data.get("message")
-            return await get_project_details(websocket, query, jsonfile)
+            return await get_project_details(websocket, query, jsonfile,apikey,model)
         print("*****************************************************")
         print("project_name :",project_name)
         print("*****************************************************")
@@ -193,11 +191,11 @@ def verify_values_from_query(query, payload, config):
     return verified_payload
 
 
-async def fill_payload_values(websocket: WebSocket, query: str, payload_details: dict, jsonfile: str) -> Dict[str, Any]:
-    client = Groq(api_key=groq_api2)
+async def fill_payload_values(websocket: WebSocket, query: str, payload_details: dict, jsonfile: str,apikey,model) -> Dict[str, Any]:
+    client = Groq(api_key=os.getenv(apikey))
     try:
         response = client.chat.completions.create(
-        model='mixtral-8x7b-32768',
+        model=os.getenv(model),
         messages=[
             {
                 "role": "system",
@@ -480,11 +478,11 @@ async def ask_user(websocket: WebSocket, pro, pay):
 
 import logging
 
-def nlp_response(answer, payload): 
+def nlp_response(answer, payload,apikey,model): 
     try:
-        client = Groq(api_key=groq_api3)
+        client = Groq(api_key=os.getenv(apikey))
         response = client.chat.completions.create(
-            model='mixtral-8x7b-32768',
+            model=os.getenv(model),
             messages=[
                 {
                     "role": "system",

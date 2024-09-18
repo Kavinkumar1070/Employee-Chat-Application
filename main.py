@@ -186,6 +186,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 token = data_json.get("token")
                 user_message = data_json.get("message")
                 role = data_json.get("role")
+                apikey = data_json.get('apikey')
+                model = data_json.get('model')
 
                 # Check for 'quit' message
                 if user_message.lower() == 'quit':
@@ -194,7 +196,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 
                 # Main logic
                 jsonfile = choose_json(role)
-                response = await get_project_details(websocket, user_message, jsonfile)
+                response = await get_project_details(websocket, user_message, jsonfile,apikey,model)
                 query = response[0]
                 project_name = response[1]
                 print(query)
@@ -204,7 +206,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 project_details = get_project_script(project_name, jsonfile)
                 payload_details = split_payload_fields(project_details)
                 if payload_details != {}:
-                    filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile)
+                    filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile,apikey,model)
                     if filled_cleaned == "Internal server error":
                         await websocket.send_text("navigate")  # Redirect to the new page
                 else:
@@ -247,7 +249,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     await websocket.send_text("navigate")  # Redirect to the new page
                     continue
                 else:
-                    model_output = nlp_response(result,payload)
+                    model_output = nlp_response(result,payload,apikey,model)
                     await websocket.send_text(model_output + " Thanks for using. Need anything, feel free to ask!")
                     continue
                                                     
