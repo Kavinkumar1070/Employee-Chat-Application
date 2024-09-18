@@ -105,9 +105,24 @@ def create_employee(db: Session, employee: EmployeeCreate):
 
 
 def get_employee(db: Session, employee_id: str):
-    data=db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id == employee_id).first()
-    return data
+    data = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id == employee_id).first()
+    
+    if not data:
+        raise HTTPException(status_code=404, detail="Employee not found")
 
+    return {
+        "id": data.id,
+        "employment_id": data.employment_id,
+        "firstname": data.firstname,
+        "lastname": data.lastname,
+        "emailaddress": data.emailaddress,
+        "contactnumber": data.contactnumber,
+        "dateofbirth": str(data.dateofbirth),
+        "address": data.address,
+        "gender": data.gender,
+        "nationality": data.nationality,
+        "maritalstatus": data.maritalstatus,
+    }
 
 
 def update_employee(db: Session, employee_id: str, update_data: EmployeeUpdate):

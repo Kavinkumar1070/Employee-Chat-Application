@@ -82,6 +82,7 @@ async def read_employee_route(
     if employee_role.name == "employee":
         db_employee = get_employee(db,current_employee_id)
         return db_employee
+    
     if employee_role.name == "teamlead":
             db_employee = get_employee(db,current_employee_id)
             return db_employee

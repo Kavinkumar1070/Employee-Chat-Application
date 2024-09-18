@@ -72,44 +72,65 @@ def generate_html_table(data):
     <html>
     <head>
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f7f7f8;
-                margin: 0;
-                padding: 0;
-                color: #333;
-            }
+           body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f8;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .table-wrapper {
+            width: 100%; /* Make the wrapper take full width of its parent */
+            max-width:990px; /* Limit the maximum width */
+            overflow-x: auto; /* Allow horizontal scrolling if needed */
+            margin: 20px auto; /* Center the wrapper and add margin */
+           b padding: 0 15px; /* Add some padding for smaller screens */
+            ox-sizing: border-box; /* Include padding in the width calculation */
+        }
+        table {
+            width: 100%; /* Ensure table takes the full width of the wrapper */
+            border-collapse: collapse;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0 auto; /* Center the table within the wrapper */
+            border: 2px solid black;  /* Black border around the table */
+            border-radius: 8px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid black;  /* Black border around cells */
+            white-space: nowrap; /* Prevent text from wrapping */
+        }
+        th {
+            background-color: #3C3D37;
+            color: #fff;
+            text-transform: uppercase;
+            border-bottom: 3px solid #000;  /* Thick bottom border for header */
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        td {
+            transition: background-color 0.3s ease;
+        }
+
+        /* Responsive design adjustments */
+        @media (max-width: 768px) {
             .table-wrapper {
-                width: 925px;
-                overflow-x: auto;
-                margin: 20px 0;
+                padding: 0 10px; /* Adjust padding for smaller screens */
             }
             table {
-                width: 100%;
-                border-collapse: collapse;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                margin: auto;
-                border: 2px solid black;  /* Black border around the table */
-                border-radius: 8px;
+                font-size: 14px; /* Reduce font size for smaller screens */
             }
-            th, td {
-                padding: 12px 15px;
-                text-align: left;
-                border: 1px solid black;  /* Black border around cells */
-                white-space: nowrap;
+        }
+        @media (max-width: 1024px) {
+            .table-wrapper {
+                padding: 0 10px; /* Adjust padding for smaller screens */
             }
-            th {
-                background-color: #3C3D37;
-                color: #fff;
-                text-transform: uppercase;
-                border-bottom: 3px solid #000;  /* Thick bottom border for header */
+            table {
+                font-size: 14px; /* Reduce font size for smaller screens */
             }
-            tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
-            td {
-                transition: background-color 0.3s ease;
-            }
+        }
         </style>
     </head>
     <body>

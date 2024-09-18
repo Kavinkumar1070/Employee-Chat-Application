@@ -11,7 +11,7 @@
 <body>
     <div class="container">
         <div class=main-sidebar>
-        <div class="sidebar">            
+        <div class="sidebar" id="sidebar">            
             <h2>Available Operation</h2>
             <ul id="lists"></ul>
         </div>
@@ -258,15 +258,41 @@
  
        
         //afdsfd
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('toggleBtn');
-            sidebar.classList.toggle('sidebar-hidden');
-            toggleBtn.classList.toggle('sidebar-open');
-        }
- 
-        document.getElementById('toggleBtn').addEventListener('click', toggleSidebar);
- 
+        
+            // Function to toggle the sidebar visibility
+            function toggleSidebar() {
+                sidebar.classList.toggle('sidebar-hidden');
+                toggleBtn.classList.toggle('sidebar-open');
+            }
+        
+            // Event listener for the toggle button
+            toggleBtn.addEventListener('click', toggleSidebar);
+        
+            // Function to handle responsive behavior
+            function handleResize() {
+                if (window.innerWidth <= 980) {
+                    if (!sidebar.classList.contains('sidebar-hidden')) {
+                        // Sidebar is open and screen is small, close it
+                        sidebar.classList.add('sidebar-hidden');
+                        toggleBtn.classList.add('sidebar-open');
+                    }
+                } else {
+                    // Screen is larger, ensure sidebar is visible
+                    sidebar.classList.remove('sidebar-hidden');
+                    toggleBtn.classList.remove('sidebar-open');
+                }
+            }
+        
+            // Add event listener for window resize
+            window.addEventListener('resize', handleResize);
+        
+            // Initial check to set the sidebar state on page load
+            handleResize();
+        });
+        
         // Close dropdown if clicked outside
         window.onclick = function(event) {
             if (!event.target.matches('.default')) {
