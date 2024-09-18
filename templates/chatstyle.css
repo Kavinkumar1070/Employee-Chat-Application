@@ -20,7 +20,7 @@ body {
     position: relative;
 }
 .sidebar {
-    width: 280px;
+    width: 260px;
     background-color: #3C3D37;
     color: #ffffff;
     padding-left: 20px;
@@ -48,22 +48,47 @@ body {
     font-size: 20px;
     position: absolute;
     top: 15px;
-    left: 250px;/* Position in the top-left corner by default */
+    margin-top:-10px;
+    left: 10px;/* Position in the top-left corner by default */
+    z-index: 1000;
+}
+ 
+.toggle-sidebar-refesh {
+    background-color: #3C3D37;
+    color: #ffffff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    position: absolute;
+    top: 15px;
+    margin-top:-10px;
+    left: 220px;/* Position in the top-left corner by default */
     z-index: 1000;
 }
 
 
 .toggle-sidebar-btn.sidebar-open {
-    left:15px; /* Position next to the open sidebar */
-    top: 10px; /* Adjust top if needed */
+    left:10px; /* Position next to the open sidebar */
+    top: 18px; /* Adjust top if needed */
     background: none;
     color:black;
+}
+
+.toggle-sidebar-refesh.sidebar-open {
+    left:40px; /* Position next to the open sidebar */
+    top: 15px; /* Adjust top if needed */
+    background: none;
+    color:black;
+    font-size:x-large;
 }
 
 /* Additional styles */
 .sidebar h2 {
     margin-bottom: 0px;
     color:#ECDFCC ;
+    margin-top:50px;
+
 }
 
 #profile-info p {
@@ -73,6 +98,7 @@ body {
     --smaller-font-size: .75rem;
     font-weight: bold;
     margin: 10px 0;
+    margin-left:25px;
     color: black; /* Light gray text */
 }
 
@@ -238,7 +264,7 @@ input[type="text"] {
     margin-top: 5px;
     margin-left:30px;
     list-style: none;
-    width:100px;
+    width:auto;
     z-index: 1000;
 }
 

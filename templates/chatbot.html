@@ -16,6 +16,9 @@
             <ul id="lists"></ul>
         </div>
     </div>
+        
+        <button onclick="window.location.reload();"class="toggle-sidebar-refesh" id="refreshBtn" >&#128472;</button>
+
         <button class="toggle-sidebar-btn"  id="toggleBtn">☰</button>
         <div style="width:100%;">
             <div class="top-right-container">
@@ -261,11 +264,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('toggleBtn');
+            const refreshBtn = document.getElementById('refreshBtn');
+
         
             // Function to toggle the sidebar visibility
             function toggleSidebar() {
                 sidebar.classList.toggle('sidebar-hidden');
                 toggleBtn.classList.toggle('sidebar-open');
+                refreshBtn.classList.toggle('sidebar-open');
+
             }
         
             // Event listener for the toggle button
