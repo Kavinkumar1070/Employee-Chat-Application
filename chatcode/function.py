@@ -263,12 +263,17 @@ def validate(payload_detail, response_config):
     for key, values in payload_details.items():
         if key in response_config.keys():
             value = response_config.get(key)
-            required = values.get('required', False)
+            #required = values.get('required', False)
             
+            
+            # Normalize 'None' string to None
+            if value == "None":
+                value = None
+                
             # If the field is required and missing, set to None
             if value is None:
-                if required:
-                    validated_payload[key] = None
+                #if required:
+                validated_payload[key] = None
                 continue
             
             # Check datatype and format

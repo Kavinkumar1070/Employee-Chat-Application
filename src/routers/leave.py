@@ -46,7 +46,7 @@ async def apply_leave(
     # Accessing employee_id directly from the object
     employee_id = current_employee.employment_id
     if not employee_id:
-        raise HTTPException(status_code=400, detail="Invalid employee data")
+        raise HTTPException(status_code=400, detail="Invalid Employee data Please Authenticate ")
     db_leave = create_employee_leave(db, leave, employee_id)
     await send_email_leave(
         db_leave["employee_email"],
@@ -57,7 +57,7 @@ async def apply_leave(
         db_leave["status"],
         db_leave["other_entires"],
     )
-    return {"leave applied successfully check your mail"}
+    return {"details":f"leave applied successfully for {employee_id} check your mail{db_leave["employee_email"]}"}
 
 
 @router.get(
@@ -74,7 +74,7 @@ def get_leaves_by_employee(
     if employee_role == "employee" or employee_role == "teamlead":
         db_employee = get_leave_by_employee_id(db, current_employee_id)
     else:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        raise HTTPException(status_code=404, detail=f"Employee id :{current_employee_id.employee_id} not found")
 
     if not db_employee:
         raise HTTPException(status_code=404, detail="Employee not applied for leave")
@@ -96,7 +96,7 @@ def get_leave_by(
     if employee_role.name == "teamlead":
         db_leave = get_leave_by_report_manager(db, current_employee_id)
     if not db_leave:
-        raise HTTPException(status_code=404, detail="Leave not found")
+        raise HTTPException(status_code=404, detail=f"Employee '{current_employee_id.employee_id}' has no pending leaves")
     leave_details = [
         {"employee_id": leave.employee.employee_id, "leave_id": leave.id}
         for leave in db_leave
@@ -121,7 +121,7 @@ def get_leave_by_month(
         return get_employee_leave_by_month(db, current_employee_id, monthnumber, yearnumber)
     if employee_role.name == "teamlead":
             return get_employee_leave_by_month(db, current_employee_id, monthnumber, yearnumber)
-    return {"detail": "No leaves this Month"}
+    return {"detail":  " No leaves Applied for This Month "}
 
 
 @router.put("/admin/teamlead/update", dependencies=[Depends(roles_required("teamlead", "admin"))])
@@ -144,7 +144,7 @@ async def update_leave(
             db_leave = update_employee_leave(db, leave)
         else:
             raise HTTPException(
-                status_code=400, detail="Invalid leave status provided."
+                status_code=400, detail="Invalid leave status provided 'Pending'."
             )
     if employee_role.name == "teamlead":
         if leave.status == "approved":
@@ -158,11 +158,11 @@ async def update_leave(
             db_leave = update_employee_teamlead(db, report_manager, leave)
         else:
             raise HTTPException(
-                status_code=400, detail="Invalid leave status provided."
+                status_code=400, detail="Invalid leave status provided 'Pending'."
             )
 
     if not db_leave:
-        raise HTTPException(status_code=404, detail="Leave not found")
+        raise HTTPException(status_code=404, detail=f"Leave not found {leave.leave_id}")
     await send_email_leave(
         db_leave["employee_email"],
         db_leave["employee_firstname"],
@@ -186,7 +186,7 @@ def delete_leave(
 ):
     success = delete_employee_leave(db, current_user.id, leave_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Leave not found")
+        raise HTTPException(status_code=404, detail=f"Leave id {leave_id} is not found")
     return {"leave deleted successfully"}
 
 

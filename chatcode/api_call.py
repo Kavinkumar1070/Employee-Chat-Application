@@ -207,18 +207,18 @@ async def database_operation(websocket: WebSocket, details: dict):
         async with httpx.AsyncClient(timeout=timeout_seconds) as client:
             response = await method_dispatch[method](client)
             print('__________')
-            if response.status_code == 404 :
+            if response.status_code >= 400 :
                 error_message = response.text
                 print(f"Error: {error_message}")
                 error_message = json.loads(error_message)
                 await websocket.send_text(error_message['detail'])
                 return "Error","Detail"
-            if response.status_code >= 400:
-            # Capture and log the full response to understand the issue
-                error_message = response.text
-                print(f"Error: {error_message}")
-                return "payload", "error"  
-            print('__________')
+            # if response.status_code == 400:
+            # # Capture and log the full response to understand the issue
+            #     error_message = response.text
+            #     print(f"Error: {error_message}")
+            #     return "payload", "error"  
+            # print('__________')
             response_data = response.json()
             print(response_data)
             if method == 'GET':

@@ -156,7 +156,7 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: 
     )
     if not employee_data:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Employee Not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee '{employee_id}' Not found"
         )
     def map_leave_duration(leave_duration_str: str):
         if leave_duration_str.lower() == 'oneday':
@@ -206,7 +206,7 @@ def get_employee_leave_by_month(db: Session, employee_id: str, month: int, year:
     )
     if not employee_data:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Employee Not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee '{employee_id}' Not found"
         )
     data= (
         db.query(EmployeeLeave)
@@ -237,7 +237,7 @@ def get_employee_leave_by_month_tl(db: Session, employee_id: str  ,report_manage
             .all()
             )
     
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Employee not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Employee '{employee_id}' Not found")
 
 def get_leave_by_employee_id(db: Session, employee_id: str):
     employee_data = (
@@ -247,7 +247,7 @@ def get_leave_by_employee_id(db: Session, employee_id: str):
     )
     if not employee_data:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Employee Not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee '{employee_id}' Not found"
         )
     return (
         db.query(EmployeeLeave)
@@ -275,7 +275,7 @@ def get_leave_by_employee_team(db: Session, employee_id: str, report_manager: st
         
         return leave_records
     
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Can Not Access Employee Details")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Can Not Access Employee {employee_id} Details")
 
 
 
@@ -286,6 +286,9 @@ def get_leave_by_id(db: Session, current_employee_id: str):
         .filter(EmployeeEmploymentDetails.employee_id == current_employee_id)
         .first()
     )
+    if not data_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Employee id: '{current_employee_id}' not found")
+
     return (
         db.query(EmployeeLeave)
         .filter(
@@ -332,7 +335,7 @@ def get_leave_by_report_manager(db: Session, report_manager_id: str):
     if not leave_details:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="No pending leave records found for the employees",
+            detail=f"No pending leave records found for this employees ",
         )
 
     return leave_details
@@ -349,7 +352,7 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
         .first()
     )
     if not db_leave:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail="Leave not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Leave not found for leave id:{leave_update.leave_id}")
     employee_id=db_leave.employee_id
     employee_data = (
         db.query(EmployeeEmploymentDetails)
@@ -361,7 +364,7 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
     # If employee not found, raise an exception
     if not employee_data:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee id:{employee_id} not found"
         )
 
     # If leave request found, update the details
@@ -371,7 +374,7 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
             if leave_update.reason:
                 db_leave.reject_reason = leave_update.reason
             else:    
-                db_leave.reject_reason = "Leave Granted"  
+                db_leave.reject_reason =f"Leave Granted for Employee id :{employee_id}"  
         if leave_update.reason and leave_update.status == LeaveStatus.REJECTED.value:
             db_leave.status = LeaveStatus.REJECTED
             db_leave.reject_reason = leave_update.reason
@@ -381,9 +384,7 @@ def update_employee_leave(db: Session, leave_update: EmployeeLeaveUpdate):
         db.commit()  # Commit the changes
         db.refresh(db_leave)  # Refresh the instance
     if not db_leave or db_leave.id is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="leave not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Leave not found for leave id:{db_leave.id}")
         # Set the employee email for sending a notification
 
         # Send an email notification asynchronously
@@ -416,7 +417,7 @@ def update_employee_teamlead(
         .first()
     )
     if not db_leave:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail="Leave not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Leave not found for leave id:{leave_update.leave_id}")
     employee_id=db_leave.employee_id
     employee_data = (
         db.query(EmployeeEmploymentDetails)
@@ -450,9 +451,7 @@ def update_employee_teamlead(
         db.commit()  # Commit the changes
         db.refresh(db_leave)  # Refresh the instance
     if not db_leave or db_leave.id is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="leave not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Leave not found for leave id:{db_leave.id}")
         # Set the employee email for sending a notification
 
         # Send an email notification asynchronously
@@ -481,9 +480,7 @@ def delete_employee_leave(db: Session, employee_id: str, leave_id: int):
         .first()
     )
     if not db_leave:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No leave applied"
-        )
+        return False
     db.delete(db_leave)
     db.commit()
     return db_leave
@@ -533,7 +530,7 @@ def get_calender(db:Session, employee_id:int):
     data=db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_id).first()
     if not data:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Leave calendar Not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Leave calendar Not Found for the Employee: {employee_id}"
         )
     return {
         "sick_leave":data.sick_leave,
@@ -560,10 +557,10 @@ def get_calender_tl(db:Session,report_manager:str, employee_id:str):
 def get_calender_admin(db:Session, employee_id:str):
     employee_data=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id).first()
     if not employee_data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Employee not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Employee id:{employee_id} is not found")
     data=db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_data.id).first()
     if not data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Leave not found in calender")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Leave not found in Calender for this Employee id:'{employee_id}'")
     return {
         "sick_leave":data.sick_leave,
         "personal_leave":data.personal_leave,
@@ -583,4 +580,4 @@ def update_leave_calendar(db: Session,  leave_update: LeaveCalendarUpdate):
         db.refresh(leave_calendar)
         return leave_calendar
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="LeaveCalendar entry not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"LeaveCalendar entry not found for Employee id :{leave_update.employee_id}")

@@ -341,11 +341,6 @@
         "url": "http://127.0.0.1:8000/admin/roles/",
         "method": "GET",
         "payload": {
-            "id": {
-                "description": "Role id to retrieve role details",
-                "datatype": "integer",
-                "required": false
-            }
         }
     },
     "assign role to employee": {
@@ -382,7 +377,7 @@
                 "assigned": "None"
             },
             "function": {
-                "description": "new work allocated to role",
+                "description": "New Function allocated to role",
                 "datatype": "string",
                 "required": true,
                 "assigned": "None"
@@ -391,6 +386,32 @@
                 "description": "JSON file name (ex.admin.json)",
                 "datatype": "string",
                 "required": true,
+                "assigned": "None"
+            }
+        }
+    },
+    "update role function": {
+        "project": "update role function",
+        "project description": "Update  a new role based  work or function id .",
+        "url": "http://127.0.0.1:8000/admin/roles/function/",
+        "method": "PUT",
+        "payload": {
+            "function_id": {
+                "description": "Function ID for Update function",
+                "datatype": "integer",
+                "required": true,
+                "assigned": "None"
+            },
+            "function": {
+                "description": "update function description for role",
+                "datatype": "string",
+                "required": false,
+                "assigned": "None"
+            },
+            "jsonfile": {
+                "description": "JSON file name (ex.admin.json)",
+                "datatype": "string",
+                "required": false,
                 "assigned": "None"
             }
         }

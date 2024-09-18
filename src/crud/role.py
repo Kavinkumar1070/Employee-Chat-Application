@@ -9,7 +9,7 @@ from src.schemas.role import EmployeeRole
 from src.core.utils import normalize_string
 from src.models.personal import EmployeeOnboarding
 from src.models.association import employee_role
-from src.schemas.role import RoleFunctionCreate, RoleFunctionUpdate,RoleCreate,UpdateRole
+from src.schemas.role import RoleFunctionCreate,RoleCreate,UpdateRole,UpateRoleFunction
 
 
 def create(db: Session, role: RoleCreate):
@@ -65,6 +65,10 @@ def get_single(db: Session, role_id: int):
     single_role=db.query(Role).filter(Role.id == role_id).first()
     return single_role
 
+def get_function(db: Session, function: int):
+    single_function=db.query(RoleFunction).filter(RoleFunction.id == function).first()
+    return single_function
+
 def assign_employee_role(db: Session, data: EmployeeRole):
     # Check if the employee exists
     employee_details = (
@@ -74,14 +78,14 @@ def assign_employee_role(db: Session, data: EmployeeRole):
     )
     if not employee_details:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Employee not Found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee ID:'{data.employee_id}' is not Found"
         )
 
     # Check if the role exists
     role_details = db.query(Role).filter(Role.id == data.role_id).first()
     if not role_details:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Role not Found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Role ID:'{data.role_id}' is not Found"
         )
 
     # Check if the employee already has the "Team Leader" role
@@ -95,7 +99,7 @@ def assign_employee_role(db: Session, data: EmployeeRole):
     )
 
     if existing_role:
-        return {"message": f"Employee already has the role '{role_details.name}'"}
+        return {"detail": f"Employee already has the role '{role_details.name}'"}
 
     # Check if the employee has the default "Employee" role
     default_role = (
@@ -106,7 +110,7 @@ def assign_employee_role(db: Session, data: EmployeeRole):
 
     if not default_role:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Employee does not have a default role",
         )
 
@@ -120,7 +124,7 @@ def assign_employee_role(db: Session, data: EmployeeRole):
     db.execute(update_statement)
     db.commit()
 
-    return {"message": f"Role updated successfully  ' {role_details.name}'"}
+    return {"detail": f"Role updated successfully ' {role_details.name}'"}
 
 
 # RoleFunction CRUD operations
@@ -128,7 +132,7 @@ def create_role_function(db: Session, role_function: RoleFunctionCreate):
     role = db.query(Role).filter(Role.id == role_function.role_id).first()
     if not role:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Role not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Role Id:'{role_function.role_id}' not found"
         )
     db_role_function = RoleFunction(
         role_id=role_function.role_id,
@@ -162,3 +166,27 @@ def delete_role_function(db: Session, role_function_id: int):
         db.delete(db_role_function)
         db.commit()
     return db_role_function
+
+
+def update_function(db: Session, update_data: UpateRoleFunction):
+    function = db.query(RoleFunction).filter(RoleFunction.id == update_data.function_id).first()
+    print(function.function)
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    try:
+        if function:
+            # Loop through the update_data dict and update fields dynamically
+            for key, value in update_data.dict(exclude_unset=True).items():
+                if key == "function":
+                    setattr(function, "function", normalize_string(value))
+                if key == "jsonfile":
+                    setattr(function, "jsonfile", normalize_string(value))
+                else:
+                    setattr(function, key, value)
+            
+            db.commit()
+            db.refresh(function)
+        return function
+    except IntegrityError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Function already exists"
+        )

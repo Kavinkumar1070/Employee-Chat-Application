@@ -201,21 +201,24 @@ async def websocket_endpoint(websocket: WebSocket):
                 response = await get_project_details(websocket, user_message, jsonfile,apikey,model)
                 query = response[0]
                 project_name = response[1]
-                print(query)
-                print(project_name)
+                #print(query)
+                #print(project_name)
                 if query == "Internal" and project_name =="server error":
                     await websocket.send_text("navigateerror")  # Redirect to the new page
                 project_details = get_project_script(project_name, jsonfile)
                 payload_details = split_payload_fields(project_details)
                 if payload_details != {}:
+                    print('not empty')
                     filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile,apikey,model)
                     if filled_cleaned == "Internal server error":
                         await websocket.send_text("navigateerror")  # Redirect to the new page
                 else:
+                    print('empty')
                     filled_cleaned = payload_details
-                print('start')        
+                        
                 
-                validate_payload = validate(project_details, filled_cleaned)    
+                validate_payload = validate(project_details, filled_cleaned) 
+                print('validate_payload: ',validate_payload)   
                 # Handling PUT requests
                 if validate_payload['method'] == 'PUT':
                     answer = await update_process(websocket, project_details, validate_payload)
