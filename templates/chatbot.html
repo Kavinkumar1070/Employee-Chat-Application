@@ -5,60 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot UI with API and Models</title>
     <link rel="stylesheet" href="../templates/chatstyle.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
 </head>
 <body>
     <div class="container">
+        <div class=main-sidebar>
         <div class="sidebar">            
             <h2>Available Operation</h2>
             <ul id="lists"></ul>
         </div>
-    <div style="width:100%;">
-        <div class="top-right-container">
-            <div id="profile-info">
-                <p id="employee-id">Employee ID: Loading...</p>
+    </div>
+        <button class="toggle-sidebar-btn"  id="toggleBtn">☰</button>
+        <div style="width:100%;">
+            <div class="top-right-container">
+                <div style="display: flex; gap: 1px; align-items: center;">
+                    <div style="width: 50px;"></div>
+                    <div id="profile-info" >
+                        <p id="employee-id">Employee ID: Loading...</p>
+                    </div>
+                 </div>
+                <div class="ff">
+                    <div class="dropdown" id="apikey-dropdown">
+                        <div class="default" onclick="toggleDropdown('apikey')">API Key 1</div>
+                        <ul id="apikey-list" class="dropdown-content">
+                            <li onclick="selectOption('apikey', 'API Key 1')">API Key 1</li>
+                            <li onclick="selectOption('apikey', 'API Key 2')">API Key 2</li>
+                            <li onclick="selectOption('apikey', 'API Key 3')">API Key 3</li>
+                        </ul>
+                    </div>
+                    <div class="dropdown" id="models-dropdown">
+                        <div class="default" onclick="toggleDropdown('models')">Model A</div>
+                        <ul id="models-list" class="dropdown-content">
+                            <li onclick="selectOption('models', 'Model A')">Model A</li>
+                            <li onclick="selectOption('models', 'Model B')">Model B</li>
+                            <li onclick="selectOption('models', 'Model C')">Model C</li>
+                        </ul>
+                    </div>
+                </div> 
             </div>
-            <div class="ff">
-                <div class="dropdown" id="apikey-dropdown">
-                    <div class="default" onclick="toggleDropdown('apikey')">API Key 1</div>
-                    <ul id="apikey-list" class="dropdown-content">
-                        <li onclick="selectOption('apikey', 'API Key 1')">API Key 1</li>
-                        <li onclick="selectOption('apikey', 'API Key 2')">API Key 2</li>
-                        <li onclick="selectOption('apikey', 'API Key 3')">API Key 3</li>
-                    </ul>
+            <div class="main-content">
+                <div class="headerbox">
+                    <p id="welcome-message" class="para">Loading...</p>
                 </div>
-
-                <div class="dropdown" id="models-dropdown">
-                    <div class="default" onclick="toggleDropdown('models')">Model A</div>
-                    <ul id="models-list" class="dropdown-content">
-                        <li onclick="selectOption('models', 'Model A')">Model A</li>
-                        <li onclick="selectOption('models', 'Model B')">Model B</li>
-                        <li onclick="selectOption('models', 'Model C')">Model C</li>
-                    </ul>
-                </div>
-            </div> 
-        </div>
-
-        <div class="main-content">
-            <div class="headerbox">
-                <p id="welcome-message" class="para">Loading...</p>
-            </div>
-            <div class="chat-container">
-                <div class="chat-box" id="chat-box">
-                    <div id="initial">
-                        <p>Hello,Please ask a query related to the topics mentioned in available operations:</p>
-                        <p>Enter 'quit' to end the session.</p>
+                <div class="chat-container">
+                    <div class="chat-box" id="chat-box">
+                        <div id="initial">
+                            <p>Hello, Please ask a query related to the topics mentioned in available operations:</p>
+                            <p>Enter 'quit' to end the session.</p>
+                        </div>
+                    </div>
+                    <div class="input-box">
+                        <input type="text" id="user-input" placeholder="Type a message..." disabled>
+                        <button id="send-button" onclick="sendMessage()" disabled>Send</button>
                     </div>
                 </div>
-                <div class="input-box">
-                    <input type="text" id="user-input" placeholder="Type a message..." disabled>
-                    <button id="send-button" onclick="sendMessage()" disabled>Send</button>
-                </div>
+            
             </div>
-        </div>
-        
-        <!-- API Key and Model Fields -->
         
         </div>
+    
     </div>
 
     <script>
@@ -227,7 +233,14 @@
             }
         });
 
-         function toggleDropdown(field) {
+        function toggleDropdown(field) {
+            const dropdowns = document.querySelectorAll('.dropdown-content');
+            dropdowns.forEach(dropdown => {
+                if (dropdown.id !== field + '-list') {
+                    dropdown.style.display = 'none';
+                }
+            });
+            
             const dropdown = document.getElementById(field + '-list');
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         }
@@ -237,6 +250,18 @@
             defaultElement.innerText = value;
             toggleDropdown(field);
         }
+
+
+        
+        //afdsfd
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.getElementById('toggleBtn');
+            sidebar.classList.toggle('sidebar-hidden');
+            toggleBtn.classList.toggle('sidebar-open');
+        }
+
+        document.getElementById('toggleBtn').addEventListener('click', toggleSidebar);
 
         // Close dropdown if clicked outside
         window.onclick = function(event) {

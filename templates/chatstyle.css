@@ -7,20 +7,6 @@ body {
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
     overflow-x: hidden; /* Prevent horizontal scrolling */
-
-}
-
-#initial p{
-    color:#3C3D37;
-    font-size:20px;
-}
-
-#role {
-    font-size:20px; 
-}
-
-#employee-id {
-    font-size:20px; 
 }
 
 .container {
@@ -30,23 +16,62 @@ body {
     position: relative; /* Relative positioning to allow absolute placement for top-right container */
 }
 
+.main-sidebar{
+    position: relative;
+}
 .sidebar {
-    width: 300px; /* Fixed width for sidebar */
-    background-color: #3C3D37; /* Dark gray for the sidebar */
+    width: 280px;
+    background-color: #3C3D37;
     color: #ffffff;
-    padding-left:20px;
+    padding-left: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    overflow-y:auto;
+    height: 100vh;
+    overflow-y: auto;
+    transition: width ease; /* Smooth transition when toggling */
+    position: relative;
 }
 
+.sidebar-hidden {
+    width: 0;
+    padding-left: 0;
+    overflow: hidden;
+}
+
+.toggle-sidebar-btn {
+    background-color: #3C3D37;
+    color: #ffffff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    position: absolute;
+    top: 15px;
+    left: 250px;/* Position in the top-left corner by default */
+    z-index: 1000;
+}
+
+
+.toggle-sidebar-btn.sidebar-open {
+    left:15px; /* Position next to the open sidebar */
+    top: 10px; /* Adjust top if needed */
+    background: none;
+    color:black;
+}
+
+/* Additional styles */
 .sidebar h2 {
     margin-bottom: 0px;
     color:#ECDFCC ;
 }
 
 #profile-info p {
+    --body-font: "Poppins", sans-serif;
+    --normal-font-size: 5rem;
+    --small-font-size: 3rem;
+    --smaller-font-size: .75rem;
+    font-weight: bold;
     margin: 10px 0;
     color: black; /* Light gray text */
 }
@@ -67,9 +92,8 @@ body {
     width: 60%; /* Fixed width to 60% */
     display: flex;
     flex-direction: column;
-    height: 90%; /* Full height to make sure input is always at the bottom */
+    height: 92%; /* Full height to make sure input is always at the bottom */
     margin: 10px auto; /* Center horizontally */
-    
 }
 
 .headerbox {
@@ -142,7 +166,7 @@ input[type="text"] {
     margin-right: 10px;
 }
 
-button {
+#send-button {
     background-color: #3C3D37;
     color: #ffffff;
     border: none;
@@ -153,7 +177,7 @@ button {
     transition: background-color 0.3s;
 }
 
-button:hover {
+#send-button:hover {
     background-color: #697565;
 }
 
@@ -162,7 +186,7 @@ button:hover {
     left: 22.7%;
     display: flex;
     flex-direction: row;
-    gap: 10px;
+    gap: 20px;
     z-index: 100;
     justify-content: space-between;
     width: 98%;
@@ -170,53 +194,63 @@ button:hover {
     border-bottom: 2px solid #e5e5ea; /* Light gray bottom border */
 }
 
-
-
-.ff{
-    display:flex;
-    flex-direction:row;
+.ff {
+    display: flex;
+    flex-direction: row;
 }
+
 .dropdown {
     position: relative;
     width: auto; /* Fixed width for the dropdowns */
 }
 
 .default {
+    --body-font: "Poppins", sans-serif;
+    --normal-font-size: 5rem;
+    --small-font-size: 3rem;
+    --smaller-font-size: .75rem;
+    font-weight: bold;
     background-color: #3C3D37;
-    color: #ECDFCC;
+    color:#ECDFCC;
     padding: 10px;
-    margin-left:15px;
+    margin-left:35px;
+    margin-right: 25px;
     cursor: pointer;
     border-radius: 5px;
     text-align: left;
     font-size: 16px;
     border: 1px solid #e5e5ea;
-    width:auto;
 }
 
 .dropdown-content {
+    --body-font: "Poppins", sans-serif;
+    --normal-font-size: 5rem;
+    --small-font-size: 3rem;
+    --smaller-font-size: .75rem;
+    font-weight: bold;
     display: none;
     position: absolute;
-    background-color: #f9f9f9;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
+    background-color: #F5F7F8;
+    color: #3C3D37;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 5px;
+    margin-left:30px;
     list-style: none;
-    padding: 0;
-    margin: 0;
-    width: auto;
-    margin-left:15px;
+    width:100px;
+    z-index: 1000;
 }
 
 .dropdown-content li {
-    color: #3C3D37;
-    padding: 10px;
-    text-align: left;
+    padding: 8px 12px;
     cursor: pointer;
-    border-bottom: 1px solid #e5e5ea;
-    background-color: #e9ecef;
-    
 }
 
 .dropdown-content li:hover {
     background-color: #dcdcdc;
+}
+
+.dropdown.show .dropdown-content {
+    display: block;
 }
