@@ -97,8 +97,8 @@ body {
     --small-font-size: 3rem;
     --smaller-font-size: .75rem;
     font-weight: bold;
-    margin: 10px 0;
-    margin-left:25px;
+    margin: 0px 0;
+    margin-left:20px;
     color: black; /* Light gray text */
 }
 
@@ -240,8 +240,8 @@ input[type="text"] {
     background-color: #3C3D37;
     color:#ECDFCC;
     padding: 10px;
-    margin-left:35px;
-    margin-right: 25px;
+    margin-left:10px;
+    margin-right: 10px;
     cursor: pointer;
     border-radius: 5px;
     text-align: left;
@@ -263,7 +263,7 @@ input[type="text"] {
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin-top: 5px;
-    margin-left:30px;
+    margin-left:10px;
     list-style: none;
     width:auto;
     z-index: 1000;
@@ -287,19 +287,13 @@ input[type="text"] {
     background-color: #3C3D37;
     color:#ECDFCC;
     border: none;
-    font-weight: bold;
-    padding: 10px 15px;
-    font-size: 14px;
+    padding:10px;
+    margin-left:10px;
     cursor: pointer;
     border-radius: 4px;
-    margin-left: 15px; /* Space between dropdowns and logout button */
     transition: background-color 0.3s;
 }
 
 .logout-btn:hover,.default:hover {
     background-color: #697565; /* Darker red on hover */
-}
-
-.logout-btn i {
-    margin-right: 8px; /* Adjust the space between the icon and the text */
 }

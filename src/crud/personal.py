@@ -155,7 +155,7 @@ def update_employee(db: Session, employee_id: str, update_data: EmployeeUpdate):
         )
         if exist_email and exist_email.employment_id != employee_id:
             raise HTTPException(
-                status_code=status.HTTP_208_ALREADY_REPORTED,
+                status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Email address '{update_data.emailaddress}' already exists",
             )
 

@@ -2,7 +2,7 @@ body {
   margin-top: 30px;
   padding: 0;
   /*background: linear-gradient(to right, #8e9eab, #eef2f3);  Gradient background */
-  background-color: #fff;
+  background-color: whitesmoke;
   font-family: sans-serif;
   color: #2c3e50;
   display: flex;
@@ -18,7 +18,7 @@ form{
 .login-box {
   width: 390px;
   padding: 40px;
-  background: whitesmoke; /* Transparent background */
+  background: #ffffff; /* Transparent background */
   backdrop-filter: blur(100%); /* Background blur effect */
   border-radius: 15px;
   box-shadow: 10px 15px 32px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
@@ -74,7 +74,7 @@ h1 {
   transition: border-bottom 0.3s ease, box-shadow 0.3s ease;
 }
 #registerText:hover {
-  color: #697565 !important; /* Ensure hover style is applied */
+  color: #7f7f7f !important; /* Ensure hover style is applied */
 }
 
 /* Focus effect for input */
@@ -131,7 +131,7 @@ h1 {
   width: 60%;
   margin-left:20%;
   height: 40px;
-  background: #3C3D37; /* Semi-transparent button */
+  background: #000000; /* Semi-transparent button */
   color: #fff;
   border: none;
   outline: none;
@@ -144,7 +144,7 @@ h1 {
 }
 
 .login-box button:hover {
-  background: #697565; /* Solid color on hover */
+  background: #7f7f7f; /* Solid color on hover */
   transform: translateY(-1px);
 }
 
@@ -161,6 +161,7 @@ h1 {
 
 .register-link a:hover {
   text-decoration: underline;
+  
 }
 
 #message {

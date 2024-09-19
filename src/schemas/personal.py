@@ -41,7 +41,7 @@ class EmployeeUpdate(BaseModel):
     firstname: Optional[str] = None
     lastname: Optional[str] = None
     dateofbirth: Optional[str] = Field(None, example="1990-05-15")
-    contactnumber: Optional[int] = None
+    contactnumber: Optional[str] = None
     emailaddress: Optional[EmailStr] = None
     address: Optional[str] = None
     nationality: Optional[str] = None
