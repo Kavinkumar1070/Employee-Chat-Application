@@ -83,7 +83,7 @@ def read_role_functions(role_id: int, db: Session = Depends(get_db),current_empl
         print('*******************')
         if not data:
             raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=f"No data available for this id: {role_id}"
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"No Data Available For This Role Id: {role_id}"
         )
         return data
             

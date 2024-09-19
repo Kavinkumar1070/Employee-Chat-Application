@@ -85,7 +85,7 @@ def adjust_leave_balance(
  
 
 
-def create_leave_balance(db: Session, employee_id: int, leave_type: str):
+def create_leave_balance(db: Session, employee_id: int, leave_type: str, leave_entries: list):
     # Define mappings for leave types
     leave_fields = {
         "sick": ("sick_leave", "Sick leave quota is exhausted. You cannot approve the additional sick leave."),
@@ -115,20 +115,22 @@ def create_leave_balance(db: Session, employee_id: int, leave_type: str):
     # Handle unlimited unpaid leave case
     current_balance = getattr(leave_calendar, field_name)
 
-    if current_balance >= 0 and leave_type == "unpaid":
+    if leave_type == "unpaid":
         # No decrement or balance check, just return the calendar
         return leave_calendar
 
-    # Get the current leave balance for the specified leave type
-   
-
-    # For other leave types, decrement the balance and check if there is sufficient leave available
-    if current_balance > 0:
+    if current_balance is not None and current_balance > 0:
         setattr(leave_calendar, field_name, current_balance - 1)
     else:
+        leave_ids = [entry.id for entry in leave_entries if entry is not None]
+        data=[]
+        for d in leave_ids:
+            if d is not None:
+                data.append(d)
+        print(data)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"No available {leave_type} leave. You cannot 'apply' {leave_type} Leave. Please select another option from '[sick', 'personal', 'vacation']."
+            detail=f"This is the leave ID(s): {data} Please Note This id. This is No More  available {leave_type} leave. You cannot 'apply' {leave_type} Leave. Please select another option from '[sick', 'personal', 'vacation']. "
         )
 
     # Commit the changes and handle exceptions
@@ -144,9 +146,6 @@ def create_leave_balance(db: Session, employee_id: int, leave_type: str):
 
     return leave_calendar
 
-
-
-
 def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: str):
     leave_entries = []
     employee_data = (
@@ -154,10 +153,13 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: 
         .filter(EmployeeEmploymentDetails.employee_id == employee_id)
         .first()
     )
+
     if not employee_data:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee '{employee_id}' Not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Employee '{employee_id}' Not found"
         )
+
     def map_leave_duration(leave_duration_str: str):
         if leave_duration_str.lower() == 'oneday':
             return LeaveDuration.ONE_DAY
@@ -165,9 +167,10 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: 
             return LeaveDuration.HALF_DAY
         else:
             raise ValueError("Invalid leave duration")
+
     leave.duration = map_leave_duration(leave.duration.value)
-    leave_type=leave.leave_type
-    create_leave_balance(db, employee_data.id,leave_type)
+    leave_type = leave.leave_type
+
     for i in range(leave.total_days):
         end_date = leave.start_date + timedelta(days=i)
         db_leave = EmployeeLeave(
@@ -178,14 +181,21 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: 
             end_date=end_date,
             reason=leave.reason,
         )
+
         leave_entries.append(db_leave)
         db.add(db_leave)
+
+        # Call create_leave_balance and handle its return
+        balance = create_leave_balance(db, employee_data.id, leave_type, leave_entries)
+        print("Updated leave calendar:", balance)
+
     db.commit()
     employee_code = employee_data.employee_id
     employee_email = employee_data.employee_email
     employee_firstname = employee_data.employee.firstname
     employee_lastname = employee_data.employee.lastname
-    other_leave=[leave.id for leave in leave_entries ]
+    other_leave_ids = [leave.id for leave in leave_entries]
+
     return {
         "leave": db_leave.id,
         "reason": db_leave.reason,
@@ -194,7 +204,7 @@ def create_employee_leave(db: Session, leave: EmployeeLeaveCreate, employee_id: 
         "employee_code": employee_code,
         "employee_firstname": employee_firstname,
         "employee_lastname": employee_lastname,
-        "other_entires":other_leave
+        "other_entries": other_leave_ids
     }
 
 
@@ -217,6 +227,8 @@ def get_employee_leave_by_month(db: Session, employee_id: str, month: int, year:
         )
         .all()
     )
+    if not data:
+        return {"detail":f" No leaves Applied for This Month to '{employee_id}' "}
     return data
     
 def get_employee_leave_by_month_tl(db: Session, employee_id: str  ,report_manager:str , month: int, year: int):
@@ -306,15 +318,11 @@ def get_leave_by_admin(db: Session):
 def get_leave_by_report_manager(db: Session, report_manager_id: str):
     # Query to get all employees reporting to the given manager
     manager=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == report_manager_id).first()
-    print(manager.employee_id)
     employees = (
         db.query(EmployeeEmploymentDetails)
         .filter(EmployeeEmploymentDetails.reporting_manager == report_manager_id)
         .all()
     )
-    # print(employees)
-    for i in employees:
-        print(i.employee_id)
     # If no employees found, raise a 404 error
     if not employees:
         raise HTTPException(
@@ -577,6 +585,8 @@ def get_calender_admin(db:Session, employee_id:str):
 
 def update_leave_calendar(db: Session,  leave_update: LeaveCalendarUpdate):
     employee_data = db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == leave_update.employee_id).first()
+    if not employee_data:
+         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f" Employee id :'{leave_update.employee_id}' is Not Found")
     leave_calendar = db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_data.id).first()
     if leave_calendar:
         for key, value in leave_update.dict(exclude_unset=True).items():

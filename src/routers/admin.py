@@ -130,6 +130,9 @@ async def read_employee(
 
     # Prepare the response with employee details
         employee_details = {
+            "id":db_employee.id,
+            "employee_data":db_employee.employee.employment_id,
+            "employee_name":db_employee.employee.firstname,
             "employee_email": db_employee.employee_email,
             "job_position": db_employee.job_position,
             "department": db_employee.department,
@@ -140,8 +143,7 @@ async def read_employee(
             "basic_salary": db_employee.basic_salary,
             "is_active": db_employee.is_active,
             "releave_date": str(db_employee.releave_date),
-            "employee_data":db_employee.employee.employment_id,
-            "employee_name":db_employee.employee.firstname
+
         }
 
         return employee_details
@@ -184,7 +186,7 @@ def get_leave_by(
     if not db_leave:
         raise HTTPException(status_code=404, detail=f"No Pending Leave for this Employee {employee_id}")
     leave_details = [
-        {"employee_id": leave.employee.employee_id, "leave_id": leave.id}
+        {"leave_id": leave.id,"employee_id": leave.employee.employee_id,"date":leave.start_date,"Reason":leave.leave_type}
         for leave in db_leave
     ]
 

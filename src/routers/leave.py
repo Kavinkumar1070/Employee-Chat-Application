@@ -109,7 +109,7 @@ def get_leave_by(
     "/pending/leave/all",
     dependencies=[Depends(roles_required("teamlead"))],
 )
-def get_leave_by(
+def get_leave_of_employee(
     db: Session = Depends(get_db), current_employee=Depends(get_current_employee)
 ):
     current_employee_id = current_employee.employment_id
@@ -119,7 +119,7 @@ def get_leave_by(
     if not db_leave:
         raise HTTPException(status_code=404, detail=f"Employee '{current_employee_id.employee_id}' has no pending leaves")
     leave_details = [
-        {"employee_id": leave.employee.employee_id, "leave_id": leave.id}
+        {"leave_id": leave.id,"employee_id": leave.employee.employee_id,"date":leave.start_date,"Reason":leave.leave_type}
         for leave in db_leave
     ]
     return leave_details
@@ -139,6 +139,7 @@ def get_leave_by_month(
     employee_role = get_current_employee_roles(current_employee.id, db)
     if employee_role.name == "employee":
         return get_employee_leave_by_month(db, current_employee_id, monthnumber, yearnumber)
+    
     if employee_role.name == "teamlead":
             return get_employee_leave_by_month(db, current_employee_id, monthnumber, yearnumber)
     return {"detail":f" No leaves Applied for This Month to '{current_employee_id}' "}

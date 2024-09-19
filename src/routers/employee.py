@@ -48,18 +48,19 @@ async def read_employee(
 
     # Prepare the response with employee details
     employee_details = {
-        "employee_email": db_employee.employee_email,
-        "job_position": db_employee.job_position,
-        "department": db_employee.department,
-        "start_date": db_employee.start_date,
-        "employment_type": db_employee.employment_type,
-        "reporting_manager": db_employee.reporting_manager,
-        "work_location": db_employee.work_location,
-        "basic_salary": db_employee.basic_salary,
-        "is_active": db_employee.is_active,
-        "releave_date": str(db_employee.releave_date),
-        "employee_data":db_employee.employee.employment_id,
-        "employee_name":db_employee.employee.firstname
+            "id":db_employee.id,
+            "employee_data":db_employee.employee.employment_id,
+            "employee_name":db_employee.employee.firstname,
+            "employee_email": db_employee.employee_email,
+            "job_position": db_employee.job_position,
+            "department": db_employee.department,
+            "start_date": db_employee.start_date,
+            "employment_type": db_employee.employment_type,
+            "reporting_manager": db_employee.reporting_manager,
+            "work_location": db_employee.work_location,
+            "basic_salary": db_employee.basic_salary,
+            "is_active": db_employee.is_active,
+            "releave_date": str(db_employee.releave_date),
     }
 
     return employee_details

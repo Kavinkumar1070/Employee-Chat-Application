@@ -8,7 +8,7 @@
             "firstname": {
                 "description": "First name of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "lastname": {

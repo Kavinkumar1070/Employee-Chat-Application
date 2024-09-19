@@ -8,7 +8,7 @@
             "firstname": {
                 "description": "First name of the employee",
                 "datatype": "string",
-                "required": true,
+                "required": false,
                 "assigned": "None"
             },
             "lastname": {
@@ -124,6 +124,13 @@
         "project": "get pending leaves",
         "project description": "Retrieve pending leaves.",
         "url": "http://127.0.0.1:8000/leave/pending/leave",
+        "method": "GET",
+        "payload": {}
+    },
+    "get pending leaves of employee": {
+        "project": "get pending leaves of employee",
+        "project description": "Retrieve pending leaves employee is working under the Teamleader or Reportmanager.",
+        "url": "http://127.0.0.1:8000/leave/pending/leave/all",
         "method": "GET",
         "payload": {}
     },
