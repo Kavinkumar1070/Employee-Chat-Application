@@ -48,10 +48,7 @@ class EmployeeUpdate(BaseModel):
     gender: Optional[str] = None
     maritalstatus: Optional[str] = None
 
-    @validator("contactnumber", check_fields=False)
-    def validate_phone_number(cls, value):
-        if value is None:
-            return value  # Skip validation if the value is None
+
     @validator('dateofbirth', pre=True)
     def parse_date(cls, value):
         if value is not None:
