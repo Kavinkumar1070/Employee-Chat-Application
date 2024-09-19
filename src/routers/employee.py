@@ -21,7 +21,7 @@ from src.schemas.employee import (
 )
 
 router = APIRouter(
-    prefix="/employee", tags=["employee"], responses={400: {"message": "Not found"}}
+    prefix="/employee", tags=["employee"], responses={400: {"detail": "Not found"}}
 )
 
 
@@ -44,7 +44,7 @@ async def read_employee(
     elif employee_role.name == "teamlead":
             db_employee = get_all_employee_employment_details(db, current_employee_id)
     if db_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        raise HTTPException(status_code=404, detail=f"Employee '{current_employee_id}' not found")
 
     # Prepare the response with employee details
     employee_details = {

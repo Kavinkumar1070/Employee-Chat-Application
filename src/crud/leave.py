@@ -29,7 +29,7 @@ def adjust_leave_balance(
     if not leave_calendar:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="LeaveCalendar entry not found for the specified employee."
+            detail=f"LeaveCalendar entry not found for the specified employee {employee_id}."
         )
     if leave_type not in leave_fields:
         raise HTTPException(
@@ -100,7 +100,7 @@ def create_leave_balance(db: Session, employee_id: int, leave_type: str):
     if not leave_calendar:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="LeaveCalendar entry not found for the specified employee."
+            detail=f"LeaveCalendar entry not found for the specified employee {employee_id}."
         )
 
     if leave_type not in leave_fields:
@@ -302,15 +302,19 @@ def get_leave_by_admin(db: Session):
     return db.query(EmployeeLeave).filter(EmployeeLeave.status == "pending").all()
 
 
+
 def get_leave_by_report_manager(db: Session, report_manager_id: str):
     # Query to get all employees reporting to the given manager
     manager=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == report_manager_id).first()
+    print(manager.employee_id)
     employees = (
         db.query(EmployeeEmploymentDetails)
         .filter(EmployeeEmploymentDetails.reporting_manager == report_manager_id)
         .all()
     )
-
+    # print(employees)
+    for i in employees:
+        print(i.employee_id)
     # If no employees found, raise a 404 error
     if not employees:
         raise HTTPException(
@@ -319,8 +323,7 @@ def get_leave_by_report_manager(db: Session, report_manager_id: str):
         )
 
     # Extract the employee IDs from the employment details
-    employee_ids = [employee.id for employee in employees]
-    employee_ids.append(manager.id)
+    employee_ids = [employee.id for employee in employees ]
     # Query to get all pending leave records for the employees
     leave_details = (
         db.query(EmployeeLeave)
@@ -335,7 +338,7 @@ def get_leave_by_report_manager(db: Session, report_manager_id: str):
     if not leave_details:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No pending leave records found for this employees ",
+            detail=f"No Pending Leave Records Found for this Team Employees ",
         )
 
     return leave_details
@@ -430,7 +433,7 @@ def update_employee_teamlead(
     # If employee not found, raise an exception
     if not employee_data:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found or not authenticated to access the employee"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee not found or not authenticated to access the employee {employee_id}"
         )
 
     # If leave request found, update the details
@@ -476,11 +479,15 @@ def update_employee_teamlead(
 def delete_employee_leave(db: Session, employee_id: str, leave_id: int):
     db_leave = (
         db.query(EmployeeLeave)
-        .filter(EmployeeLeave.employee_id == employee_id, EmployeeLeave.id == leave_id)
+        .filter(EmployeeLeave.employee_id == employee_id, EmployeeLeave.id == leave_id,
+                EmployeeLeave.status == "pending")
         .first()
     )
     if not db_leave:
-        return False
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f" No pending Leave  in leave id : '{leave_id}' "
+        )
     db.delete(db_leave)
     db.commit()
     return db_leave
@@ -543,7 +550,7 @@ def get_calender_tl(db:Session,report_manager:str, employee_id:str):
     employee_data=db.query(EmployeeEmploymentDetails).filter(EmployeeEmploymentDetails.employee_id == employee_id,
                                                              EmployeeEmploymentDetails.reporting_manager == report_manager).first()
     if not employee_data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail="Employee not Found or not Authenticate to View Details")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Employee '{employee_id}' not Found or not Authenticate to View Details")
     data=db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_data.id).first()
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND ,detail=f"Please ask admin to create leave calender to {employee_id}")

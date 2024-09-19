@@ -15,7 +15,7 @@ from src.schemas.role import (
 )
 
 router = APIRouter(
-    prefix="/admin/roles", tags=["admin/role"], responses={400: {"message": "Not found"}}
+    prefix="/admin/roles", tags=["admin/role"], responses={400: {"detail": "Not found"}}
 )
 
 
@@ -42,7 +42,7 @@ async def update_role(request: UpdateRole, db: Session = Depends(get_db)):
     exists_role = get_single(db, request.role_id)
     if exists_role:
         update(db,request)
-        raise HTTPException(status_code=status.HTTP_200_OK, detail="Role updated Successfully")
+        raise HTTPException(status_code=status.HTTP_200_OK, detail=f"Role id :'{request.role_id}' updated Successfully")
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Role id: '{request.role_id}' is not found"
@@ -93,7 +93,7 @@ async def update_functions(request: UpateRoleFunction, db: Session = Depends(get
     exists_role = get_function(db, request.function_id)
     if exists_role:
         update_function(db,request)
-        raise HTTPException(status_code=status.HTTP_200_OK, detail="Function updated Successfully")
+        raise HTTPException(status_code=status.HTTP_200_OK, detail=f"Function '{request.function}' updated Successfully")
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Function id: '{request.function_id}' is not found"

@@ -14,7 +14,7 @@ from src.core.authentication import roles_required
 from datetime import datetime,date
 
 router = APIRouter(
-    prefix="/personal", tags=["Personal"], responses={400: {"message": "Not found"}}
+    prefix="/personal", tags=["Personal"], responses={400: {"detail": "Not found"}}
 )
 
 
@@ -87,7 +87,7 @@ async def read_employee_route(
             db_employee = get_employee(db,current_employee_id)
             return db_employee
     else:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        raise HTTPException(status_code=404, detail=f"Employee '{current_employee_id}' is  not found")
 
 @router.put(
     "/employees",
@@ -105,9 +105,9 @@ async def update_employee_data(
     if employee_role in ["employee", "teamlead"]:
         updated_employee = update_employee(db, employee_id_c, employee_update)
     else:
-        raise HTTPException(status_code=403, detail="Unauthorized role")
+        raise HTTPException(status_code=403, detail="Unauthorized Role to Access this Route")
     if updated_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        raise HTTPException(status_code=404, detail=f"Employee '{employee_id_c}' is not found")
     
     return updated_employee
 

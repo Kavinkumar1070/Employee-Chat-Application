@@ -118,7 +118,7 @@ def get_all_employee_teamlead(db: Session, employee_id: str, reporting_manager: 
         .first()
     )
     if not db_employee:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Can Not Access Employee Details with the role 'Teamleade' ")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Can Not Access Employee Details with the role 'Teamlead' ")
     return db_employee
 
 def update_employee_employment_details(

@@ -39,7 +39,7 @@ from src.crud.leave import (
 
 #personal
 router = APIRouter(
-    prefix="/admin", tags=["admin"], responses={400: {"message": "Not found"}}
+    prefix="/admin", tags=["admin"], responses={400: {"detail": "Not found"}}
 )
 
 
@@ -167,7 +167,7 @@ async def delete_employee_details(employee_id: str, db: Session = Depends(get_db
     db_employee = delete_employee_employment_details(db, employee_id=employee_id)
     if db_employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
-    return {"message": "The Employee is Deleted Successfully"}
+    return {"detail": f"The Employee '{employee_id}' is Deleted Successfully"}
 
 
 @router.get(
@@ -182,7 +182,7 @@ def get_leave_by(
     if employee_role.name == "admin":
         db_leave = get_leave_by_id(db,employee_id)
     if not db_leave:
-        raise HTTPException(status_code=404, detail=f"Leave  not found for this Employee {employee_id}")
+        raise HTTPException(status_code=404, detail=f"No Pending Leave for this Employee {employee_id}")
     leave_details = [
         {"employee_id": leave.employee.employee_id, "leave_id": leave.id}
         for leave in db_leave

@@ -34,7 +34,7 @@ def delete(db: Session, db_role: int):
     role = db.query(Role).filter(Role.id == db_role).first()
     db.delete(role)
     db.commit()
-    return {"message": "Role deleted successfully"}
+    return {"detail":f"Role {db_role} deleted successfully"}
 
 
 def update(db: Session, update_data: UpdateRole):
@@ -53,7 +53,7 @@ def update(db: Session, update_data: UpdateRole):
         return role
     except IntegrityError as e:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Role name already exists"
+            status_code=status.HTTP_403_FORBIDDEN, detail=f"Role '{update_data.new_name}' name already exists"
         )
 
 
@@ -170,8 +170,6 @@ def delete_role_function(db: Session, role_function_id: int):
 
 def update_function(db: Session, update_data: UpateRoleFunction):
     function = db.query(RoleFunction).filter(RoleFunction.id == update_data.function_id).first()
-    print(function.function)
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     try:
         if function:
             # Loop through the update_data dict and update fields dynamically
@@ -188,5 +186,6 @@ def update_function(db: Session, update_data: UpateRoleFunction):
         return function
     except IntegrityError as e:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Function already exists"
+            status_code=status.HTTP_403_FORBIDDEN, detail=f"Function '{ update_data.function}'already exists"
         )
+    

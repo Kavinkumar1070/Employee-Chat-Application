@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot UI with API and Models</title>
     <link rel="stylesheet" href="../templates/chatstyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
  
 </head>
@@ -47,6 +48,9 @@
                         <li onclick="selectOption('models', 'gemma2-9b-it')">Gemma</li>
                         </ul>
                     </div>
+                    <button id="logout-button" class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
                 </div>
             </div>
             <div class="main-content">
@@ -285,11 +289,13 @@
                         // Sidebar is open and screen is small, close it
                         sidebar.classList.add('sidebar-hidden');
                         toggleBtn.classList.add('sidebar-open');
+                        refreshBtn.classList.add('sidebar-open');
                     }
                 } else {
                     // Screen is larger, ensure sidebar is visible
                     sidebar.classList.remove('sidebar-hidden');
                     toggleBtn.classList.remove('sidebar-open');
+                    refreshBtn.classList.remove('sidebar-open');
                 }
             }
         
@@ -306,6 +312,14 @@
                 const dropdowns = document.querySelectorAll('.dropdown-content');
                 dropdowns.forEach(dropdown => dropdown.style.display = 'none');
             }
+        }
+
+        function logout() {
+            // Clear the token from localStorage
+            localStorage.removeItem('token');
+        
+            // Redirect to the login page
+            window.location.href = '/templates/index.html';  // Update the URL as per your application routing
         }
     </script>
 </body>

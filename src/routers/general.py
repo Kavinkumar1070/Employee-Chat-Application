@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Path
 from pydantic import BaseModel
 
 router = APIRouter(
-    prefix="/general", tags=["general"], responses={400: {"message": "Not found"}}
+    prefix="/general", tags=["general"], responses={400: {"detail": "Not found"}}
 )
 
 class GeneralQuestion(BaseModel):
