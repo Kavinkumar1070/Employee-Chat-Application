@@ -26,12 +26,12 @@ def create_employee(db: Session, employee: EmployeeCreate):
     )
     if len(str(employee.contactnumber)) != 10:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Contact number  must be 10 numbers",
         )
     if exist_number or exist_email:
         raise HTTPException(
-            status_code=status.HTTP_208_ALREADY_REPORTED,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Contact number or email address already exists",
         )
 
@@ -143,7 +143,7 @@ def update_employee(db: Session, employee_id: str, update_data: EmployeeUpdate):
         )
         if exist_number and exist_number.employment_id != employee_id:
             raise HTTPException(
-                status_code=status.HTTP_208_ALREADY_REPORTED,
+                status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Contact number '{update_data.contactnumber}' already exists",
             )
 

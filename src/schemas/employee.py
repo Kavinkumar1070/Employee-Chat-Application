@@ -1,4 +1,5 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr,validator
+from dateutil import parser
 from typing import Optional
 from datetime import date
 
@@ -14,6 +15,17 @@ class EmployeeEmploymentDetailsBase(BaseModel):
     reporting_manager: Optional[str]
     work_location: Optional[str]
     basic_salary: Optional[float]
+        
+    @validator('start_date', pre=True)
+    def parse_date(cls, value):
+        if value is not None:
+            try:
+                # Parse the date from various formats
+                parsed_date = parser.parse(value)
+                return parsed_date.strftime('%Y-%m-%d')  # Convert to standard format YYYY-MM-DD
+            except (ValueError, TypeError):
+                raise ValueError("Invalid date format. Please use a valid date string.")
+        return value
 
 
 class EmployeeEmploymentDetailsCreate(EmployeeEmploymentDetailsBase):
@@ -31,6 +43,16 @@ class EmployeeEmploymentDetailsUpdate(BaseModel):
     employee_email: Optional[EmailStr] = None
     basic_salary: Optional[float] = None
 
+    @validator('start_date', pre=True)
+    def parse_date(cls, value):
+        if value is not None:
+            try:
+                # Parse the date from various formats
+                parsed_date = parser.parse(value)
+                return parsed_date.strftime('%Y-%m-%d')  # Convert to standard format YYYY-MM-DD
+            except (ValueError, TypeError):
+                raise ValueError("Invalid date format. Please use a valid date string.")
+        return value
 
 class EmployeeEmploymentDetails(EmployeeEmploymentDetailsBase):
     id: int

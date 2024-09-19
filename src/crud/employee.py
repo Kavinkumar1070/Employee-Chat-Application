@@ -104,7 +104,7 @@ def get_all_employee_employment_details(db: Session, employee_id: str):
         .first()
     )
     if not emp:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=" There is  No Employee Details Please Add Employee Details  ")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f" There is  No Employee Details for this id :{employee_id}. Please check the Personal Details for this employee exist")
     return emp
 
 
