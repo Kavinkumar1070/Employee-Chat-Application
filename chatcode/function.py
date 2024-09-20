@@ -456,7 +456,10 @@ async def update_process(websocket: WebSocket, project_details:dict,data: dict):
         print("update output direct:",result)
         print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         return result
-    
+
+def normalize_string(value: str) -> str:
+    if isinstance(value, str):
+        return value.strip().lower()   
     
 async def ask_user(websocket: WebSocket, pro, pay):
     abc = pay['payload'].copy()
@@ -468,7 +471,8 @@ async def ask_user(websocket: WebSocket, pro, pay):
             #logger.info("Message sent to WebSocket, waiting for response...")
             user_input = await websocket.receive_text()
             user_input_data = json.loads(user_input)
-            abc[key] = user_input_data.get("message")
+            cleanstr = user_input_data.get("message")
+            abc[key] = normalize_string(cleanstr)
             valid = validate(pro, abc)
             if valid['payload'][key] is None:
                 return await ask_user(websocket, pro, valid)
