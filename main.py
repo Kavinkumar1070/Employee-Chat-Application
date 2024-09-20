@@ -256,19 +256,19 @@ async def websocket_endpoint(websocket: WebSocket):
                 
                 if result == "Table" and payload == "Return":
                     # Handle when there is a specific error and detailed payload response
-                    await websocket.send_text("Thanks for using. Need anything, feel free to ask!")
+                    await websocket.send_text("Glad to help! If you need more assistance, I'm just a message away.")
                     continue
                 
                 elif result and payload:
                     # Case when both result and payload have values
                     model_output = await nlp_response(websocket, result, payload, apikey, model)
-                    await websocket.send_text(f"{model_output} Thanks for using. Need anything, feel free to ask!")
+                    await websocket.send_text(f"{model_output} Glad to help! If you need more assistance, I'm just a message away.")
                     continue
                 
                 elif result and not payload:
                     # Case when result exists but payload is empty
                     result =  result['detail']
-                    await websocket.send_text(f"{result} Thanks for using. Need anything, feel free to ask!")
+                    await websocket.send_text(f"{result} Glad to help! If you need more assistance, I'm just a message away.")
                     continue
                 
                 else:
@@ -278,7 +278,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
                                                     
             except Exception as e:
-                print('1111111')
+                print('Chat error')
                 await websocket.send_text(f"An error occurred: {str(e)}")
                 await asyncio.sleep(5)
                 await websocket.send_text("navigateerror")
@@ -288,7 +288,7 @@ async def websocket_endpoint(websocket: WebSocket):
         logger.info("WebSocket disconnected")
         await asyncio.sleep(3)
     except Exception as e:
-        print('22222222')
+        print('out of chat')
         logger.error(f"Unexpected error in WebSocket connection: {str(e)}")
         await asyncio.sleep(3)
     finally:
