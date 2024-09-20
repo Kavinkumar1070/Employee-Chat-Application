@@ -53,7 +53,7 @@ def update(db: Session, update_data: UpdateRole):
         return role
     except IntegrityError as e:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=f"Role '{update_data.new_name}' name already exists"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Role '{update_data.new_name}' name already exists"
         )
 
 
@@ -186,6 +186,6 @@ def update_function(db: Session, update_data: UpateRoleFunction):
         return function
     except IntegrityError as e:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=f"Function '{ update_data.function}'already exists"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Function '{ update_data.function}'already exists"
         )
     

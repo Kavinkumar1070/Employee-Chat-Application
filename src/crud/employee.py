@@ -29,7 +29,7 @@ def create_employee_employment_details(
 
         if existing_employee:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Employee with the given employee_id {employee_employment_data.employment_id} or email {employee_employment_data.email} already exists."
             )
 

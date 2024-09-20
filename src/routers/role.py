@@ -83,7 +83,7 @@ def read_role_functions(role_id: int, db: Session = Depends(get_db),current_empl
         print('*******************')
         if not data:
             raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=f"No Data Available For This Role Id: {role_id}"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"No Data Available For This Role Id: {role_id}"
         )
         return data
             
@@ -103,5 +103,5 @@ async def update_functions(request: UpateRoleFunction, db: Session = Depends(get
 def delete_existing_role_function(id: int, db: Session = Depends(get_db)):
     db_role_function = delete_role_function(db, id)
     if db_role_function is None:
-        raise HTTPException(status_code=404, detail=f"Role Function for id:'{id}' is not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Role Function for id:'{id}' is not found")
     return db_role_function

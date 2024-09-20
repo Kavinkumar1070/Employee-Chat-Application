@@ -33,7 +33,7 @@ def adjust_leave_balance(
         )
     if leave_type not in leave_fields:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Invalid leave type specified. Please use 'sick', 'personal', 'vacation', or 'unpaid'."
         )
     # Get the field name and error message from the mappings
@@ -45,7 +45,7 @@ def adjust_leave_balance(
     # Check if the employee is applying for a full day leave but only has 0.5 days left
     if current_balance == 0.5 and duration == "oneday":
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"You only have {current_balance} {leave_type} leave left. You cannot apply for a full day leave."
         )
     # Check if the leave type is unpaid (no limit)
@@ -60,7 +60,7 @@ def adjust_leave_balance(
         setattr(leave_calendar, field_name, current_balance - decrement_value)
     else:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"{error_message} Current balance: {current_balance}. You cannot apply/approve this leave."
         )
  
@@ -105,7 +105,7 @@ def create_leave_balance(db: Session, employee_id: int, leave_type: str, leave_e
 
     if leave_type not in leave_fields:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Invalid leave type specified. Please use 'sick', 'personal', 'vacation', or 'unpaid'."
         )
 
@@ -129,7 +129,7 @@ def create_leave_balance(db: Session, employee_id: int, leave_type: str, leave_e
                 data.append(d)
         print(data)
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"This is the leave ID(s): {data} Please Note This id. This is No More  available {leave_type} leave. You cannot 'apply' {leave_type} Leave. Please select another option from '[sick', 'personal', 'vacation']. "
         )
 
@@ -535,7 +535,7 @@ def leave_calender(db: Session):
     except IntegrityError as e:
         db.rollback()  
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Error saving leave calendar data"
         )
     

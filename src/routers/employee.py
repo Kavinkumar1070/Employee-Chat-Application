@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Query,Path
+from fastapi import APIRouter, HTTPException, Depends, Query,Path,status
 from sqlalchemy.orm import Session
 from typing import Optional
 from src.core.utils import normalize_string
@@ -44,7 +44,7 @@ async def read_employee(
     elif employee_role.name == "teamlead":
             db_employee = get_all_employee_employment_details(db, current_employee_id)
     if db_employee is None:
-        raise HTTPException(status_code=404, detail=f"Employee '{current_employee_id}' not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee '{current_employee_id}' not found")
 
     # Prepare the response with employee details
     employee_details = {
