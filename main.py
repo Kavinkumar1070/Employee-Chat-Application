@@ -201,24 +201,36 @@ async def websocket_endpoint(websocket: WebSocket):
                 response = await get_project_details(websocket, user_message, jsonfile,apikey,model)
                 query = response[0]
                 project_name = response[1]
-                #print(query)
-                #print(project_name)
-                if query == "Internal" and project_name =="server error":
-                    await websocket.send_text("navigateerror")  # Redirect to the new page
+                print('________________________________________________________________________________________')
+                print('Query amd Project name') 
+                print(query)
+                print(project_name)
+                print('________________________________________________________________________________________')
                 project_details = get_project_script(project_name, jsonfile)
+                print('________________________________________________________________________________________')
+                print('Project Details') 
+                print(project_details)
+                print('________________________________________________________________________________________')
                 payload_details = split_payload_fields(project_details)
+                print('________________________________________________________________________________________')
+                print('Payload Details') 
+                print(payload_details)
+                print('________________________________________________________________________________________')
                 if payload_details != {}:
-                    print('not empty')
+                    print('________________________________________________________________________________________')
+                    print('Payload Detail is Not Empty')
                     filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile,apikey,model)
-                    if filled_cleaned == "Internal server error":
-                        await websocket.send_text("navigateerror")  # Redirect to the new page
                 else:
-                    print('empty')
+                    print('________________________________________________________________________________________')
+                    print('Payload Detail is Empty')
                     filled_cleaned = payload_details
                         
                 
                 validate_payload = validate(project_details, filled_cleaned) 
-                print('validate_payload: ',validate_payload)   
+                print('Validate Payload') 
+                print(validate_payload)
+                print('________________________________________________________________________________________')
+                
                 # Handling PUT requests
                 if validate_payload['method'] == 'PUT':
                     answer = await update_process(websocket, project_details, validate_payload)
@@ -242,32 +254,43 @@ async def websocket_endpoint(websocket: WebSocket):
                 print('result :',result)
                 print('payload :',payload)
                 
-                if result =="payload"  and payload == "error" :
-                    await websocket.send_text("Facing internal issue.try again!")
-                    continue
-                if result =="Error"  and payload == "Detail" :
+                if result == "Table" and payload == "Return":
+                    # Handle when there is a specific error and detailed payload response
                     await websocket.send_text("Thanks for using. Need anything, feel free to ask!")
                     continue
-                if result == "Backend" and payload == "Error":
-                    await websocket.send_text("Backend Server Error")
-                    await asyncio.sleep(3)
-                    await websocket.send_text("navigateerror")  # Redirect to the new page
+                
+                elif result and payload:
+                    # Case when both result and payload have values
+                    model_output = await nlp_response(websocket, result, payload, apikey, model)
+                    await websocket.send_text(f"{model_output} Thanks for using. Need anything, feel free to ask!")
                     continue
+                
+                elif result and not payload:
+                    # Case when result exists but payload is empty
+                    result =  result['detail']
+                    await websocket.send_text(f"{result} Thanks for using. Need anything, feel free to ask!")
+                    continue
+                
                 else:
-                    model_output = nlp_response(result,payload,apikey,model)
-                    await websocket.send_text(model_output + " Thanks for using. Need anything, feel free to ask!")
+                    # Default fallback in case both result and payload are empty
+                    await websocket.send_text("Back end server error try again.")
                     continue
+
                                                     
-            except json.JSONDecodeError:
-                await websocket.send_text("Invalid input format. Please send a valid JSON.")
             except Exception as e:
+                print('1111111')
                 await websocket.send_text(f"An error occurred: {str(e)}")
+                await asyncio.sleep(5)
+                await websocket.send_text("navigateerror")
+                break
 
     except WebSocketDisconnect:
         logger.info("WebSocket disconnected")
+        await asyncio.sleep(3)
     except Exception as e:
-        print('++++++')
+        print('22222222')
         logger.error(f"Unexpected error in WebSocket connection: {str(e)}")
+        await asyncio.sleep(3)
     finally:
         await websocket.close()
 

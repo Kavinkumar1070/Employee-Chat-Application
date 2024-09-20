@@ -210,35 +210,22 @@ async def database_operation(websocket: WebSocket, details: dict):
             if response.status_code >= 400 :
                 error_message = response.text
                 print(f"Error: {error_message}")
-                error_message = json.loads(error_message)
-                await websocket.send_text(error_message['detail'])
-                return "Error","Detail"
+                response_data = error_message
+                return response_data,payload
             
             response_data = response.json()
             print(response_data)
-            if method == 'GET':
+            
+            if method == 'GET':                      #"Table","Return"
                 html_table = generate_html_table(response_data)
                 await websocket.send_text(f"{html_table}")
-                return "Error","Detail"
-            else:
-                
+                return "Table","Return"
+            else:                                    #result and payload, result and not payload
                 return response_data,payload
-
-    except httpx.HTTPStatusError as e:
-        error_message = e.response.text
-        error_message = json.loads(error_message)
-        await websocket.send_text(error_message['detail'])
-        return "Error","Detail"
-
-    except httpx.RequestError as e:
-        error_message = f"Request error occurred: {str(e)}"
-        await websocket.send_text(error_message)
-        return "Backend","Error"
 
     except Exception as e:
         error_message = f"An unexpected error occurred: {str(e)}"
         await websocket.send_text(error_message)
-        return "Backend","Error"
 
 
 

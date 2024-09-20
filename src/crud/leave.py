@@ -539,7 +539,7 @@ def leave_calender(db: Session):
             detail="Error saving leave calendar data"
         )
     
-    return {"message": "Leave calendar created successfully"}
+    return {"detail": "Leave calendar created successfully"}
 
 def get_calender(db:Session, employee_id:int):
     data=db.query(LeaveCalendar).filter(LeaveCalendar.employee_id == employee_id).first()
