@@ -105,8 +105,7 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str,ap
             user_input_data = json.loads(user_input)
             query = user_input_data.get("message")
             return await get_project_details(websocket, query, jsonfile,apikey,model)
-        #return query, project_name
-        await websocket.send_text("Error: Failed to process the response on get project detail.")
+        return query, project_name
 
     except Exception as e:
         print(f"Error while processing the response: {e}")
