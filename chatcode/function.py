@@ -105,7 +105,8 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str,ap
             user_input_data = json.loads(user_input)
             query = user_input_data.get("message")
             return await get_project_details(websocket, query, jsonfile,apikey,model)
-        return query, project_name
+        #return query, project_name
+        await websocket.send_text("Error: Failed to process the response on get project detail.")
 
     except Exception as e:
         print(f"Error while processing the response: {e}")
@@ -197,6 +198,7 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
             response_config = result.get('payload', {})
             verified_payload = verify_values_from_query(query, response_config, payload_details)
             return verified_payload
+        
         
         except json.JSONDecodeError:
             logger.error("Error: Failed to decode JSON from the response on fill_payload_values.")

@@ -280,7 +280,7 @@ async def websocket_endpoint(websocket: WebSocket):
             except Exception as e:
                 print('Chat error')
                 await websocket.send_text(f"An error occurred: {str(e)}")
-                await asyncio.sleep(5)
+                await asyncio.sleep(2)
                 await websocket.send_text("navigateerror")
                 break
 

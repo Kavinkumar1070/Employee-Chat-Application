@@ -9,7 +9,77 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
  
 </head>
+<style>
+    #custom-alert {
+    margin-top:300px;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white; /* Red */
+    color: black;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(5px); /* Blur effect */
+    z-index:999;
+    min-width: 300px; /* Minimum width */
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.alert-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.alert-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+@keyframes slideDown {
+    0% { transform: translateY(-50px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.home-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.home-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+
+</style>
 <body>
+    <div id="custom-alert" class="alert-hidden">
+        <div class="alert-content">
+            <h2>Oops! Something went wrong</h2>
+            <p>Internal server error. Please refresh or try again later.</p>
+            <button class="home-btn" onclick="refreshing()">Try Again</button>
+        </div>
+    
+</div>
+
     <div class="container">
         <div class=main-sidebar>
         <div class="sidebar" id="sidebar">            
@@ -73,7 +143,7 @@
             </div>
        
         </div>
-   
+    
     </div>
  
     <script>
@@ -133,6 +203,28 @@
                 enableInput(); // Enable input even if fetching profile fails
             }
         }
+
+
+        function refreshing() {
+            window.location.href = "../templates/index.html";
+        };
+
+        function showAlert(message) {
+            const alertDiv = document.getElementById('custom-alert');
+            const overlay = document.getElementById('overlay');
+            
+            console.log("Show alert called with message:", message);
+
+            // Set the alert message
+            alertDiv.querySelector('h2').textContent = message; // Change the header or use a paragraph
+            alertDiv.classList.remove('alert-hidden');
+            alertDiv.classList.add('alert-visible');
+            
+            overlay.classList.remove('overlay-hidden');
+            overlay.classList.add('overlay-visible');
+        }
+        
+        
  
         function enableInput() {
             userInput.disabled = false;
@@ -167,14 +259,15 @@
             }
             // If the server sends "Server Error" or "Backend Error", redirect the user
             if (message === "navigateerror") {
-                window.location.href = "../templates/complete.html";  // Update this URL as needed
-            } if (message === "quit") {
-                window.location.href ='/templates/index.html';  // Update this URL as needed
-            }else {
+                showAlert("An error occurred. Please try again.");
+            } else if (message === "quit") {
+                showAlert("You are about to leave this page.");
+            } else {
                 // Handle other types of messages
                 addMessageChat(message, 'bot');
             }
         };
+
         function sendMessage() {
             const message = userInput.value;
             if (message.trim() === "") return;
