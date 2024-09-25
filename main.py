@@ -253,6 +253,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 
                 print('result :',result)
                 print('payload :',payload)
+                print(type(result))
                 
                 if result == "Table" and payload == "Return":
                     # Handle when there is a specific error and detailed payload response
@@ -266,11 +267,21 @@ async def websocket_endpoint(websocket: WebSocket):
                     continue
                 
                 elif result and  not payload:
-                    result = json.loads(result)
-                    # Case when result exists but payload is empty
-                    result =  result['detail']
-                    await websocket.send_text(f"{result}. Glad to help! If you need more assistance, I'm just a message away.")
-                    continue
+                    
+                    if isinstance(result, str):
+                        result = json.loads(result)
+                        # Case when result exists but payload is empty
+                        result =  result['detail']
+                        await websocket.send_text(f"{result}. Glad to help! If you need more assistance, I'm just a message away.")
+                        continue
+                    if 'detail' in result:
+                        # Case when result exists but payload is empty
+                        result =  result['detail']
+                        await websocket.send_text(f"{result}. Glad to help! If you need more assistance, I'm just a message away.")
+                        continue
+                    else:
+                        await websocket.send_text(f"check not payload")
+                        continue
                 
                 else:
                     # Default fallback in case both result and payload are empty
