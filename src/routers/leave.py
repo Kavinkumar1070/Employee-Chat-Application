@@ -55,7 +55,7 @@ async def apply_leave(
         db_leave["leave"],
         db_leave["reason"],
         db_leave["status"],
-        db_leave["other_entires"],
+        db_leave["other_entries"],
     )
     return {"details":f"leave applied successfully for {employee_id} check your mail{db_leave["employee_email"]}"}
 

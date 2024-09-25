@@ -205,6 +205,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 print('Query amd Project name') 
                 print(query)
                 print(project_name)
+                if isinstance(project_name, str) and project_name == "Groq API error":
+                        await websocket.send_text("Error: Failed to process the response from Groq API.")
+                        await asyncio.sleep(3)
+                        await websocket.send_text('navigateerror')
+                        continue
                 print('________________________________________________________________________________________')
                 project_details = get_project_script(project_name, jsonfile)
                 print('________________________________________________________________________________________')
@@ -220,6 +225,12 @@ async def websocket_endpoint(websocket: WebSocket):
                     print('________________________________________________________________________________________')
                     print('Payload Detail is Not Empty')
                     filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile,apikey,model)
+                    # Check if response indicates a Groq API error
+                    if isinstance(filled_cleaned, str) and filled_cleaned == "Groq API error":
+                        await websocket.send_text("Error: Failed to process the response from Groq API.")
+                        await asyncio.sleep(3)
+                        await websocket.send_text('navigateerror')
+                        continue
                 else:
                     print('________________________________________________________________________________________')
                     print('Payload Detail is Empty')
@@ -253,7 +264,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 
                 print('result :',result)
                 print('payload :',payload)
-                print(type(result))
                 
                 if result == "Table" and payload == "Return":
                     # Handle when there is a specific error and detailed payload response
@@ -261,10 +271,16 @@ async def websocket_endpoint(websocket: WebSocket):
                     continue
                 
                 elif result and payload:
+                    if result == 'Internal Server Error':
                     # Case when both result and payload have values
-                    model_output = await nlp_response(websocket, result, payload, apikey, model)
-                    await websocket.send_text(f"{model_output}. Glad to help! If you need more assistance, I'm just a message away.")
-                    continue
+                        await websocket.send_text(f"{result}. Sorry for inconvenience, try after sometime.")
+                        continue
+                    else:
+                    # Case when both result and payload have values
+                        model_output = await nlp_response(websocket, result, payload, apikey, model)
+                        await websocket.send_text(f"{model_output}. Glad to help! If you need more assistance, I'm just a message away.")
+                        continue
+
                 
                 elif result and  not payload:
                     
@@ -288,14 +304,13 @@ async def websocket_endpoint(websocket: WebSocket):
                     await websocket.send_text("Back end server error try again.")
                     await asyncio.sleep(3)
                     continue
+                
 
                                                     
             except Exception as e:
                 print('Chat error')
                 await websocket.send_text(f"An error occurred: {str(e)}")
-                await asyncio.sleep(3)
-                await websocket.send_text("navigateerror")
-                break
+
 
     except WebSocketDisconnect:
         logger.info("WebSocket disconnected")

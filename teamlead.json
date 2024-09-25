@@ -233,13 +233,13 @@
             "new_password": {
                 "description": "new email password",
                 "datatype": "string",
-                "required": false,
+                "required": true,
                 "assigned": "None"
             },
             "confirm_password": {
                 "description": "confirm new email password",
                 "datatype": "string",
-                "required": false,
+                "required": true,
                 "assigned": "None"
             }
             
