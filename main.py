@@ -262,18 +262,20 @@ async def websocket_endpoint(websocket: WebSocket):
                 elif result and payload:
                     # Case when both result and payload have values
                     model_output = await nlp_response(websocket, result, payload, apikey, model)
-                    await websocket.send_text(f"{model_output} Glad to help! If you need more assistance, I'm just a message away.")
+                    await websocket.send_text(f"{model_output}. Glad to help! If you need more assistance, I'm just a message away.")
                     continue
                 
-                elif result and not payload:
+                elif result and  not payload:
+                    result = json.loads(result)
                     # Case when result exists but payload is empty
                     result =  result['detail']
-                    await websocket.send_text(f"{result} Glad to help! If you need more assistance, I'm just a message away.")
+                    await websocket.send_text(f"{result}. Glad to help! If you need more assistance, I'm just a message away.")
                     continue
                 
                 else:
                     # Default fallback in case both result and payload are empty
                     await websocket.send_text("Back end server error try again.")
+                    await asyncio.sleep(3)
                     continue
 
                                                     
