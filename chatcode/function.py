@@ -4,13 +4,11 @@ import logging
 from typing import Any, Dict
 from datetime import datetime
 from fastapi import WebSocket
-import groq
 from groq import Groq
 from fastapi import WebSocket
 import os 
 from dotenv import load_dotenv
 import groq
-
 
 # Setup logging
 logger = logging.getLogger(__name__)

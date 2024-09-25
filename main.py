@@ -266,17 +266,14 @@ async def websocket_endpoint(websocket: WebSocket):
                 print('payload :',payload)
                 
                 if result == "Table" and payload == "Return":
-                    # Handle when there is a specific error and detailed payload response
                     await websocket.send_text("Glad to help! If you need more assistance, I'm just a message away.")
                     continue
                 
                 elif result and payload:
                     if result == 'Internal Server Error':
-                    # Case when both result and payload have values
                         await websocket.send_text(f"{result}. Sorry for inconvenience, try after sometime.")
                         continue
                     else:
-                    # Case when both result and payload have values
                         model_output = await nlp_response(websocket, result, payload, apikey, model)
                         await websocket.send_text(f"{model_output}. Glad to help! If you need more assistance, I'm just a message away.")
                         continue
@@ -286,12 +283,10 @@ async def websocket_endpoint(websocket: WebSocket):
                     
                     if isinstance(result, str):
                         result = json.loads(result)
-                        # Case when result exists but payload is empty
                         result =  result['detail']
                         await websocket.send_text(f"{result}. Glad to help! If you need more assistance, I'm just a message away.")
                         continue
                     if 'detail' in result:
-                        # Case when result exists but payload is empty
                         result =  result['detail']
                         await websocket.send_text(f"{result}. Glad to help! If you need more assistance, I'm just a message away.")
                         continue
@@ -300,7 +295,6 @@ async def websocket_endpoint(websocket: WebSocket):
                         continue
                 
                 else:
-                    # Default fallback in case both result and payload are empty
                     await websocket.send_text("Back end server error try again.")
                     await asyncio.sleep(3)
                     continue
