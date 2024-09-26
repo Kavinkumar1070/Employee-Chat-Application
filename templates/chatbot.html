@@ -344,6 +344,16 @@ body.blur-active .container {
                 // Display the initial bot message
                 addMessageWithChoices(promptMessage[0].trim(), choices); 
             }
+            else if(message.includes('Fields')){
+                console.log(message)
+                const field =message.split("Fields:")
+                console.log(field)
+                const fieldList=field[1]
+                const data=field[0]
+                addMessageUpdateChoices(data,fieldList)
+
+
+            }
             else if (message === "navigateerror") {
                 showAlert("An error occurred. Please try again.");
             }
@@ -356,6 +366,102 @@ body.blur-active .container {
                 addMessageChat(message, 'bot');
             }
         };
+        
+        function addMessageUpdateChoices(message, choices) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', 'bot');
+            messageDiv.textContent = message;
+        
+            // Create a container for the choice buttons
+            const choicesContainer = document.createElement('div');
+            choicesContainer.classList.add('choices-container');
+            choicesContainer.innerHTML = '';
+        
+            // Split choices into an array and create buttons
+            const choicesArray = choices.split(','); // Assuming choices are comma-separated
+            console.log("cjhsd",choicesArray)
+            choicesArray.forEach((choice) => {
+                const choiceButton = document.createElement('button'); // Create a button for each choice
+                choiceButton.textContent = choice.trim(); // Set the button text
+                choiceButton.classList.add('choice-btn'); // Add a class for styling
+                choiceButton.setAttribute('data-value', choice.trim()); // Set a data attribute for the button's value
+                
+                if (choice.trim() === "All") {
+                    choiceButton.addEventListener('click', () => {
+                        // Send the text "All" when the button is clicked
+                        sendMessageRadio("All");
+                        userInput.value = ''; 
+        
+                        // Enable input after choice selection
+                        userInput.disabled = false;
+                        sendButton.disabled = false;
+
+                    });
+                } else {
+                    choiceButton.addEventListener('click', () => {
+                        handleMultiChoiceSelection(choice.trim());
+                    });
+                }
+        
+                choicesContainer.appendChild(choiceButton); // Append the button to the container
+            });
+        
+            // Append the choices container inside the bot message
+            messageDiv.appendChild(choicesContainer);
+        
+            // Add the bot message with choices to the chat box
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom after adding choices
+        
+            // Disable input until a choice is selected
+            userInput.disabled = true;
+            sendButton.disabled = true;
+        }
+        
+        // Function to handle the user's choice selection
+        let selectedChoices = [];
+        console.log(selectedChoices)
+        function handleMultiChoiceSelection(choice) {
+            // Check if the choice is already in the array
+            const index = selectedChoices.indexOf(choice);
+        
+            if (index === -1) {
+                // If the choice is not in the array, add it
+                selectedChoices.push(choice);
+            } else {
+                // If the choice is already in the array, remove it
+                selectedChoices.splice(index, 1);
+            }
+        
+            // Update the input box to show the selected choices
+            userInput.value = selectedChoices.join(', ');
+        
+            // Enable the input and send button for additional typing or sending
+            userInput.disabled = false;
+            sendButton.disabled = false;
+        }
+        
+        function sendMessageRadio(message = null) {
+            // Use the message from the choice button if provided, otherwise get the input value
+            const userMessage = message || userInput.value.trim();
+            
+            if (userMessage === "") return;  // If the message is empty, don't send
+        
+            if (initialMessage) {
+                initialMessage.style.display = 'none';
+            }
+        
+            // Get the selected API Key and Model
+            const selectedApiKey = document.querySelector('#apikey-dropdown .default').innerText;
+            const selectedModel = document.querySelector('#models-dropdown .default').innerText;
+        
+            addMessageToChat(userMessage, 'user');
+
+        }
+
+
+
+
         function addMessageWithChoices(message, choices) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', 'bot');
@@ -367,6 +473,7 @@ body.blur-active .container {
         
             // Split choices into an array and create buttons
             const choicesArray = choices.split(','); // Assuming choices are comma-separated
+            console.log("cjhsd",choicesArray)
             choicesArray.forEach((choice) => {
                 const choiceButton = document.createElement('button'); // Create a button for each choice
                 choiceButton.textContent = choice.trim(); // Set the button text

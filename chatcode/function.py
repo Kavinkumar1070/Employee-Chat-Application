@@ -333,8 +333,14 @@ async def update_process_with_user_input(websocket: WebSocket, project_details: 
             print('false fields:',available_field) 
             
             if len(available_field)  != 0:     
-                await websocket.send_text("Enter 'All' (or) Choose the field names, 'separated by commas'")
-                await websocket.send_text(f"{available_field} ")
+                
+                
+                choices_list = ",".join(available_field)
+                print(choices_list)
+                choices_list = choices_list + ",All"
+                print(choices_list)
+                message='Select "All" or pick a field from the available choices below'
+                await websocket.send_text(f"{message}.Fields:{choices_list} ")
                 fields_input = await websocket.receive_text()
                 fields_input = json.loads(fields_input)
                 fields_input = fields_input.get('message')  
