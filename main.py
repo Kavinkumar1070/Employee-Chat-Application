@@ -17,6 +17,8 @@ import logging
 import json
 from chatcode.function import *
 from chatcode.api_call import *
+from chatcode.onbapi_call import *
+from chatcode.groq_function import *
 from chatcode.onbfunction import collect_user_input, validate_input,get_jsonfile
 import asyncio
 
@@ -224,7 +226,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 if payload_details != {}:
                     print('________________________________________________________________________________________')
                     print('Payload Detail is Not Empty')
-                    filled_cleaned = await fill_payload_values(websocket, query, payload_details, jsonfile,apikey,model)
+                    filled_cleaned = await fill_payload_values(websocket, query, payload_details, apikey,model)
                     # Check if response indicates a Groq API error
                     if isinstance(filled_cleaned, str) and filled_cleaned == "Groq API error":
                         await websocket.send_text("Error: Failed to process the response from Groq API.")
