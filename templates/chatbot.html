@@ -97,7 +97,54 @@ body.blur-active .container {
     transform: translateY(-5px);
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
 }
+.choices-container {
+    margin-top: 10px;
+}
+.choice-btn {
+    position: relative;
+    overflow: hidden;
+    background-color: #616361;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
 
+.choice-btn:hover {
+    background-color: #5a654b;
+    transform: scale(1.05);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.choice-btn:active::after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 300%;
+    height: 300%;
+    background: rgba(255, 255, 255, 0.2);
+    top: 50%;
+    left: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+}
 </style>
 <body>
     <div id="custom-alert" class="alert-hidden">
@@ -290,8 +337,17 @@ body.blur-active .container {
                     chatBox.innerHTML += `<div class="message-content">${otherContent}</div>`;
                 }
             }
-            // If the server sends "Server Error" or "Backend Error", redirect the user
-            if (message === "navigateerror") {
+            else if (message.includes("Choices are:")) {
+                const promptMessage = message.split("Choices are:");
+                const choices = promptMessage[1].trim();
+                
+                // Display the initial bot message
+                addMessageWithChoices(promptMessage[0].trim(), choices); 
+            }
+            else if (message === "navigateerror") {
+                showAlert("An error occurred. Please try again.");
+            }
+            else if (message === "navigateerror") {
                 showAlert("An error occurred. Please try again.");
             } else if (message === "quit") {
                 showAlert("You are about to leave this page.");
@@ -300,7 +356,88 @@ body.blur-active .container {
                 addMessageChat(message, 'bot');
             }
         };
+        function addMessageWithChoices(message, choices) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', 'bot');
+            messageDiv.textContent = message;
+        
+            // Create a container for the choice buttons
+            const choicesContainer = document.createElement('div');
+            choicesContainer.classList.add('choices-container');
+        
+            // Split choices into an array and create buttons
+            const choicesArray = choices.split(','); // Assuming choices are comma-separated
+            choicesArray.forEach((choice) => {
+                const choiceButton = document.createElement('button'); // Create a button for each choice
+                choiceButton.textContent = choice.trim(); // Set the button text
+                choiceButton.classList.add('choice-btn'); // Add a class for styling
+                choiceButton.setAttribute('data-value', choice.trim()); // Set a data attribute for the button's value
+        
+                // Add click event listener to handle choice selection
+                choiceButton.addEventListener('click', () => {
+                    handleChoiceSelection(choice.trim());
+                });
+        
+                choicesContainer.appendChild(choiceButton); // Append the button to the container
+            });
+        
+            // Append the choices container inside the bot message
+            messageDiv.appendChild(choicesContainer);
+        
+            // Add the bot message with choices to the chat box
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom after adding choices
+        
+            // Disable input until a choice is selected
+            userInput.disabled = true;
+            sendButton.disabled = true;
+        }
+        
+        // Function to handle the user's choice selection
+        function handleChoiceSelection(choice) {
+        
+            // Enable input after choice selection
+            userInput.disabled = false;
+            sendButton.disabled = false;
+            sendMessageRadio(choice);
 
+        }
+        function sendMessageRadio(message = null) {
+            // Use the message from the choice button if provided, otherwise get the input value
+            const userMessage = message || userInput.value.trim();
+            
+            if (userMessage === "") return;  // If the message is empty, don't send
+        
+            if (initialMessage) {
+                initialMessage.style.display = 'none';
+            }
+        
+            // Get the selected API Key and Model
+            const selectedApiKey = document.querySelector('#apikey-dropdown .default').innerText;
+            const selectedModel = document.querySelector('#models-dropdown .default').innerText;
+        
+            addMessageToChat(userMessage, 'user');
+        
+            // Create the payload with the selected API Key and Model
+            const payload = {
+                message: userMessage,
+                employee_id: employeeId,
+                role: role,
+                token: token,
+                apikey: selectedApiKey,  // Add the API Key to the payload
+                model: selectedModel      // Add the Model to the payload
+            };
+            console.log('payload', payload);
+        
+            // Send the payload via WebSocket
+            websocket.send(JSON.stringify(payload));
+        
+            // Clear the input field only if the message came from the input box
+            if (!message) {
+                userInput.value = "";
+            }
+        }
+        
         function sendMessage() {
             const message = userInput.value;
             if (message.trim() === "") return;

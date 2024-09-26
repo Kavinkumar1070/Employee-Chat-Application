@@ -417,17 +417,27 @@ async def ask_user(websocket: WebSocket, pro, pay):
     for key, value in abc.items():
         if value is None or value == "None":
             des = pro['payload'][key]['description']
-            await websocket.send_text(f"Please provide {des}")
+            data_type = pro['payload'][key]['datatype']
+
+            if data_type == "choices":
+                choices = pro['payload'][key]['choices']
+                choices_list = ",".join(choices)
+                await websocket.send_text(f"Please provide  {des}. Choices are: {choices_list}")
+            else:
+                await websocket.send_text(f"Please provide {des}")
+
             user_input = await websocket.receive_text()
             user_input_data = json.loads(user_input)
             cleanstr = user_input_data.get("message")
             abc[key] = normalize_string(cleanstr)
             valid = validate(pro, abc)
+
             if valid['payload'][key] is None:
                 return await ask_user(websocket, pro, valid)
             else:
                 pay['payload'][key] = abc[key]
     return pay
+
 
 
 async def nlp_response(websocket: WebSocket,answer, payload,apikey,model): 

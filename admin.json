@@ -451,14 +451,14 @@
         "method": "POST",
         "payload": {
             "leave_type": {
-                "description": "Type of leave  ['sick','personal','vacation','unpaid']",
+                "description": "Type of leave ",
                 "datatype": "choices",
                 "required": true,
                 "choices":["sick","personal","vacation","unpaid"],
                 "assigned": "None"
             },
             "duration": {
-                "description": "Duration of the leave ['oneday', 'halfday']",
+                "description": "Duration of the leave ",
                 "datatype": "choices",
                 "choices": ["oneday", "halfday"],
                 "required": true,
