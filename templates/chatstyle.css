@@ -173,6 +173,7 @@ body {
     color: #181C14;
     border-radius: 15px 15px 15px 0;
     width:auto;
+    text-align: left;
 }
 
 .input-box {

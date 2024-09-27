@@ -94,8 +94,8 @@ h1 {
   color: rgba(8, 8, 8, 0.6);
 }
 ::placeholder {
-  color: rgb(26, 25, 25);
-  position:relative;
+  color: 
+  rgb(26, 25, 25);
   font-size: 15px;
   font-weight:bold;
   padding:15px;
@@ -106,6 +106,7 @@ h1 {
 .login-box .input-box input:valid ~ label {
   top: -30px;
   left: 0;
+  margin-bottom:10px;
   color: #007bff;
   font-size: 15px;
 }

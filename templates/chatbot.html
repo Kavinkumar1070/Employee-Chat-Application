@@ -145,6 +145,11 @@ body.blur-active .container {
         opacity: 0;
     }
 }
+.choice-btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 </style>
 <body>
     <div id="custom-alert" class="alert-hidden">
@@ -395,11 +400,34 @@ body.blur-active .container {
                         // Enable input after choice selection
                         userInput.disabled = false;
                         sendButton.disabled = false;
+                        disableChoicesContainer(choicesContainer);
 
                     });
                 } else {
                     choiceButton.addEventListener('click', () => {
                         handleMultiChoiceSelection(choice.trim());
+        
+                        const handleEnterOrSend = (event) => {
+                            if (event.key === 'Enter' || event.type === 'click') {
+                                sendMessageRadio(userInput.value); // Send the selected choices in the input field
+                                userInput.value = ''; // Clear input after sending
+        
+                                // Disable the buttons and prevent further interaction
+                                disableChoicesContainer(choicesContainer);
+        
+                                // Remove the event listeners to avoid multiple triggers
+                                userInput.removeEventListener('keydown', handleEnterOrSend);
+                                sendButton.removeEventListener('click', handleEnterOrSend);
+                            }
+                        };
+        
+                        // Remove previous listeners to prevent duplication
+                        userInput.removeEventListener('keydown', handleEnterOrSend);
+                        sendButton.removeEventListener('click', handleEnterOrSend);
+        
+                        // Attach event listeners for both Enter and Send button click
+                        userInput.addEventListener('keydown', handleEnterOrSend);
+                        sendButton.addEventListener('click', handleEnterOrSend);
                     });
                 }
         
@@ -440,28 +468,6 @@ body.blur-active .container {
             userInput.disabled = false;
             sendButton.disabled = false;
         }
-        
-        function sendMessageRadio(message = null) {
-            // Use the message from the choice button if provided, otherwise get the input value
-            const userMessage = message || userInput.value.trim();
-            
-            if (userMessage === "") return;  // If the message is empty, don't send
-        
-            if (initialMessage) {
-                initialMessage.style.display = 'none';
-            }
-        
-            // Get the selected API Key and Model
-            const selectedApiKey = document.querySelector('#apikey-dropdown .default').innerText;
-            const selectedModel = document.querySelector('#models-dropdown .default').innerText;
-        
-            addMessageToChat(userMessage, 'user');
-
-        }
-
-
-
-
         function addMessageWithChoices(message, choices) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', 'bot');
@@ -483,6 +489,8 @@ body.blur-active .container {
                 // Add click event listener to handle choice selection
                 choiceButton.addEventListener('click', () => {
                     handleChoiceSelection(choice.trim());
+
+                    disableChoicesContainer(choicesContainer);
                 });
         
                 choicesContainer.appendChild(choiceButton); // Append the button to the container
@@ -508,6 +516,7 @@ body.blur-active .container {
             sendButton.disabled = false;
             sendMessageRadio(choice);
 
+
         }
         function sendMessageRadio(message = null) {
             // Use the message from the choice button if provided, otherwise get the input value
@@ -518,6 +527,11 @@ body.blur-active .container {
             if (initialMessage) {
                 initialMessage.style.display = 'none';
             }
+            const lastChoicesContainer = document.querySelector('.choices-container:last-child');
+            if (lastChoicesContainer) {
+                disableOtherChoices(lastChoicesContainer);  // Disable previous buttons
+            }
+
         
             // Get the selected API Key and Model
             const selectedApiKey = document.querySelector('#apikey-dropdown .default').innerText;
@@ -544,6 +558,21 @@ body.blur-active .container {
                 userInput.value = "";
             }
         }
+        function disableChoicesContainer(container) {
+            const buttons = container.querySelectorAll('.choice-btn');
+            buttons.forEach(button => {
+                button.disabled = true; // Disable each button
+                button.classList.add('disabled'); // Optionally, add a disabled class for styling
+            });
+        }
+        function disableOtherChoices(container) {
+            const buttons = container.querySelectorAll('.choice-btn');
+            buttons.forEach(button => {
+                button.disabled = true;  // Disable all buttons in the container
+                button.classList.add('disabled');  // Add a CSS class to visually indicate disabled state
+            });
+        }
+        
         
         function sendMessage() {
             const message = userInput.value;
