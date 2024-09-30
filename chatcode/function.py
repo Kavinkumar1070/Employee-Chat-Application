@@ -429,6 +429,10 @@ async def ask_user(websocket: WebSocket, pro, pay):
                 choices = pro['payload'][key]['choices']
                 choices_list = ",".join(choices)
                 await websocket.send_text(f"Please provide  {des}. Choices are: {choices_list}")
+            elif data_type == "integer":
+                await websocket.send_text(f"Please provide  {des}. datatype:{data_type} ")
+            elif data_type == "date":
+                await websocket.send_text(f"Please provide  {des}. datatype:{data_type} ")
             else:
                 await websocket.send_text(f"Please provide {des}")
 
