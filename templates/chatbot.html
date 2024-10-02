@@ -169,6 +169,50 @@
         opacity: 0.6;
         cursor: not-allowed;
     }
+
+    input[type="date"] {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #e5e5ea;
+        border-radius: 20px;
+        background-color: #EEEEEE;
+        color: #3C3D37;
+        outline: none;
+        font-size: 18px;
+        margin-right: 10px;
+        appearance: none; /* Remove default styling in some browsers */
+    }
+    
+    input[type="date"]::-webkit-calendar-picker-indicator {
+         /* Optional: Change background for the date picker */
+        border: none; /* Optional: Remove border */
+        color: #32332e; /* Optional: Change color of the indicator */
+    }
+    
+    /* Additional styling to remove the default arrow in Firefox */
+    input[type="date"]::-moz-inner-spin-button {
+        display: none;
+    }
+    input[type="number"] {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #e5e5ea;
+        border-radius: 20px;
+        background-color: #EEEEEE;
+        color: #3C3D37;
+        outline: none;
+        font-size: 18px;
+        margin-right: 10px;
+        appearance: none; /* Remove default styling in some browsers */
+    }
+    
+    /* Optional: Style for the spinner buttons in Chrome */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none; /* Remove default spinner */
+        margin: 0; /* Reset margin */
+    }
+    
 </style>
 
 <body>
@@ -391,7 +435,6 @@
                 console.log(message)
                 const type = message.split("datatype:")
                 console.log(type)
-
                 const datatypeMessage = message
                 handleDatatypeInput(type[0], type[1]); // New function to handle input restriction
             } else {
@@ -399,25 +442,19 @@
                 addMessageChat(message, 'bot');
             }
         };
-        function handleDatatypeInput(Message, type) {
-            const datatype = type; // Assume the message contains the datatype
-            const description = Message; // Assume description exists in the message
+        function handleDatatypeInput(message, type) {
+            const datatype = type.trim(); // Get the datatype
+            const description = message; // Message description
             console.log("datatype", datatype);
             console.log("description", description);
-
+        
             // Display the prompt message
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', 'bot');
             messageDiv.textContent = description;
             chatBox.appendChild(messageDiv);
-
-            // Clear existing input restrictions
-            userInput.setAttribute('type', 'text');
-            userInput.removeAttribute('pattern');
-            userInput.removeAttribute('inputmode');
-            userInput.style.borderColor = ''; // Reset border color
-            sendButton.disabled = true; // Initially disable the send button
-
+        
+        
             // Set input restrictions based on the datatype
             if (datatype === 'integer') {
                 userInput.setAttribute('type', 'number');
@@ -425,47 +462,103 @@
                 userInput.setAttribute('pattern', '[0-9]*');
             } else if (datatype === 'date') {
                 userInput.setAttribute('type', 'date');
-                console.log("sdasfdasdasd")
-            } else if (datatype === 'regex') {
-                userInput.setAttribute('pattern', datatypeMessage.regex); // Set regex pattern if provided
-            } else {
-                userInput.setAttribute('type', 'text'); // Default case for string and other types
+            } else if (datatype === 'mobile') {
+                userInput.setAttribute('type', 'number'); // Keep as text for mobile validation
             }
-
-            // Event listener for input validation
-            userInput.addEventListener('input', function () {
+        
+            // Input validation function
+            console.log("1")
+            const validateInput = function () {
                 let isValid = true;
-
+                console.log("2")
                 // Check if the input matches the expected data type
-                if (datatype === 'integer') {
-                    isValid = /^\d+$/.test(userInput.value); // Valid if it's a whole number (integer)
+                if (datatype === 'mobile') {
+                    console.log("3")
+                    isValid = /^\d{10}$/.test(userInput.value); // Validate for exactly 10 digits
+                    userInput.style.borderColor = isValid ? 'green' : 'red'; // Set border color based on validity
+                } else if (datatype === 'integer') {
+                    console.log("4")
+                    isValid = /^-?\d+$/.test(userInput.value.trim()); // Validate if the input is a valid integer
+                    userInput.style.borderColor = isValid ? 'green' : 'red'; // Set border color based on validity
                 } else if (datatype === 'date') {
-                    isValid = !!userInput.valueAsDate; // Valid if it's a valid date
-                } else if (datatype === 'regex') {
-                    isValid = new RegExp(datatypeMessage.regex).test(userInput.value); // Valid if it matches the regex pattern
+                    console.log("5");
+                
+                    // Check if the input has a valid date selected
+                    if (userInput.valueAsDate) {
+                        const dateValue = userInput.valueAsDate; // Get the date object from the input
+                        const day = String(dateValue.getDate()).padStart(2, '0'); // Get the day, padded to 2 digits
+                        const month = String(dateValue.getMonth() + 1).padStart(2, '0'); // Get the month (0-indexed), padded to 2 digits
+                        const year = dateValue.getFullYear(); // Get the year
+                
+                        // Reformat the date to dd/mm/yyyy
+                        const formattedDate = `${day}/${month}/${year}`;
+                        console.log("Formatted date:", formattedDate);
+                
+                        // Optionally display the formatted date somewhere or process it
+                        isValid = true; // The date is valid
+                        userInput.style.borderColor = 'green'; // Set border color to green to indicate valid input
+                    }else {
+                        userInput.style.borderColor = 'red'; // Set border color to red if no valid date is selected
+                        isValid = false;
+                    }
+                }else {
+                    console.log("6")
+                    // Reset to default border color for unsupported datatypes
+                    userInput.style.borderColor = '';
                 }
-
-                // Update input field color based on validity
-                if (!isValid) {
-                    userInput.style.borderColor = 'red'; // Red border for invalid input
-                    sendButton.disabled = true; // Disable send button
-                } else {
-                    userInput.style.borderColor = 'green'; // Green border for valid input
-                    sendButton.disabled = false; // Enable send button
-                }
-            });
-
+        
+                // Enable or disable the send button based on validity
+                sendButton.disabled = !isValid; // Disable button if input is invalid
+            };
+            console.log("7")
+            // Add the input event listener
+            userInput.addEventListener('input', validateInput);
+            console.log("8")
             // Prevent form submission with "Enter" key if the input is invalid
             userInput.addEventListener('keypress', function (event) {
                 if (event.key === 'Enter' && sendButton.disabled) {
                     event.preventDefault(); // Prevent form submission
                 }
             });
-
-            userInput.disabled = false; // Enable input after setting restrictions
-            sendButton.disabled = true; // Initially disable send button
+            console.log("9")
+            // Function to clean up after message is sent
+            const cleanup = function () {
+                console.log("10")
+                // Remove the input listener
+                userInput.removeEventListener('input', validateInput);
+                console.log("11")
+                // Reset input type and attributes
+                userInput.setAttribute('type', 'text'); // Reset to default type
+                userInput.removeAttribute('pattern');
+                userInput.removeAttribute('inputmode');
+                userInput.style.borderColor = ''; // Reset border color
+                sendButton.disabled = true; // Disable send button again
+            };
+            console.log("12")
+        
+            // Assuming you have a send button logic
+            sendButton.onclick = function () {
+                userInput.removeEventListener('input', validateInput);
+                console.log("111")
+                // Reset input type and attributes
+                userInput.setAttribute('type', 'text'); // Reset to default type
+                userInput.removeAttribute('pattern');
+                userInput.removeAttribute('inputmode');
+                userInput.style.borderColor = ''; // Reset border color
+                sendButton.disabled = true; 
+                console.log("Message sent:", userInput.value);
+                sendMessage()
+                cleanup(); // Clean up after sending the message
+            };
+            console.log("end")
         }
-
+        userInput.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') { // Check if the pressed key is Enter
+                event.preventDefault(); // Prevent the default action (like form submission)
+                sendButton.onclick(); // Trigger the send button click function
+            }
+        });
+        
 
         function addMessageUpdateChoices(message, choices) {
             const messageDiv = document.createElement('div');
@@ -670,7 +763,18 @@
 
 
         function sendMessage() {
-            const message = userInput.value;
+            let message;
+            if (userInput.valueAsDate) {
+                const dateValue = userInput.valueAsDate; // Get the date object from the input
+                const day = String(dateValue.getDate()).padStart(2, '0'); // Get the day, padded to 2 digits
+                const month = String(dateValue.getMonth() + 1).padStart(2, '0'); // Get the month (0-indexed), padded to 2 digits
+                const year = dateValue.getFullYear(); // Get the year
+        
+                // Reformat the date to dd/mm/yyyy
+                 message = `${day}/${month}/${year}`;
+            }else{
+                 message = userInput.value;
+            }
             if (message.trim() === "") return;
 
             if (initialMessage) {

@@ -107,10 +107,10 @@ async def get_project_details(websocket: WebSocket, query: str, jsonfile: str,ap
         return query, project_name
         
     
-    except client.exceptions.GroqAPIError as groq_error:
-        print(f"Groq API error: {groq_error}")
-        await websocket.send_text("Error: Failed to process the response from Groq API.")
-        return  "query","Groq API error"
+    # except client.exceptions.GroqAPIError as groq_error:
+    #     print(f"Groq API error: {groq_error}")
+    #     await websocket.send_text("Error: Failed to process the response from Groq API.")
+    #     return  "query","Groq API error"
     
     except Exception as e:
         print(f"Error while processing the response: {e}")
@@ -207,10 +207,10 @@ async def fill_payload_values(websocket: WebSocket, query: str, payload_details:
             logger.error("Error: Failed to decode JSON from the response on fill_payload_values.")
             await websocket.send_text("Error: Failed to decode JSON from the response on fill_payload_values.")
             
-    except client.exceptions.GroqAPIError as groq_error:
-        print(f"Groq API error: {groq_error}")
-        await websocket.send_text("Error: Failed to process the response from Groq API.")
-        return "Groq API error"
+    # except client.exceptions.GroqAPIError as groq_error:
+    #     print(f"Groq API error: {groq_error}")
+    #     await websocket.send_text("Error: Failed to process the response from Groq API.")
+    #     return "Groq API error"
     
     except Exception as e:
         logger.error(f"Error while processing the response on fill_payload_values: {e}")
@@ -250,10 +250,10 @@ def validate(payload_detail, response_config):
                 formats = values.get('formats', [])
                 if not formats:
                     formats = [
-            '%Y-%m-%d',       # 2024-09-13
-            '%Y/%m/%d',       # 2024/09/13           
-            '%Y.%m.%d',       # 2024.09.13
-            '%Y %b %d',       # 2024 Sep 13]
+            '%d-%m-%Y',       # 2024-09-13
+            '%d/%m/%Y',       # 2024/09/13           
+            '%d.%m.%Y',       # 2024.09.13
+            '%d %b %Y',       # 2024 Sep 13]
                     ]   
                 value = value.strip()
                 valid_date = False
@@ -431,6 +431,8 @@ async def ask_user(websocket: WebSocket, pro, pay):
                 await websocket.send_text(f"Please provide  {des}. Choices are: {choices_list}")
             elif data_type == "integer":
                 await websocket.send_text(f"Please provide  {des}. datatype:{data_type} ")
+            elif data_type == "mobile":
+                await websocket.send_text(f"Please provide  {des}. datatype:{data_type} ")
             elif data_type == "date":
                 await websocket.send_text(f"Please provide  {des}. datatype:{data_type} ")
             else:
@@ -447,7 +449,6 @@ async def ask_user(websocket: WebSocket, pro, pay):
             else:
                 pay['payload'][key] = abc[key]
     return pay
-
 
 
 async def nlp_response(websocket: WebSocket,answer, payload,apikey,model): 
@@ -475,10 +476,10 @@ async def nlp_response(websocket: WebSocket,answer, payload,apikey,model):
         response_text = response.choices[0].message.content.strip()
         return response_text
     
-    except client.exceptions.GroqAPIError as groq_error:
-        print(f"Groq API error: {groq_error}")
-        await websocket.send_text("Error: Failed to process the response from Groq API.")
-        return "Groq API error"
+    # except client.exceptions.GroqAPIError as groq_error:
+    #     print(f"Groq API error: {groq_error}")
+    #     await websocket.send_text("Error: Failed to process the response from Groq API.")
+    #     return "Groq API error"
         
     except Exception as e:
         logging.error(f"Error during API call: {e}")

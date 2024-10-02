@@ -18,9 +18,9 @@
                 "assigned": "None"
             },
             "dateofbirth": {
-                "description": "Date of birth of the employee in year month day format Ex:YYYY-MM-DD",
+                "description": "Date of birth of the employee in year month day format Ex:DD-MM-YYYY",
                 "datatype": "date",
-                "format": "%Y-%m-%d",
+                "format": "%d-%m-%Y",
                 "required": true,
                 "assigned": "None"
             },
@@ -106,9 +106,9 @@
                 "assigned": "None"
             },
             "dateofbirth": {
-                "description": "Date of birth of the employee in YYYY-MM-DD format",
+                "description": "Date of birth of the employee in DD-MM-YYYY format",
                 "datatype": "date",
-                "format": "%Y-%m-%d",
+                "format": "%d-%m-%Y",
                 "required": false,
                 "assigned": "None"
             },
@@ -209,9 +209,9 @@
                 "assigned": "None"
             },
             "start_date": {
-                "description": "Start date of the employee in YYYY-MM-DD format",
+                "description": "Start date of the employee in DD-MM-YYYY format",
                 "datatype": "date",
-                "format": "%Y-%m-%d",
+                "format": "%d-%m-%Y",
                 "required": false,
                 "assigned": "None"
             },
@@ -465,9 +465,9 @@
                 "assigned": "None"
             },
             "start_date": {
-                "description": "Start date of the leave in YYYY-MM-DD format",
+                "description": "Start date of the leave in DD-MM-YYYY format",
                 "datatype": "date",
-                "format": "%Y-%m-%d",
+                "format": "%d-%m-%Y",
                 "required": true,
                 "assigned": "None"
             },
