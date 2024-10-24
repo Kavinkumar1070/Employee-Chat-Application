@@ -14,7 +14,7 @@ class RoleCreate(BaseModel):
 
 class UpdateRole(BaseModel):
     role_id: int
-    new_name: str
+    new_name: Optional[str] = None
     sick_leave: Optional[int] = None
     personal_leave: Optional[int] = None
     vacation_leave: Optional[int] = None
@@ -31,6 +31,10 @@ class RoleFunctionCreate(BaseModel):
     jsonfile: str
 
 
-class RoleFunctionUpdate(BaseModel):
-    function: str | None = None
-    jsonfile: str | None = None
+
+
+
+class UpateRoleFunction(BaseModel):
+    function_id: int
+    function: Optional[str]=None
+    jsonfile: Optional[str]=None

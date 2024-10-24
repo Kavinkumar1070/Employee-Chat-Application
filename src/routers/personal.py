@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException,Path
+from fastapi import APIRouter, Depends, HTTPException,Path,status
 from sqlalchemy.orm import Session
 from src.core.database import SessionLocal
 from src.models.personal import EmployeeOnboarding
@@ -14,7 +14,7 @@ from src.core.authentication import roles_required
 from datetime import datetime,date
 
 router = APIRouter(
-    prefix="/personal", tags=["Personal"], responses={400: {"message": "Not found"}}
+    prefix="/personal", tags=["Personal"], responses={400: {"detail": "Not found"}}
 )
 
 
@@ -37,7 +37,7 @@ def convert_date_format(date_input):
         return date_obj.strftime("%Y-%m-%d")
     except ValueError:
         raise HTTPException(
-            status_code=400, detail="Incorrect date format. Use YYYY-MM-DD."
+            status_code=status.HTTP_404_NOT_FOUND, detail="Incorrect date format. Use YYYY-MM-DD."
         )
 
 
@@ -82,11 +82,12 @@ async def read_employee_route(
     if employee_role.name == "employee":
         db_employee = get_employee(db,current_employee_id)
         return db_employee
+    
     if employee_role.name == "teamlead":
             db_employee = get_employee(db,current_employee_id)
             return db_employee
     else:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee '{current_employee_id}' is  not found")
 
 @router.put(
     "/employees",
@@ -104,9 +105,9 @@ async def update_employee_data(
     if employee_role in ["employee", "teamlead"]:
         updated_employee = update_employee(db, employee_id_c, employee_update)
     else:
-        raise HTTPException(status_code=403, detail="Unauthorized role")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorized Role to Access this Route")
     if updated_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee '{employee_id_c}' is not found")
     
     return updated_employee
 

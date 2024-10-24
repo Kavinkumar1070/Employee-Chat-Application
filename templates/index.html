@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <!-- FontAwesome for icons -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/templates/loginstyle.css" />
+</head>
+<body>
+
+<section>
+  <div class="login-box">
+    <img src="/templates/user.png" class="avatar" alt="Avatar">
+    <form>
+      <div class="input-box">
+        <i class="fa fa-envelope icon"></i> <!-- Icon -->
+        <input type="email" id="email" placeholder="Enter your Registered Email" required>
+      </div>
+      <div class="input-box">
+        <i class="fa fa-lock icon"></i> <!-- Icon -->
+        <input type="password" id="password" placeholder="Enter your Password" required>
+      </div>
+      <button type="button" onclick="login()">Login</button>
+      <p style="text-align:center;"> 
+        Don't have an account? 
+        <b onclick="register()" style="color:#000000; cursor: pointer;" id="registerText">Register now</b>
+      </p>
+    </form>
+    <div id="message"></div>
+  </div>
+</section>
+<script src="/static/js/main.js"></script>
+<script>
+  async function login() {
+    const username = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+      document.getElementById('message').innerText = 'Please enter both email and password.';
+      return;
+    }
+
+    try {
+      const response = await fetch('/auth/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          username: username,
+          password: password
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Incorrect email or password`);
+      }
+
+      const data = await response.json();
+      const token = data.access_token;
+
+
+      localStorage.setItem('token', token);
+
+      window.location.href = "/templates/chatbot.html";
+
+    } catch (error) {
+      document.getElementById('message').innerText = error.message;
+    }
+  }
+
+  function register() {
+    window.location.href = "/templates/onboard.html";
+  }
+</script>
+
+
+</body>
+</html>

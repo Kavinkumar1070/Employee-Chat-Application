@@ -11,10 +11,11 @@ from src.schemas.role import (
     UpdateRole,
     RoleCreate,
     EmployeeRole,
+    UpateRoleFunction
 )
 
 router = APIRouter(
-    prefix="/admin/roles", tags=["admin/role"], responses={400: {"message": "Not found"}}
+    prefix="/admin/roles", tags=["admin/role"], responses={400: {"detail": "Not found"}}
 )
 
 
@@ -22,8 +23,8 @@ router = APIRouter(
 async def create_role(name: RoleCreate, db: Session = Depends(get_db)):
     name.name = normalize_string(name.name)
     if create(db, name):
-        return f"{name} Role Created Successfully"
-    return {"message": f"{name} Role is Already Exists"}
+        return f"'{name}' Role and its leaves are Created Successfully"
+    return {"detail": f"'{name}' Role is Already Exists"}
 
 
 @router.delete("/{role_id}", dependencies=[Depends(roles_required("admin"))])
@@ -31,7 +32,7 @@ async def delete_role(role_id: int, db: Session = Depends(get_db)):
     role = get_single(db, role_id)
     if not role:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Role not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Role id: '{role_id}' is not found"
         )
     return delete(db, role.id)
 
@@ -41,16 +42,20 @@ async def update_role(request: UpdateRole, db: Session = Depends(get_db)):
     exists_role = get_single(db, request.role_id)
     if exists_role:
         update(db,request)
-        raise HTTPException(status_code=status.HTTP_200_OK, detail="Role updated")
+        raise HTTPException(status_code=status.HTTP_200_OK, detail=f"Role id :'{request.role_id}' updated Successfully")
     else:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Role not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Role id: '{request.role_id}' is not found"
         )
 
 
 @router.get("/", dependencies=[Depends(roles_required("admin"))])
 async def get_roles( db: Session = Depends(get_db)):
     role = get(db)
+    if not role:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"No Roles Created, please create new Roles"
+        )
     return role
 
 
@@ -73,14 +78,30 @@ def create_new_role_function(
 def read_role_functions(role_id: int, db: Session = Depends(get_db),current_employee=Depends(get_current_employee)):
     employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
-    print(employee_id)
     if employee_role.name == "admin":
-        return get_role_functions(db, role_id)
+        data = get_role_functions(db, role_id)
+        print('*******************')
+        if not data:
+            raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"No Data Available For This Role Id: {role_id}"
+        )
+        return data
+            
 
+@router.put("/function/", dependencies=[Depends(roles_required("admin"))])
+async def update_functions(request: UpateRoleFunction, db: Session = Depends(get_db)):
+    exists_role = get_function(db, request.function_id)
+    if exists_role:
+        update_function(db,request)
+        raise HTTPException(status_code=status.HTTP_200_OK, detail=f"Function '{request.function}' updated Successfully")
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Function id: '{request.function_id}' is not found"
+        )
 
 @router.delete("/functions/{id}", dependencies=[Depends(roles_required("admin"))])
 def delete_existing_role_function(id: int, db: Session = Depends(get_db)):
     db_role_function = delete_role_function(db, id)
     if db_role_function is None:
-        raise HTTPException(status_code=404, detail="Role Function not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Role Function for id:'{id}' is not found")
     return db_role_function

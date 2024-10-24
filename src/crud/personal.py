@@ -26,12 +26,12 @@ def create_employee(db: Session, employee: EmployeeCreate):
     )
     if len(str(employee.contactnumber)) != 10:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Contact number  must be 10 numbers",
         )
     if exist_number or exist_email:
         raise HTTPException(
-            status_code=status.HTTP_208_ALREADY_REPORTED,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Contact number or email address already exists",
         )
 
@@ -79,7 +79,7 @@ def create_employee(db: Session, employee: EmployeeCreate):
     role = db.query(Role).filter(Role.name == "employee").first()
     if not role:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=" Default Role is not Found "
+            status_code=status.HTTP_404_NOT_FOUND, detail=" Default Role is not Found Please contact Admin To Create Role"
         )
     db_employee_role = (
         db.query(employee_role)
@@ -105,9 +105,24 @@ def create_employee(db: Session, employee: EmployeeCreate):
 
 
 def get_employee(db: Session, employee_id: str):
-    data=db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id == employee_id).first()
-    return data
+    data = db.query(EmployeeOnboarding).filter(EmployeeOnboarding.employment_id == employee_id).first()
+    
+    if not data:
+        raise HTTPException(status_code=404, detail=f"Employee {employee_id} is not found")
 
+    return {
+        "id": data.id,
+        "employment_id": data.employment_id,
+        "firstname": data.firstname,
+        "lastname": data.lastname,
+        "emailaddress": data.emailaddress,
+        "contactnumber": data.contactnumber,
+        "dateofbirth": str(data.dateofbirth),
+        "address": data.address,
+        "gender": data.gender,
+        "nationality": data.nationality,
+        "maritalstatus": data.maritalstatus,
+    }
 
 
 def update_employee(db: Session, employee_id: str, update_data: EmployeeUpdate):
@@ -128,8 +143,8 @@ def update_employee(db: Session, employee_id: str, update_data: EmployeeUpdate):
         )
         if exist_number and exist_number.employment_id != employee_id:
             raise HTTPException(
-                status_code=status.HTTP_208_ALREADY_REPORTED,
-                detail="Contact number already exists",
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Contact number '{update_data.contactnumber}' already exists",
             )
 
     if update_data.emailaddress is not None:
@@ -140,8 +155,8 @@ def update_employee(db: Session, employee_id: str, update_data: EmployeeUpdate):
         )
         if exist_email and exist_email.employment_id != employee_id:
             raise HTTPException(
-                status_code=status.HTTP_208_ALREADY_REPORTED,
-                detail="Email address already exists",
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Email address '{update_data.emailaddress}' already exists",
             )
 
     for key, value in update_data.dict(exclude_unset=True).items():

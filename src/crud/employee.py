@@ -29,8 +29,8 @@ def create_employee_employment_details(
 
         if existing_employee:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Employee with the given employee_id or email already exists."
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Employee with the given employee_id {employee_employment_data.employment_id} or email {employee_employment_data.email} already exists."
             )
 
         # Validate EmployeeOnboarding record exists
@@ -66,7 +66,7 @@ def create_employee_employment_details(
         if not inter_data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reporting manager is not associated with a role."
+                detail=f"Reporting manager is not associated with a role {employee_role}."
             )
 
         # Create new employee employment details
@@ -103,6 +103,8 @@ def get_all_employee_employment_details(db: Session, employee_id: str):
         .filter(EmployeeEmploymentDetails.employee_id == employee_id)
         .first()
     )
+    if not emp:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f" There is  No Employee Details for this id :{employee_id}. Please check the Personal Details for this employee exist")
     return emp
 
 
@@ -116,7 +118,7 @@ def get_all_employee_teamlead(db: Session, employee_id: str, reporting_manager: 
         .first()
     )
     if not db_employee:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Can Not Access Employee Details")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Can Not Access Employee Details with the role 'Teamlead' ")
     return db_employee
 
 def update_employee_employment_details(
@@ -145,14 +147,14 @@ def update_employee_employment_details(
         if not role.name == "teamlead" and not role.name == "admin":
                 raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reporting_manager is not associated with role",
+                detail="Reporting_manager is not associated with role 'Teamlead' ",
             )
 
         # If no reporting manager is found, raise an HTTP exception
         if not reporting_manager:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reporting_manager id should not be empty or was not found",
+                detail="Reporting_manager id should not be empty (or) Reporting_manager  not found",
             )
 
         # Check if the reporting manager is associated with a role
@@ -165,7 +167,7 @@ def update_employee_employment_details(
         if not inter_data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Reporting manager is not associated with a role",
+                detail="Reporting manager is not associated with a role,'Teamlead' ",
             )
         
         # Update the employee employment record with the reporting manager

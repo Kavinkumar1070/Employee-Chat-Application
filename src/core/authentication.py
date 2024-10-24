@@ -156,7 +156,7 @@ def get_current_employee_roles(
     )
     if not roles:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="User does not have any assigned roles",
         )
     return roles

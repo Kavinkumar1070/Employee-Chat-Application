@@ -1,177 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot UI</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-    <link rel="stylesheet" href="/templates/newstyle.css">
-    <style>
-        /* Add styles to ensure the chat UI is visible */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 400px; /* Adjust height as needed */
-            overflow-y: auto;
-            border-radius: 12px; /* Rounded corners */
-            border: 1px solid #ddd; /* Light border */
-            padding: 15px; /* Increased padding for better spacing */
-            background: linear-gradient(145deg, #ffffff, #f9f9f9); /* Subtle gradient background */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-            font-family: 'Roboto', sans-serif; /* Ensure consistent font */
-            color: #333; /* Text color for readability */
-        }
-        
-        .message {
-            padding: 10px;
-            border-radius: 10px; /* Rounded corners for messages */
-            margin: 5px 0;
-            max-width: 80%;
-            word-wrap: break-word; /* Handle long words */
-        }
-        
-
-        
-
-        .input-box {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        #send-button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        #send-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-    </style>
+    <link rel="stylesheet" href="/templates/onstyle.css">
 </head>
+<style>
+    .home-btn {
+        background-color: #697565;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        font-size: 16px;
+        font-weight: 600;
+    }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/styles.css">
-    <style>
-    
-    </style>
-</head>
+    .home-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .choices-container {
+        margin-top: 10px;
+    }
+
+    .choice-btn {
+        position: relative;
+        overflow: hidden;
+        background-color: #616361;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        margin: 5px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .choice-btn:hover {
+        background-color: #5a654b;
+        transform: scale(1.05);
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .choice-btn:active::after {
+        content: "";
+        display: block;
+        position: absolute;
+        width: 300%;
+        height: 300%;
+        background: rgba(255, 255, 255, 0.2);
+        top: 50%;
+        left: 50%;
+        pointer-events: none;
+        transform: translate(-50%, -50%) scale(0);
+        border-radius: 50%;
+        animation: ripple 0.6s ease-out;
+    }
+
+    @keyframes ripple {
+        0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 1;
+        }
+
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0;
+        }
+    }
+
+    .choice-btn.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+
 <body>
-    <header class="header">
-        <nav class="nav container">
-            <div class="nav__data">
-                <a href="/templates/samplechatbot.html" class="nav__logo">
-                    <i class="ri-code-s-slash-line"></i> CodeBot
-                </a>
-                
-                <div class="nav__toggle" id="nav-toggle">
-                    <i class="ri-menu-line nav__toggle-menu"></i>
-                    <i class="ri-close-line nav__toggle-close"></i>
-                </div>
-            </div>
-
-            <!--=============== NAV MENU ===============-->
-            <div class="nav__menu" id="nav-menu">
-                <ul class="nav__list">
-                    <li>
-                        <a href="/templates/front_page.html" class="nav__link">Home</a>
-                    </li>
-                        <a href="/templates/login.html" class="nav__link">Login</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </header>
-    <body>
-        <div class="acontainer">
-            <h1><span id="welcome-message" class="highlight">Welcome New Employee</span></h1>
-            <h2 class="subtitle">How can I assist you today?</h2>
-            <h2 class="subtitle">Hello, I am AI Registration Bot for New Employee.</h2>
-            <div class="chat-container">
-                <div class="chat-box" id="chat-box">
-                    <div class="card-container" id="lists">
-                        <div class="card">Enter "Onboard" for Registration.</div>
-                        <div class="card">Enter "Quit" to return to the Login Screen.</div>
-                    </div>
+    <div class="main-content">
+        <div class="headerbox">
+            <p id="welcome-message" class="para">Welcome New Employee</p>
+        </div>
+        <div class="chat-container">
+            <div class="chat-box" id="chat-box">
+                <div id="initial">
+                    <p>Hello, I am AI Registration Bot for New Employee Registration.</p>
+                    <ul>
+                        <!-- Updated to call the function that sends the message automatically -->
+                        <li>Enter or click <b><a href="#" onclick="populateAndSend('Onboard')">Onboard</a></b> for
+                            Registration</li>
+                        <li>Enter or click <b><a href="#" onclick="populateAndSend('Quit')">Quit</a></b> for return to
+                            Login Screen</li>
+                    </ul>
                 </div>
             </div>
             <div class="input-box">
                 <input type="text" id="user-input" placeholder="Type a message...">
-                <button id="send-button" onclick="sendMessage()">
-                    <i class="fa fa-paper-plane" style="font-size: 1.5em;"></i>
-    
-                </button>
+                <button onclick="sendMessage()">Send</button>
             </div>
         </div>
         <script>
             const chatBox = document.getElementById('chat-box');
             const userInput = document.getElementById('user-input');
-            const initialMessage = document.getElementById('lists');
-    
-            // Ensure the WebSocket URL is correct
+            const sendButton = document.querySelector('.input-box button'); // Button element
+            const initialMessage = document.getElementById('initial');
+        
             const websocket = new WebSocket("ws://127.0.0.1:8000/ws/onboard");
-    
+        
             websocket.onopen = () => {
                 console.log("WebSocket connection established.");
             };
-    
+        
             websocket.onmessage = (event) => {
                 const message = event.data;
-    
-                // If the server sends "navigate", redirect the user
+        
+                // Handle the navigation command
                 if (message === "navigate") {
-                    window.location.href = "/templates/index.html";  // Update this URL as needed
-                } else {
+                    window.location.href = "/templates/index.html";  // Update URL as needed
+                }
+                // Handle choices being sent by the bot
+                else if (message.includes("Choices are:")) {
+                    const promptMessage = message.split("Choices are:");
+                    const choices = promptMessage[1].trim();
+        
+                    // Add the bot's message along with the choices
+                    addMessageWithChoices(promptMessage[0].trim(), choices);
+                }
+                // Handle standard bot responses
+                else {
                     addMessageToChat(message, 'bot');
                 }
             };
-    
+        
+            function addMessageWithChoices(message, choices) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', 'bot');
+                messageDiv.textContent = message;
+        
+                // Create a container for choice buttons
+                const choicesContainer = document.createElement('div');
+                choicesContainer.classList.add('choices-container');
+        
+                // Create buttons for each choice
+                const choicesArray = choices.split(',');  // Assuming choices are comma-separated
+                choicesArray.forEach((choice) => {
+                    const choiceButton = document.createElement('button');
+                    choiceButton.textContent = choice.trim();
+                    choiceButton.classList.add('choice-btn');
+                    choiceButton.setAttribute('data-value', choice.trim());
+        
+                    // Add click event listener for choice selection
+                    choiceButton.addEventListener('click', () => {
+                        handleChoiceSelection(choice.trim());
+                        disableChoicesContainer(choicesContainer);
+                    });
+        
+                    choicesContainer.appendChild(choiceButton);
+                });
+        
+                messageDiv.appendChild(choicesContainer);
+                chatBox.appendChild(messageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the bottom
+        
+                // Disable input until a choice is made
+                userInput.disabled = true;
+                sendButton.disabled = true;
+            }
+        
+            function handleChoiceSelection(choice) {
+                // Send the selected choice as a message
+                sendMessageRadio(choice);
+        
+                // Re-enable the input after a choice is made
+                userInput.disabled = false;
+                sendButton.disabled = false;
+            }
+        
+            function disableChoicesContainer(container) {
+                const buttons = container.querySelectorAll('.choice-btn');
+                buttons.forEach(button => {
+                    button.disabled = true;  // Disable each button after selection
+                    button.classList.add('disabled');  // Optionally style disabled buttons
+                });
+            }
+        
+            // Send message through WebSocket
             function sendMessage() {
-                const message = userInput.value.trim();  // Trim whitespace
-                if (message === "") return;  // Don't send empty messages
-            
+                const message = userInput.value.trim();
+                if (message === "") return;  // Prevent empty messages
+        
                 if (initialMessage) {
-                    initialMessage.style.display = 'none';
+                    initialMessage.style.display = 'none';  // Hide initial message
                 }
-            
+        
                 addMessageToChat(message, 'user');
                 websocket.send(JSON.stringify({ message: message }));
-            
-                userInput.value = "";
+        
+                userInput.value = "";  // Clear input after sending
             }
-    
+        
+            // Send radio-style message directly (used for choices)
+            function sendMessageRadio(choice) {
+                addMessageToChat(choice, 'user');  // Display the choice in chat
+                websocket.send(JSON.stringify({ message: choice }));  // Send choice to server
+            }
+        
             function addMessageToChat(message, sender) {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', sender);
                 messageElement.textContent = message;
                 chatBox.appendChild(messageElement);
-    
-                // Scroll to the bottom of the chat box
-                chatBox.scrollTop = chatBox.scrollHeight;
+                chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to bottom of chat
             }
-    
-            // Handle "Enter" keypress to send the message
+        
+            // Handle Enter key to send message
             userInput.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter') {
                     sendMessage();
                 }
             });
-        </script>
-    </body>
-    </html>
-
-    <script src="/static/js/main.js"></script>
+        
+            // Populate input field and send message automatically
+            function populateAndSend(text) {
+                userInput.value = text;
+                sendMessage();
+            }
+        </script>        
+    </div>
 </body>
+
 </html>

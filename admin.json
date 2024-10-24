@@ -18,9 +18,9 @@
                 "assigned": "None"
             },
             "dateofbirth": {
-                "description": "Date of birth of the employee in year month day format Ex:YYYY-MM-DD",
+                "description": "Date of birth of the employee in year month day format Ex:DD-MM-YYYY",
                 "datatype": "date",
-                "format": "%Y-%m-%d",
+                "format": "%d-%m-%Y",
                 "required": true,
                 "assigned": "None"
             },
@@ -106,9 +106,9 @@
                 "assigned": "None"
             },
             "dateofbirth": {
-                "description": "Date of birth of the employee in YYYY-MM-DD format",
+                "description": "Date of birth of the employee in DD-MM-YYYY format",
                 "datatype": "date",
-                "format": "%Y-%m-%d",
+                "format": "%d-%m-%Y",
                 "required": false,
                 "assigned": "None"
             },
@@ -209,9 +209,9 @@
                 "assigned": "None"
             },
             "start_date": {
-                "description": "Start date of the employee in YYYY-MM-DD format",
+                "description": "Start date of the employee in DD-MM-YYYY format",
                 "datatype": "date",
-                "format": "%Y-%m-%d",
+                "format": "%d-%m-%Y",
                 "required": false,
                 "assigned": "None"
             },
@@ -341,11 +341,6 @@
         "url": "http://127.0.0.1:8000/admin/roles/",
         "method": "GET",
         "payload": {
-            "id": {
-                "description": "Role id to retrieve role details",
-                "datatype": "integer",
-                "required": false
-            }
         }
     },
     "assign role to employee": {
@@ -382,7 +377,7 @@
                 "assigned": "None"
             },
             "function": {
-                "description": "new work allocated to role",
+                "description": "New Function allocated to role",
                 "datatype": "string",
                 "required": true,
                 "assigned": "None"
@@ -391,6 +386,32 @@
                 "description": "JSON file name (ex.admin.json)",
                 "datatype": "string",
                 "required": true,
+                "assigned": "None"
+            }
+        }
+    },
+    "update role function": {
+        "project": "update role function",
+        "project description": "Update  a new role based  work or function id .",
+        "url": "http://127.0.0.1:8000/admin/roles/function/",
+        "method": "PUT",
+        "payload": {
+            "function_id": {
+                "description": "Function ID for Update function",
+                "datatype": "integer",
+                "required": true,
+                "assigned": "None"
+            },
+            "function": {
+                "description": "update function description for role",
+                "datatype": "string",
+                "required": false,
+                "assigned": "None"
+            },
+            "jsonfile": {
+                "description": "JSON file name (ex.admin.json)",
+                "datatype": "string",
+                "required": false,
                 "assigned": "None"
             }
         }
@@ -430,23 +451,23 @@
         "method": "POST",
         "payload": {
             "leave_type": {
-                "description": "Type of leave  ['sick','personal','vacation','unpaid']",
+                "description": "Type of leave ",
                 "datatype": "choices",
                 "required": true,
                 "choices":["sick","personal","vacation","unpaid"],
                 "assigned": "None"
             },
             "duration": {
-                "description": "Duration of the leave ['oneday', 'halfday']",
+                "description": "Duration of the leave ",
                 "datatype": "choices",
                 "choices": ["oneday", "halfday"],
                 "required": true,
                 "assigned": "None"
             },
             "start_date": {
-                "description": "Start date of the leave in YYYY-MM-DD format",
+                "description": "Start date of the leave in DD-MM-YYYY format",
                 "datatype": "date",
-                "format": "%Y-%m-%d",
+                "format": "%d-%m-%Y",
                 "required": true,
                 "assigned": "None"
             },
@@ -619,13 +640,13 @@
             "new_password": {
                 "description": "new email password",
                 "datatype": "string",
-                "required": false,
+                "required": true,
                 "assigned": "None"
             },
             "confirm_password": {
                 "description": "confirm new email password",
                 "datatype": "string",
-                "required": false,
+                "required": true,
                 "assigned": "None"
             }
             

@@ -23,11 +23,11 @@ async def onboard_personal_details(websocket: WebSocket, details: dict):
     try:
         # Initialize HTTP client with timeout
         async with httpx.AsyncClient(timeout=timeout_seconds) as client:
-
-            response = await client.post(url, json=payload)
+            response = await client.post(url, json=payload)            
             response.raise_for_status()             
             response_data = response.json()
-            response_data = response_data.get('detail')
+            response_data = response_data.get('detail')            
+        
             return response_data
  
     except httpx.HTTPStatusError as e:
@@ -66,16 +66,71 @@ def generate_html_table(data):
             if key not in headers:
                 headers.append(key)
     
-    # Start building the HTML for the table with styles for horizontal scrolling
+    # Start building the HTML for the table with modern styles and black borders
     table = '''
     <!DOCTYPE html>
     <html>
     <head>
         <style>
-            table { width: 100%; }
-            th, td { border: 1px solid black; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
-            .table-wrapper { width: 100%; overflow-x: auto; }
+           body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f8;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .table-wrapper {
+            width: 100%; /* Make the wrapper take full width of its parent */
+            max-width:990px; /* Limit the maximum width */
+            overflow-x: auto; /* Allow horizontal scrolling if needed */
+            margin: 20px auto; /* Center the wrapper and add margin */
+           b padding: 0 15px; /* Add some padding for smaller screens */
+            ox-sizing: border-box; /* Include padding in the width calculation */
+        }
+        table {
+            width: 100%; /* Ensure table takes the full width of the wrapper */
+            border-collapse: collapse;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0 auto; /* Center the table within the wrapper */
+            border: 2px solid black;  /* Black border around the table */
+            border-radius: 8px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid black;  /* Black border around cells */
+            white-space: nowrap; /* Prevent text from wrapping */
+        }
+        th {
+            background-color: #3C3D37;
+            color: #fff;
+            text-transform: uppercase;
+            border-bottom: 3px solid #000;  /* Thick bottom border for header */
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        td {
+            transition: background-color 0.3s ease;
+        }
+
+        /* Responsive design adjustments */
+        @media (max-width: 768px) {
+            .table-wrapper {
+                padding: 0 10px; /* Adjust padding for smaller screens */
+            }
+            table {
+                font-size: 14px; /* Reduce font size for smaller screens */
+            }
+        }
+        @media (max-width: 1024px) {
+            .table-wrapper {
+                padding: 0 10px; /* Adjust padding for smaller screens */
+            }
+            table {
+                font-size: 14px; /* Reduce font size for smaller screens */
+            }
+        }
         </style>
     </head>
     <body>
@@ -83,7 +138,7 @@ def generate_html_table(data):
             <table>
                 <thead>
                     <tr>'''
-    
+
     # Create table headers
     for header in headers:
         table += f'<th>{header}</th>'
@@ -109,6 +164,9 @@ def generate_html_table(data):
     '''
     
     return table
+
+
+
 
 async def database_operation(websocket: WebSocket, details: dict):
     url_template = details.get('url')
@@ -149,43 +207,31 @@ async def database_operation(websocket: WebSocket, details: dict):
         async with httpx.AsyncClient(timeout=timeout_seconds) as client:
             response = await method_dispatch[method](client)
             print('__________')
-            if response.status_code == 404 :
+            if response.status_code == 500 :
                 error_message = response.text
                 print(f"Error: {error_message}")
-                error_message = json.loads(error_message)
-                await websocket.send_text(error_message['detail'])
-                return "Error","Detail"
-            if response.status_code >= 400:
-            # Capture and log the full response to understand the issue
+                response_data = error_message
+                return response_data,payload
+            
+            if response.status_code >= 400 :
                 error_message = response.text
                 print(f"Error: {error_message}")
-                return "payload", "error"  
-            print('__________')
+                response_data = error_message
+                return response_data,payload
+            
             response_data = response.json()
             print(response_data)
-            if method == 'GET':
+            
+            if method == 'GET':                      #"Table","Return"
                 html_table = generate_html_table(response_data)
-                await websocket.send_text(f"Request successful. Data:<br>{html_table}")
-                return "Error","Detail"
-            else:
-                
+                await websocket.send_text(f"{html_table}")
+                return "Table","Return"
+            else:                                    #result and payload, result and not payload
                 return response_data,payload
-
-    except httpx.HTTPStatusError as e:
-        error_message = e.response.text
-        error_message = json.loads(error_message)
-        await websocket.send_text(error_message['detail'])
-        return "Error","Detail"
-
-    except httpx.RequestError as e:
-        error_message = f"Request error occurred: {str(e)}"
-        await websocket.send_text(error_message)
-        return "Backend","Error"
 
     except Exception as e:
         error_message = f"An unexpected error occurred: {str(e)}"
         await websocket.send_text(error_message)
-        return "Backend","Error"
 
 
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path,status
 from sqlalchemy.orm import Session
 from src.core.database import get_db
 from src.core.authentication import roles_required
@@ -39,7 +39,7 @@ from src.crud.leave import (
 
 #personal
 router = APIRouter(
-    prefix="/admin", tags=["admin"], responses={400: {"message": "Not found"}}
+    prefix="/admin", tags=["admin"], responses={400: {"detail": "Not found"}}
 )
 
 
@@ -57,7 +57,7 @@ async def read_employee_route(
         print(db_employee)
         return db_employee
     else:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee Id:{employee_id} not found")
 
 
 
@@ -77,10 +77,10 @@ async def update_employee_data(
     if employee_role == "admin":
         updated_employee = update_employee(db, employee_id, employee_update)
     else:
-        raise HTTPException(status_code=403, detail="Unauthorized role")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unauthorized role Only Admin can Access")
 
     if updated_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee Id:{employee_id} not found")
     
     return updated_employee
 
@@ -92,8 +92,8 @@ async def update_employee_data(
 async def delete_employee_route(employee_id: str, db: Session = Depends(get_db)):
     db_employee = delete_employee_employment_details(db, employee_id)
     if db_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
-    return {"details": "employee deleted successfully"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee Id:{employee_id} not found")
+    return {"details": f"employee {employee_id} deleted successfully"}
 
 
 @router.post("/employees/", dependencies=[Depends(roles_required("admin"))])
@@ -130,6 +130,9 @@ async def read_employee(
 
     # Prepare the response with employee details
         employee_details = {
+            "id":db_employee.id,
+            "employee_data":db_employee.employee.employment_id,
+            "employee_name":db_employee.employee.firstname,
             "employee_email": db_employee.employee_email,
             "job_position": db_employee.job_position,
             "department": db_employee.department,
@@ -140,14 +143,13 @@ async def read_employee(
             "basic_salary": db_employee.basic_salary,
             "is_active": db_employee.is_active,
             "releave_date": str(db_employee.releave_date),
-            "employee_data":db_employee.employee.employment_id,
-            "employee_name":db_employee.employee.firstname
+
         }
 
         return employee_details
 
     if db_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee Id:{employee_id} not found")
 
 
 @router.put("/employees/update/admin", dependencies=[Depends(roles_required("admin"))])
@@ -156,7 +158,7 @@ async def update_employee_admin(
 ):
     db_employee = update_employee_employment_details(db, employee_update)
     if db_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee Id:{employee_update.employment_id} not found")
     return db_employee
 
 
@@ -166,8 +168,8 @@ async def update_employee_admin(
 async def delete_employee_details(employee_id: str, db: Session = Depends(get_db)):
     db_employee = delete_employee_employment_details(db, employee_id=employee_id)
     if db_employee is None:
-        raise HTTPException(status_code=404, detail="Employee not found")
-    return {"message": "The Employee is Deleted Successfully"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found")
+    return {"detail": f"The Employee '{employee_id}' is Deleted Successfully"}
 
 
 @router.get(
@@ -182,9 +184,9 @@ def get_leave_by(
     if employee_role.name == "admin":
         db_leave = get_leave_by_id(db,employee_id)
     if not db_leave:
-        raise HTTPException(status_code=404, detail="Leave not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No Pending Leave for this Employee {employee_id}")
     leave_details = [
-        {"employee_id": leave.employee.employee_id, "leave_id": leave.id}
+        {"leave_id": leave.id,"employee_id": leave.employee.employee_id,"date":leave.start_date,"Reason":leave.leave_type}
         for leave in db_leave
     ]
 
@@ -204,9 +206,10 @@ def get_leave_by_month(
     current_employee_id = current_employee.employment_id
     employee_role = get_current_employee_roles(current_employee.id, db)
     if employee_role.name == "admin":
-        return get_employee_leave_by_month(db, employee_id, monthnumber, yearnumber)
-    return {"detail": "No leaves this Month"}
-
+        data= get_employee_leave_by_month(db, employee_id, monthnumber, yearnumber)
+        if not  data:
+            return {"detail":f"There is  No leaves this Month for Employee {employee_id}"}
+        return data
 
 @router.get(
     "/leaves/{employee_id}", dependencies=[Depends(roles_required("employee", "teamlead", "admin"))]
@@ -221,9 +224,9 @@ def get_leaves_by_employee(
     if employee_role.name == "admin":
         db_employee = get_leave_by_employee_id(db, employee_id)
     if not employee_role.name=="admin":
-        raise HTTPException(status_code=404, detail="Not Authorized for this action ")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Authorized for this action ")
     if not db_employee:
-        raise HTTPException(status_code=404, detail="Employee not applied for leave")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Employee {employee_id} not applied for leave")
     return db_employee
 
 
@@ -238,8 +241,8 @@ def delete_leave(
 ):
     success = delete_employee_leave(db, current_user.id, leave_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Leave not found")
-    return {"leave deleted successfully"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Leave id '{leave_id}' not found")
+    return {"details":f"leave id :{leave_id} deleted successfully"}
 
 
 @router.put("/update/leave/calender/",dependencies=[Depends(roles_required("admin"))])

@@ -3,58 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Success</title>
+    <title>Internal Server Error</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            background-color: #ffffff; /* Single background color */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
         }
+
         .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #f7f7f8;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
-            width: 300px;
+            width: 350px;
+            transform: translateY(-20px);
+            animation: slideDown 1s ease forwards;
         }
+
+        @keyframes slideDown {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
         h2 {
-            color: #4CAF50;
-            margin-bottom: 20px;
+            color: #ff5f6d;
+            font-size: 24px;
+            margin-bottom: 10px;
         }
+
         p {
             font-size: 18px;
+            color: #333;
             margin-bottom: 20px;
+            animation: fadeIn 2s ease;
         }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
         .home-btn {
             background-color: #4CAF50;
             color: white;
-            padding: 10px 20px;
+            padding: 10px 25px;
             border: none;
-            border-radius: 4px;
+            border-radius: 50px;
             cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .error-icon {
+            font-size: 50px;
+            color: #ff5f6d;
+            margin-bottom: 20px;
+            animation: shake 0.7s ease infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
         }
     </style>
     <script>
         window.onload = function() {
             // Check if the page was reloaded
-            if (performance.navigation.type === 1) {
-                // Redirect to the onboard page after a reload
-                window.location.href = "/templates/chatbot.html";
+            if (performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+                // Redirect only on manual refresh
+                window.location.href = "../templates/index.html";
             }
         };
     </script>
-    
 </head>
 <body>
 
 <div class="container">
-    <h2>Sorry Internal Issue!</h2>
-    <p>Server or Backend error, try again after some time.</p>
+    <div class="error-icon">😢</div>
+    <h2>Oops! Something went wrong</h2>
+    <p>Internal server error. Please refresh or try again later.</p>
+    <button class="home-btn" onclick="window.location.reload();">Try Again</button>
 </div>
+
 </body>
 </html>

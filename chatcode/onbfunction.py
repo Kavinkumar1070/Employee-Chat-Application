@@ -3,20 +3,18 @@ import datetime
 import logging
 from fastapi import WebSocket
 import json
+import os
 
 logger = logging.getLogger(__name__)
-import os
 
 def get_jsonfile():
     # Get the directory where the current script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    
     # Construct the absolute path to the onboard.json file
     file_path = os.path.join(script_dir, 'onboard.json')
     
     with open(file_path, 'r') as f:
-        jsonfile = json.load(f)
-        return jsonfile
+        return json.load(f)
 
 
 def validate_input(field, value, datatype):
@@ -76,25 +74,24 @@ def validate_input(field, value, datatype):
 
     return False
 
+
 async def collect_user_input(websocket: WebSocket, jsonfile, validate_input):
     res = {}
-
     for field, props in jsonfile.items():
         while True:
-            # Prepare the message for the user
+            # Prepare the message based on the datatype
             if props['datatype'] == 'gender':
-                options = "['Male', 'Female', 'Other']"
-                message = f"Please provide {field.capitalize()} {options}: "
+                options = "Male, Female, Other"
+                message = f"Please provide {field.capitalize()}. Choices are:{options}"
+                print(message)
             elif props['datatype'] == 'maritalstatus':
-                options = "['Single', 'Married', 'Divorced', 'Widowed']"
-                message = f"Please provide {field.capitalize()} {options}: "
+                options = "Single, Married, Divorced, Widowed"
+                message = f"Please provide {field.capitalize()}. Choices are: {options}"
             elif props['datatype'] == 'date':
-                options = "must be in year-month-day format ex: YYYY-MM-DD"  
-                message = f"Please provide {field.capitalize()} {options}: "  
+                message = f"Please provide {field.capitalize()} (Format: YYYY-MM-DD or similar)"
             else:
                 message = f"Please provide {field.capitalize()}: "
 
-            # Send the message to the WebSocket client
             await websocket.send_text(message)
             logger.info(f"Message sent to WebSocket: {message}")
 
